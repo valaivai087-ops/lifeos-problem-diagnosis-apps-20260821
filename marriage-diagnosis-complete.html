@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>婚姻系統診斷 | Marriage System Diagnosis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1A2B5F;
+            --gold: #C9960C;
+            --teal: #0A7A72;
+            --light-bg: #F8F6F1;
+            --white: #FFFFFF;
+            --text-dark: #2C2C2C;
+            --text-light: #666666;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            line-height: 1.8;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background-color: var(--navy);
+            color: var(--white);
+            overflow-y: auto;
+            padding: 20px;
+            border-right: 3px solid var(--gold);
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background-color: var(--gold);
+            color: var(--navy);
+            border-left-color: var(--gold);
+        }
+
+        .nav-item.active {
+            background-color: var(--gold);
+            color: var(--navy);
+            font-weight: bold;
+            border-left-color: var(--white);
+        }
+
+        /* Main Content Area */
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            background-color: var(--white);
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--navy);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .subsection-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--teal);
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        /* Card Styling */
+        .card {
+            background-color: var(--light-bg);
+            border-left: 4px solid var(--teal);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(10, 122, 114, 0.15);
+            transform: translateX(4px);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+
+        .card-title {
+            font-weight: bold;
+            color: var(--navy);
+            font-size: 16px;
+        }
+
+        .card-toggle {
+            font-size: 20px;
+            color: var(--teal);
+            transition: transform 0.3s ease;
+        }
+
+        .card.expanded .card-toggle {
+            transform: rotate(180deg);
+        }
+
+        .card-content {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(201, 150, 12, 0.3);
+        }
+
+        .card.expanded .card-content {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bilingual-text {
+            margin-bottom: 12px;
+        }
+
+        .chinese-text {
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            line-height: 1.8;
+        }
+
+        .english-text {
+            color: var(--text-light);
+            font-size: 14px;
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        /* Matrix Table */
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .matrix-table th {
+            background-color: var(--navy);
+            color: var(--white);
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .matrix-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 13px;
+        }
+
+        .matrix-table tr:hover {
+            background-color: rgba(201, 150, 12, 0.05);
+        }
+
+        .problem-num {
+            background-color: var(--gold);
+            color: var(--navy);
+            font-weight: bold;
+            width: 40px;
+            text-align: center;
+            border-radius: 4px;
+        }
+
+        /* TTS Button */
+        .tts-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background-color: var(--teal);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .tts-btn:hover {
+            background-color: #0A7A72;
+        }
+
+        .tts-btn.playing {
+            background-color: var(--gold);
+            color: var(--navy);
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 25px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--teal);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            color: var(--text-light);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 20px;
+        }
+
+        .close:hover {
+            color: var(--navy);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 3px solid var(--gold);
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                padding: 15px;
+            }
+
+            .sidebar-title {
+                display: none;
+            }
+
+            .nav-item {
+                white-space: nowrap;
+                padding: 8px 12px;
+                margin-bottom: 0;
+                font-size: 12px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .section-title {
+                font-size: 22px;
+            }
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid var(--gold);
+            text-align: center;
+            color: var(--text-light);
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-title">📋 內容目錄</div>
+            <div class="nav-item active" onclick="showSection('phenomena')">50個問題診斷</div>
+            <div class="nav-item" onclick="showSection('redefine')">婚姻本體重新定義</div>
+            <div class="nav-item" onclick="showSection('systems')">五大系統</div>
+            <div class="nav-item" onclick="showSection('entropy')">低熵 vs 高熵</div>
+            <div class="nav-item" onclick="showSection('errors')">7個根本預測誤差</div>
+            <div class="nav-item" onclick="showSection('priority')">優先節點尋找</div>
+            <div class="nav-item" onclick="showSection('minimum')">最小介入</div>
+            <div class="nav-item" onclick="showSection('agency')">高Agency演算法</div>
+            <div class="nav-item" onclick="showSection('health')">真正的健康指標</div>
+            <div class="nav-item" onclick="showSection('evolution')">五階進化</div>
+            <div class="nav-item" onclick="showSection('formula')">最後公式</div>
+        </div>
+
+        <div class="content" id="mainContent">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script type="application/json" id="marriageData">
+    {
+        "phenomena": [
+            {"num": 1, "problem": "一說話就吵架", "pattern": "特定話題必爆", "mechanism": "雙方迅速進入防衛", "bottleneck": "沒有安全對話空間", "intervention": "情緒高時先停止議題", "problemEn": "Always argue when talking", "patternEn": "Specific topics always explode", "mechanismEn": "Both parties enter defense quickly", "bottleneckEn": "No safe conversation space", "interventionEn": "Stop the topic when emotions are high"},
+            {"num": 2, "problem": "對方說話很傷人", "pattern": "衝突時開始攻擊人格", "mechanism": "問題被轉成人格戰爭", "bottleneck": "基本尊重消失", "intervention": "只談事件，不攻擊人格", "problemEn": "Partner's words hurt", "patternEn": "Personality attacks during conflict", "mechanismEn": "Problem transforms into character war", "bottleneckEn": "Basic respect disappears", "interventionEn": "Discuss events, not personality"},
+            {"num": 3, "problem": "對方沒耐心", "pattern": "一開口就嫌煩", "mechanism": "對話被預測成負擔", "bottleneck": "聆聽意願不足", "intervention": "一次只談一件事", "problemEn": "Partner lacks patience", "patternEn": "Finds speaking annoying", "mechanismEn": "Conversation predicted as burden", "bottleneckEn": "Insufficient willingness to listen", "interventionEn": "Discuss one issue at a time"},
+            {"num": 4, "problem": "愈來愈不想說話", "pattern": "說了也沒有用", "mechanism": "長期負回饋形成放棄", "bottleneck": "對話沒有正向結果", "intervention": "每天只分享一件小事", "problemEn": "Increasingly unwilling to speak", "patternEn": "Speaking seems useless", "mechanismEn": "Long-term negative feedback creates abandonment", "bottleneckEn": "Conversation lacks positive results", "interventionEn": "Share one small thing daily"},
+            {"num": 5, "problem": "沒有共同話題", "pattern": "只剩孩子與家務", "mechanism": "關係功能化", "bottleneck": "共同經驗不足", "intervention": "每週一起做一件小事", "problemEn": "No shared topics", "patternEn": "Only children and chores left", "mechanismEn": "Relationship becomes functional", "bottleneckEn": "Insufficient shared experience", "interventionEn": "Do one small thing together weekly"},
+            {"num": 6, "problem": "不再牽手", "pattern": "身體接觸逐漸下降", "mechanism": "親密Cue消失", "bottleneck": "安全親密不足", "intervention": "從自然的小接觸開始", "problemEn": "No longer holding hands", "patternEn": "Physical contact gradually decreases", "mechanismEn": "Intimacy cues disappear", "bottleneckEn": "Insufficient secure intimacy", "interventionEn": "Start with natural small touches"},
+            {"num": 7, "problem": "不想一起出門", "pattern": "相處被預測成壓力", "mechanism": "負面經驗累積", "bottleneck": "相處成本太高", "intervention": "先安排30分鐘低壓活動", "problemEn": "Unwilling to go out together", "patternEn": "Time together predicted as stress", "mechanismEn": "Negative experiences accumulate", "bottleneckEn": "Cost of togetherness too high", "interventionEn": "Schedule 30-minute low-pressure activity"},
+            {"num": 8, "problem": "不想合照", "pattern": "關係認同感下降", "mechanism": "「我們」的表徵減弱", "bottleneck": "情感連結不足", "intervention": "先處理關係，不強迫形式", "problemEn": "Unwilling to take photos together", "patternEn": "Relationship acknowledgment decreases", "mechanismEn": "Representation of 'us' weakens", "bottleneckEn": "Insufficient emotional connection", "interventionEn": "Fix relationship first, don't force photos"},
+            {"num": 9, "problem": "沒有關心", "pattern": "彼此只處理事情", "mechanism": "婚姻變成行政系統", "bottleneck": "情緒資訊交換不足", "intervention": "每天問一次「今天還好嗎？」", "problemEn": "No care shown", "patternEn": "Only managing tasks together", "mechanismEn": "Marriage becomes administrative", "bottleneckEn": "Insufficient emotional information exchange", "interventionEn": "Ask 'How are you?' once daily"},
+            {"num": 10, "problem": "生病也感受不到陪伴", "pattern": "脆弱時仍各自處理", "mechanism": "照顧功能不足", "bottleneck": "安全基地失效", "intervention": "明確說出需要什麼支持", "problemEn": "No sense of support when sick", "patternEn": "Each handles vulnerability alone", "mechanismEn": "Care function insufficient", "bottleneckEn": "Secure base fails", "interventionEn": "Clearly state needed support"},
+            {"num": 11, "problem": "家事一直吵", "pattern": "同一件事反覆發生", "mechanism": "責任沒有制度化", "bottleneck": "分工模糊", "intervention": "寫出固定責任表", "problemEn": "Always arguing about chores", "patternEn": "Same issue repeats", "mechanismEn": "Responsibilities not institutionalized", "bottleneckEn": "Division unclear", "interventionEn": "Create fixed responsibility chart"},
+            {"num": 12, "problem": "覺得都是自己在做", "pattern": "長期付出沒有被看見", "mechanism": "貢獻資訊不透明", "bottleneck": "公平感下降", "intervention": "盤點一週實際工作量", "problemEn": "Feel like doing everything", "patternEn": "Long-term effort unseen", "mechanismEn": "Contribution information opaque", "bottleneckEn": "Fairness perception decreases", "interventionEn": "Inventory actual weekly work"},
+            {"num": 13, "problem": "金錢一直吵", "pattern": "花錢就衝突", "mechanism": "雙方安全感來源不同", "bottleneck": "財務規則不足", "intervention": "設共同／個人帳戶規則", "problemEn": "Always arguing about money", "patternEn": "Spending triggers conflict", "mechanismEn": "Different security sources", "bottleneckEn": "Insufficient financial rules", "interventionEn": "Set shared/personal account rules"},
+            {"num": 14, "problem": "一談錢就不舒服", "pattern": "金錢連到控制與安全", "mechanism": "價值模型不同", "bottleneck": "沒談底層需求", "intervention": "先談「錢對我代表什麼」", "problemEn": "Money conversations uncomfortable", "patternEn": "Money linked to control and security", "mechanismEn": "Different value models", "bottleneckEn": "Underlying needs unaddressed", "interventionEn": "Discuss what money represents"},
+            {"num": 15, "problem": "教養孩子常衝突", "pattern": "孩子出問題就互怪", "mechanism": "缺少共同目標函數", "bottleneck": "教養模型不同", "intervention": "先確認共同希望孩子成為什麼人", "problemEn": "Parenting conflicts frequent", "patternEn": "Blame each other for child issues", "mechanismEn": "No shared objective function", "bottleneckEn": "Different parenting models", "interventionEn": "Confirm shared vision for child"},
+            {"num": 16, "problem": "婆媳問題", "pattern": "同樣情境一直爆發", "mechanism": "婚姻邊界模糊", "bottleneck": "原生家庭介入過深", "intervention": "夫妻先形成共同界線", "problemEn": "In-law problems", "patternEn": "Same situation keeps erupting", "mechanismEn": "Blurred marriage boundaries", "bottleneckEn": "Original family interference deep", "interventionEn": "Form shared couple boundaries first"},
+            {"num": 17, "problem": "對方家人永遠比較重要", "pattern": "衝突時伴侶被放到最後", "mechanism": "原生家庭順位未重組", "bottleneck": "婚姻聯盟不足", "intervention": "明確討論夫妻邊界", "problemEn": "Partner's family always matters more", "patternEn": "Partner placed last during conflict", "mechanismEn": "Original family hierarchy unchanged", "bottleneckEn": "Insufficient marriage alliance", "interventionEn": "Explicitly discuss couple boundaries"},
+            {"num": 18, "problem": "手機比自己重要", "pattern": "一有空就滑", "mechanism": "高刺激取代低刺激親密", "bottleneck": "注意力被外部奪走", "intervention": "每天20分鐘無手機相處", "problemEn": "Phone more important than me", "patternEn": "Always scrolling when free", "mechanismEn": "High stimulation replaces intimacy", "bottleneckEn": "Attention stolen by external", "interventionEn": "20 minutes phone-free daily"},
+            {"num": 19, "problem": "回家各做各的", "pattern": "平行生活", "mechanism": "缺少共同節點", "bottleneck": "Shared Time不足", "intervention": "固定一個共同時間", "problemEn": "Each does their own thing at home", "patternEn": "Parallel lives", "mechanismEn": "Missing shared touchpoints", "bottleneckEn": "Insufficient shared time", "interventionEn": "Set fixed shared time"},
+            {"num": 20, "problem": "很少吃飯聊天", "pattern": "生活節奏錯開", "mechanism": "共同節律消失", "bottleneck": "沒有固定連結Cue", "intervention": "每週至少一次一起吃飯", "problemEn": "Rarely eat and talk together", "patternEn": "Daily rhythm misaligned", "mechanismEn": "Shared rhythm lost", "bottleneckEn": "No fixed connection cue", "interventionEn": "Eat together at least weekly"},
+            {"num": 21, "problem": "一直翻舊帳", "pattern": "新事件觸發舊傷", "mechanism": "舊Prediction Error未整合", "bottleneck": "問題從未真正修復", "intervention": "一次只處理一個未解事件", "problemEn": "Always bringing up past issues", "patternEn": "New events trigger old wounds", "mechanismEn": "Old prediction errors unintegrated", "bottleneckEn": "Problems never truly fixed", "interventionEn": "Address one unresolved issue at time"},
+            {"num": 22, "problem": "一件小事就爆炸", "pattern": "表面事件承載多年累積", "mechanism": "情緒負債過高", "bottleneck": "長期未處理", "intervention": "先找真正引爆點", "problemEn": "Small thing causes explosion", "patternEn": "Surface event carries years of buildup", "mechanismEn": "Emotional debt too high", "bottleneckEn": "Long-term unaddressed", "interventionEn": "Find true trigger first"},
+            {"num": 23, "problem": "很容易誤會對方", "pattern": "自動猜測意圖", "mechanism": "Mind Reading取代確認", "bottleneck": "資訊失真", "intervention": "少猜一次，多問一句", "problemEn": "Easily misunderstand partner", "patternEn": "Automatic assumption of intent", "mechanismEn": "Mind reading replaces confirmation", "bottleneckEn": "Information distortion", "interventionEn": "Guess less, ask more"},
+            {"num": 24, "problem": "覺得對方故意", "pattern": "行為直接被人格化", "mechanism": "負向歸因偏誤", "bottleneck": "缺少事實確認", "intervention": "問「剛剛你的意思是？」", "problemEn": "Think partner did it intentionally", "patternEn": "Behavior immediately personalized", "mechanismEn": "Negative attribution bias", "bottleneckEn": "Lacking fact confirmation", "interventionEn": "Ask 'What did you mean?'"},
+            {"num": 25, "problem": "對方不道歉", "pattern": "道歉被理解成認輸", "mechanism": "權力競爭", "bottleneck": "修復機制失效", "intervention": "不先爭輸贏，先確認傷害", "problemEn": "Partner won't apologize", "patternEn": "Apology seen as losing", "mechanismEn": "Power competition", "bottleneckEn": "Repair mechanism fails", "interventionEn": "Don't fight win/lose, confirm harm"},
+            {"num": 26, "problem": "道歉了還是沒改善", "pattern": "語言修復沒有行為更新", "mechanism": "Feedback沒有進系統", "bottleneck": "缺少Model Update", "intervention": "道歉後加一個具體改變", "problemEn": "Apology doesn't improve things", "patternEn": "Words don't change behavior", "mechanismEn": "Feedback not integrated", "bottleneckEn": "Missing model update", "interventionEn": "Add specific change after apology"},
+            {"num": 27, "problem": "每次都說會改", "pattern": "短期改善後恢復", "mechanism": "沒有結構改變", "bottleneck": "只靠意志力", "intervention": "把承諾改成可觀察行為", "problemEn": "Always says will change", "patternEn": "Improvement reverses quickly", "mechanismEn": "No structural change", "bottleneckEn": "Relies on willpower only", "interventionEn": "Convert promise to observable behavior"},
+            {"num": 28, "problem": "同一問題十年都在", "pattern": "Pattern高度穩定", "mechanism": "舊關係模型形成吸引子", "bottleneck": "更新能力不足", "intervention": "只挑一個循環打斷", "problemEn": "Same issue for ten years", "patternEn": "Pattern highly stable", "mechanismEn": "Old relationship model creates attractor", "bottleneckEn": "Insufficient update capacity", "interventionEn": "Interrupt one cycle only"},
+            {"num": 29, "problem": "覺得對方變了", "pattern": "生命階段已變", "mechanism": "舊User Model過期", "bottleneck": "還用十年前理解對方", "intervention": "重新認識現在的彼此", "problemEn": "Feel partner changed", "patternEn": "Life stage has shifted", "mechanismEn": "Old user model outdated", "bottleneckEn": "Still understanding from ten years ago", "interventionEn": "Relearn each other now"},
+            {"num": 30, "problem": "覺得自己變了", "pattern": "需求與價值改變", "mechanism": "個體持續演化", "bottleneck": "婚姻模型沒有同步更新", "intervention": "說清楚現在真正需要什麼", "problemEn": "Feel like I changed", "patternEn": "Needs and values shifted", "mechanismEn": "Individual keeps evolving", "bottleneckEn": "Marriage model didn't update", "interventionEn": "Clearly state current true needs"},
+            {"num": 31, "problem": "一直想改變對方", "pattern": "把控制權放在不可控變數", "mechanism": "External Control過高", "bottleneck": "自己沒有行動節點", "intervention": "先處理自己能控制的部分", "problemEn": "Always trying to change partner", "patternEn": "Control focused on uncontrollable", "mechanismEn": "External control too high", "bottleneckEn": "No action leverage for self", "interventionEn": "Address what you can control"},
+            {"num": 32, "problem": "一直忍耐", "pattern": "為避免衝突壓抑需求", "mechanism": "短期穩定換長期高熵", "bottleneck": "邊界不足", "intervention": "清楚表達一條界線", "problemEn": "Always enduring", "patternEn": "Suppress needs to avoid conflict", "mechanismEn": "Short-term stability, long-term entropy", "bottleneckEn": "Insufficient boundaries", "interventionEn": "Clearly state one boundary"},
+            {"num": 33, "problem": "不敢拒絕", "pattern": "怕拒絕破壞關係", "mechanism": "愛與服從被綁在一起", "bottleneck": "自主性不足", "intervention": "從一件小事練習拒絕", "problemEn": "Can't say no", "patternEn": "Fear refusal breaks relationship", "mechanismEn": "Love and obedience tied together", "bottleneckEn": "Insufficient autonomy", "interventionEn": "Practice refusal on small thing"},
+            {"num": 34, "problem": "為家庭失去自己", "pattern": "所有資源流向別人", "mechanism": "自我系統長期失血", "bottleneck": "個人空間不足", "intervention": "每週保留固定自己的時間", "problemEn": "Lost myself for family", "patternEn": "All resources flow to others", "mechanismEn": "Self system chronically depleted", "bottleneckEn": "Insufficient personal space", "interventionEn": "Reserve fixed personal time weekly"},
+            {"num": 35, "problem": "覺得不被愛", "pattern": "愛的輸入低於需求", "mechanism": "雙方愛的表達編碼不同", "bottleneck": "訊號沒有被接收", "intervention": "說出一個具體可做的需求", "problemEn": "Feel unloved", "patternEn": "Love input below needs", "mechanismEn": "Different love expression encoding", "bottleneckEn": "Signal not received", "interventionEn": "State one specific concrete need"},
+            {"num": 36, "problem": "付出很多仍不被珍惜", "pattern": "付出與回應長期不對稱", "mechanism": "關係交換失衡", "bottleneck": "Reciprocity不足", "intervention": "停止無限加碼，觀察互惠", "problemEn": "Give much but not appreciated", "patternEn": "Effort-response asymmetry long-term", "mechanismEn": "Relationship exchange imbalanced", "bottleneckEn": "Insufficient reciprocity", "interventionEn": "Stop escalating, observe reciprocity"},
+            {"num": 37, "problem": "覺得自己不重要", "pattern": "長期需求被忽略", "mechanism": "關係順位持續下降", "bottleneck": "自我價值綁定伴侶回應", "intervention": "把自我價值與婚姻回饋分開", "problemEn": "Feel unimportant", "patternEn": "Long-term needs ignored", "mechanismEn": "Relationship priority keeps dropping", "bottleneckEn": "Self-worth tied to partner response", "interventionEn": "Separate self-worth from feedback"},
+            {"num": 38, "problem": "一直想證明自己", "pattern": "希望對方承認自己是對的", "mechanism": "自我價值進入衝突", "bottleneck": "Validation依賴", "intervention": "少證明，多描述需求", "problemEn": "Always trying to prove myself", "patternEn": "Want partner to say I'm right", "mechanismEn": "Self-worth enters conflict", "bottleneckEn": "Validation dependent", "interventionEn": "Prove less, describe needs more"},
+            {"num": 39, "problem": "冷戰", "pattern": "斷線取代修復", "mechanism": "逃避暫時降低壓力", "bottleneck": "沒有重新連線SOP", "intervention": "約定冷靜後何時再談", "problemEn": "Silent treatment", "patternEn": "Disconnection replaces repair", "mechanismEn": "Avoidance temporarily lowers pressure", "bottleneckEn": "No reconnection SOP", "interventionEn": "Agree when to talk after cooling"},
+            {"num": 40, "problem": "大吵", "pattern": "情緒升高仍繼續輸出", "mechanism": "前額葉控制下降", "bottleneck": "缺少停止機制", "intervention": "設定暫停規則", "problemEn": "Big fights", "patternEn": "Emotions escalate, keep fighting", "mechanismEn": "Prefrontal control decreases", "bottleneckEn": "Missing stop mechanism", "interventionEn": "Set pause rules"},
+            {"num": 41, "problem": "關係沒有安全感", "pattern": "不知道下一次何時受傷", "mechanism": "不可預測性過高", "bottleneck": "信任模型受損", "intervention": "增加可預測的小承諾", "problemEn": "Relationship lacks security", "patternEn": "Don't know when next hurt", "mechanismEn": "Unpredictability too high", "bottleneckEn": "Trust model damaged", "interventionEn": "Add predictable small promises"},
+            {"num": 42, "problem": "不再相信承諾", "pattern": "說與做長期不一致", "mechanism": "Prediction Error反覆出現", "bottleneck": "信用耗盡", "intervention": "不看承諾，看持續行為", "problemEn": "Don't believe promises", "patternEn": "Words-actions long-term inconsistent", "mechanismEn": "Prediction errors repeat", "bottleneckEn": "Trust depleted", "interventionEn": "Watch consistent behavior, not words"},
+            {"num": 43, "problem": "覺得只有自己努力", "pattern": "一方持續修復、一方不參與", "mechanism": "更新成本單邊承擔", "bottleneck": "雙方更新意願不對稱", "intervention": "停止假設一人能修好兩人系統", "problemEn": "Feel like only I try", "patternEn": "Only one partner works on it", "mechanismEn": "Update cost one-sided", "bottleneckEn": "Asymmetric update willingness", "interventionEn": "Stop assuming one fixes two-person system"},
+            {"num": 44, "problem": "不知道還愛不愛", "pattern": "情緒與傷害混在一起", "mechanism": "單一問題被問成二元答案", "bottleneck": "問題定義過粗", "intervention": "改問「這段關係還有哪些功能？」", "problemEn": "Don't know if still love", "patternEn": "Emotion and hurt mixed", "mechanismEn": "One issue framed as binary", "bottleneckEn": "Question too coarse", "interventionEn": "Ask 'What functions remain?'"},
+            {"num": 45, "problem": "想離開又捨不得", "pattern": "安全、習慣、孩子、經濟、情感交織", "mechanism": "多目標函數衝突", "bottleneck": "無法一次最佳化", "intervention": "分開評估每個變數", "problemEn": "Want to leave but can't", "patternEn": "Security, habit, kids, money, emotion tangled", "mechanismEn": "Multiple objective conflicts", "bottleneckEn": "Can't optimize simultaneously", "interventionEn": "Evaluate each variable separately"},
+            {"num": 46, "problem": "為孩子勉強維持", "pattern": "把完整家庭等同孩子利益", "mechanism": "單一模型控制決策", "bottleneck": "忽略家庭互動品質", "intervention": "評估孩子實際接收的關係示範", "problemEn": "Stay for the kids", "patternEn": "Intact family equals child benefit", "mechanismEn": "Single model controls decision", "bottleneckEn": "Ignores interaction quality", "interventionEn": "Assess relationship model child receives"},
+            {"num": 47, "problem": "害怕一個人", "pattern": "婚姻同時提供生活結構", "mechanism": "未知成本被放大", "bottleneck": "外部依賴高", "intervention": "增加自己的生活自主能力", "problemEn": "Fear being alone", "patternEn": "Marriage provides life structure", "mechanismEn": "Unknown cost amplified", "bottleneckEn": "High external dependency", "interventionEn": "Increase personal autonomy capacity"},
+            {"num": 48, "problem": "不知道婚姻還能不能修", "pattern": "被當下情緒控制判斷", "mechanism": "缺少可觀察指標", "bottleneck": "沒有Retest條件", "intervention": "設一段觀察期與行為指標", "problemEn": "Don't know if marriage fixable", "patternEn": "Current emotion controls judgment", "mechanismEn": "Missing observable indicators", "bottleneckEn": "No retest conditions", "interventionEn": "Set observation period and behavior markers"},
+            {"num": 49, "problem": "一直問誰對誰錯", "pattern": "關係被轉成法庭", "mechanism": "贏輸取代共同目標", "bottleneck": "目標函數錯誤", "intervention": "問「什麼結果才是我們要的？」", "problemEn": "Always asking who's right", "patternEn": "Relationship becomes courtroom", "mechanismEn": "Winning replaces shared goal", "bottleneckEn": "Wrong objective function", "interventionEn": "Ask 'What outcome do we want?'"},
+            {"num": 50, "problem": "不知道下一步怎麼走", "pattern": "所有問題一次湧現", "mechanism": "系統複雜度過高", "bottleneck": "Priority Node不明", "intervention": "只找目前最大瓶頸", "problemEn": "Don't know next step", "patternEn": "All problems surface at once", "mechanismEn": "System complexity too high", "bottleneckEn": "Priority node unclear", "interventionEn": "Find current biggest bottleneck only"}
+        ]
+    }
+    </script>
+
+    <script>
+        const marriageData = JSON.parse(document.getElementById('marriageData').textContent);
+        let currentSpeaking = null;
+
+        // TTS Function
+        function speakEnglish(text, buttonElement) {
+            if (currentSpeaking) {
+                speechSynthesis.cancel();
+                currentSpeaking.classList.remove('playing');
+            }
+
+            if (speechSynthesis.speaking) return;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            buttonElement.classList.add('playing');
+            currentSpeaking = buttonElement;
+
+            utterance.onend = () => {
+                buttonElement.classList.remove('playing');
+                currentSpeaking = null;
+            };
+
+            speechSynthesis.speak(utterance);
+        }
+
+        // Card Toggle
+        function toggleCard(element) {
+            element.classList.toggle('expanded');
+        }
+
+        // Show Section
+        function showSection(sectionName) {
+            const content = document.getElementById('mainContent');
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            event.target.classList.add('active');
+
+            switch(sectionName) {
+                case 'phenomena':
+                    showPhenomena(content);
+                    break;
+                case 'redefine':
+                    showRedefine(content);
+                    break;
+                case 'systems':
+                    showSystems(content);
+                    break;
+                case 'entropy':
+                    showEntropy(content);
+                    break;
+                case 'errors':
+                    showErrors(content);
+                    break;
+                case 'priority':
+                    showPriority(content);
+                    break;
+                case 'minimum':
+                    showMinimum(content);
+                    break;
+                case 'agency':
+                    showAgency(content);
+                    break;
+                case 'health':
+                    showHealth(content);
+                    break;
+                case 'evolution':
+                    showEvolution(content);
+                    break;
+                case 'formula':
+                    showFormula(content);
+                    break;
+            }
+        }
+
+        function showPhenomena(content) {
+            let html = `
+                <div class="section">
+                    <div class="section-title">50個婚姻問題診斷矩陣 <button class="tts-btn" onclick="speakEnglish('50 Marriage Problem Diagnosis Matrix', this)" data-text="50 Marriage Problem Diagnosis Matrix">🔊 EN</button></div>
+                    <div style="margin: 20px 0;">
+                        <p style="color: var(--text-light); line-height: 1.6;">
+                            <strong style="color: var(--navy);">婚姻表面上的問題</strong>常常是：不說話、一直吵架、沒有耐心、不被理解、沒有陪伴、金錢衝突、家事不公平、教養不同、性生活改變、婆媳問題、手機比伴侶重要、愈來愈沒有話說。但這些多半只是<strong style="color: var(--teal);">Phenomenon現象</strong>。<br><br>
+                            <strong style="color: var(--navy);">真正要問的是</strong>：<span style="color: var(--gold); font-weight: bold;">到底是哪一個關係機制，持續生成現在的結果？</span>
+                        </p>
+                    </div>
+                    <div style="background-color: var(--navy); color: white; padding: 15px; border-radius: 6px; margin: 20px 0;">
+                        <p style="font-weight: bold; margin-bottom: 10px;">📊 共同母體流程：</p>
+                        <p style="font-size: 14px; line-height: 1.8;">Problem → Pattern → Mechanism → Bottleneck → Priority Node → Minimum Intervention → Action → Feedback → Prediction Error → Model Update → Retest</p>
+                    </div>
+            `;
+
+            // Create table
+            html += '<div style="overflow-x: auto;"><table class="matrix-table">';
+            html += '<thead><tr><th>#</th><th style="min-width: 120px;">問題現象 (Problem)</th><th style="min-width: 100px;">規律 (Pattern)</th><th style="min-width: 120px;">生成機制 (Mechanism)</th><th style="min-width: 120px;">最大瓶頸 (Bottleneck)</th><th style="min-width: 120px;">最小介入 (Intervention)</th></tr></thead><tbody>';
+
+            marriageData.phenomena.forEach(item => {
+                html += `<tr>
+                    <td><span class="problem-num">${item.num}</span></td>
+                    <td><strong>${item.problem}</strong></td>
+                    <td>${item.pattern}</td>
+                    <td>${item.mechanism}</td>
+                    <td>${item.bottleneck}</td>
+                    <td><strong style="color: var(--teal);">${item.intervention}</strong></td>
+                </tr>`;
+            });
+
+            html += '</tbody></table></div>';
+            html += '<div class="footer">Author: 王欣蓉 Anne Wang | Marriage System Diagnosis Framework</div>';
+            html += '</div>';
+
+            content.innerHTML = html;
+        }
+
+        function showRedefine(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">婚姻本體重新定義 <button class="tts-btn" onclick="speakEnglish('Marriage Core System Redefinition', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">❌ 婚姻不是什麼</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="bilingual-text">
+                                <div class="chinese-text">找到一個永遠不變的人。</div>
+                                <div class="english-text">Finding a person who never changes. <button class="tts-btn" onclick="speakEnglish('Finding a person who never changes', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">✅ 婚姻更像什麼</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="bilingual-text">
+                                <div class="chinese-text"><strong style="color: var(--gold); font-size: 16px;">兩個會持續變化的人，共同維護一套需要持續更新的關係系統。</strong></div>
+                                <div class="english-text"><strong>Two people who keep evolving, jointly maintaining a relationship system that needs constant updating.</strong> <button class="tts-btn" onclick="speakEnglish('Two people who keep evolving, jointly maintaining a relationship system that needs constant updating', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">🔄 什麼會變</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                人會變。<br>年齡會變。<br>身體會變。<br>工作會變。<br>孩子會長大。<br>父母會老。<br>收入會變。<br>需求會變。<br>價值排序也會變。
+                            </div>
+                            <div class="english-text">
+                                People change. Age changes. Bodies change. Work changes. Children grow. Parents age. Income changes. Needs change. Values shift. <button class="tts-btn" onclick="speakEnglish('People change. Age changes. Bodies change. Work changes. Children grow. Parents age. Income changes. Needs change. Values shift', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">⚠️ 真正危險的不是</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="bilingual-text">
+                                <div class="chinese-text">關係改變。</div>
+                                <div class="english-text">Relationship changing. <button class="tts-btn" onclick="speakEnglish('Relationship changing', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">🚨 真正危險的是</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="bilingual-text">
+                                <div class="chinese-text"><strong style="color: var(--gold);">現實已經改變，婚姻模型卻禁止更新。</strong></div>
+                                <div class="english-text"><strong>Reality has changed, but the marriage model forbids updating.</strong> <button class="tts-btn" onclick="speakEnglish('Reality has changed, but the marriage model forbids updating', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showSystems(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">婚姻真正的五大系統 <button class="tts-btn" onclick="speakEnglish('Five True Marriage Systems', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">① 安全系統 (Safety System)</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                我跟你在一起時，<br>可以放心說話嗎？<br>可以拒絕嗎？<br>可以表達不同意見嗎？<br>會不會被羞辱、威脅、攻擊或控制？<br><br><strong style="color: var(--gold);">安全是底層。沒有安全，其他技巧都只能處理表面。</strong>
+                            </div>
+                            <div class="english-text">
+                                When with you, can I speak safely? Can I refuse? Can I express different opinions? Will I be shamed, threatened, attacked, or controlled? <br><br><strong>Safety is foundational. Without it, all other skills only address surface issues.</strong> <button class="tts-btn" onclick="speakEnglish('When with you, can I speak safely? Can I refuse? Can I express different opinions? Will I be shamed, threatened, attacked, or controlled? Safety is foundational. Without it, all other skills only address surface issues', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">② 溝通系統 (Communication System)</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                <strong style="color: var(--teal);">健康循環：</strong><br>事件 → 描述 → 需求 → 確認 → 協商<br><br>
+                                <strong style="color: var(--gold);">不健康循環：</strong><br>事件 → 猜測 → 人格化 → 攻擊 → 防衛 → 冷戰
+                            </div>
+                            <div class="english-text">
+                                <strong>Healthy cycle:</strong> Event → Description → Need → Confirm → Negotiate<br><br>
+                                <strong>Unhealthy cycle:</strong> Event → Guess → Personalize → Attack → Defend → Silent treatment <button class="tts-btn" onclick="speakEnglish('Healthy cycle: Event, Description, Need, Confirm, Negotiate. Unhealthy cycle: Event, Guess, Personalize, Attack, Defend, Silent treatment', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">③ 情感系統 (Emotional System)</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                關心。陪伴。肯定。觸碰。共同時間。被理解。<br><br>
+                                <strong style="color: var(--gold);">婚姻不能只剩功能交換。</strong>
+                            </div>
+                            <div class="english-text">
+                                Care. Presence. Affirmation. Touch. Shared time. Feeling understood.<br><br>
+                                <strong>Marriage cannot be only functional exchange.</strong> <button class="tts-btn" onclick="speakEnglish('Care. Presence. Affirmation. Touch. Shared time. Feeling understood. Marriage cannot be only functional exchange', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">④ 合作系統 (Cooperation System)</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                家務、金錢、孩子、父母、健康、工作、時間。<br><br>
+                                <strong style="color: var(--gold);">婚姻其實也是一個長期共同治理系統。</strong>
+                            </div>
+                            <div class="english-text">
+                                Chores, money, children, parents, health, work, time.<br><br>
+                                <strong>Marriage is a long-term co-governance system.</strong> <button class="tts-btn" onclick="speakEnglish('Marriage is a long-term co-governance system', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">⑤ 更新系統 (Update System)</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                真正決定婚姻能不能走遠的，不是「有沒有問題」。<br><br>
+                                <strong style="color: var(--gold);">而是：出現問題之後，系統有沒有Model Update能力。</strong>
+                            </div>
+                            <div class="english-text">
+                                What determines if marriage lasts isn't whether problems exist.<br><br>
+                                <strong>It's whether the system can update its model when problems appear.</strong> <button class="tts-btn" onclick="speakEnglish('It is whether the system can update its model when problems appear', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showEntropy(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">低熵婚姻 vs 高熵婚姻 <button class="tts-btn" onclick="speakEnglish('Low Entropy vs High Entropy Marriage', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">✅ 低熵婚姻 (Low Entropy)</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                ✓ 問題可以說<br>✓ 需求可以談<br>✓ 界線可以設<br>✓ 錯誤可以承認<br>✓ 承諾可以驗證<br>✓ 衝突可以修復<br>✓ 規則可以更新<br>✓ 彼此仍有流動性
+                            </div>
+                            <div class="english-text">
+                                ✓ Problems can be discussed<br>
+                                ✓ Needs can be addressed<br>
+                                ✓ Boundaries can be set<br>
+                                ✓ Mistakes can be admitted<br>
+                                ✓ Promises can be verified<br>
+                                ✓ Conflicts can be repaired<br>
+                                ✓ Rules can be updated<br>
+                                ✓ Still have fluidity <button class="tts-btn" onclick="speakEnglish('Problems can be discussed. Needs can be addressed. Boundaries can be set. Mistakes can be admitted. Promises can be verified. Conflicts can be repaired. Rules can be updated. Still have fluidity', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">❌ 高熵婚姻 (High Entropy)</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                ✗ 不能說<br>✗ 不能問<br>✗ 不能拒絕<br>✗ 不能犯錯<br>✗ 不能改變<br>✗ 只能忍<br>✗ 只能猜<br>✗ 只能防衛<br>✗ 問題每天重複
+                            </div>
+                            <div class="english-text">
+                                ✗ Can't speak<br>
+                                ✗ Can't ask<br>
+                                ✗ Can't refuse<br>
+                                ✗ Can't make mistakes<br>
+                                ✗ Can't change<br>
+                                ✗ Only endure<br>
+                                ✗ Only guess<br>
+                                ✗ Only defend<br>
+                                ✗ Problems repeat daily <button class="tts-btn" onclick="speakEnglish('Can not speak. Can not ask. Can not refuse. Can not make mistakes. Can not change. Only endure. Only guess. Only defend. Problems repeat daily', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">⚠️ 高熵的真相</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                最後不是某一次大吵摧毀婚姻。<br><br>
+                                <strong style="color: var(--gold);">而是：大量沒有被修復的小Prediction Error長期累積。</strong>
+                            </div>
+                            <div class="english-text">
+                                The end is not one big fight destroying marriage.<br><br>
+                                <strong>It's the accumulation of countless small unrepaired prediction errors over time.</strong> <button class="tts-btn" onclick="speakEnglish('It is the accumulation of countless small unrepaired prediction errors over time', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showErrors(content) {
+            const errors = [
+                {
+                    title: 'Prediction Error 01',
+                    problem: '「只要我更好，他就會更愛我。」',
+                    problemEn: '"If I become better, he will love me more."',
+                    correction: '自己的成長值得做，但別人的愛與尊重不是你能單方面控制的輸出。',
+                    correctionEn: 'Your growth deserves to happen, but others\' love and respect are not outputs you can unilaterally control.'
+                },
+                {
+                    title: 'Prediction Error 02',
+                    problem: '「我再忍一下，關係自然會變好。」',
+                    problemEn: '"If I endure a bit longer, the relationship will naturally improve."',
+                    correction: '沒有Feedback與Model Update，時間通常只會讓Pattern更加固化。',
+                    correctionEn: 'Without feedback and model update, time usually just solidifies patterns.'
+                },
+                {
+                    title: 'Prediction Error 03',
+                    problem: '「沒有吵架就是婚姻穩定。」',
+                    problemEn: '"No arguments means a stable marriage."',
+                    correction: '沉默也可能只是系統停止交換真實資訊。',
+                    correctionEn: 'Silence might just mean the system stopped exchanging real information.'
+                },
+                {
+                    title: 'Prediction Error 04',
+                    problem: '「結婚久了，本來就沒有感情。」',
+                    problemEn: '"After years of marriage, love naturally fades."',
+                    correction: '熟悉會降低新鮮感，但不等於尊重、關心與親密必須消失。',
+                    correctionEn: 'Familiarity decreases novelty, but doesn\'t mean respect, care, and intimacy must disappear.'
+                },
+                {
+                    title: 'Prediction Error 05',
+                    problem: '「他說會改，所以問題解決了。」',
+                    problemEn: '"He said he\'ll change, so the problem is solved."',
+                    correction: '真正的Model Update必須出現在持續行為。',
+                    correctionEn: 'True model update must show in sustained behavior.'
+                },
+                {
+                    title: 'Prediction Error 06',
+                    problem: '「只要一個人夠努力，就能救婚姻。」',
+                    problemEn: '"If one person tries hard enough, they can save the marriage."',
+                    correction: '一個人可以改變互動的一部分，但無法單方面生成雙向尊重、信任與合作。',
+                    correctionEn: 'One person can change part of interaction, but cannot unilaterally create mutual respect, trust, and cooperation.'
+                },
+                {
+                    title: 'Prediction Error 07',
+                    problem: '「離開就是失敗，留下就是成功。」',
+                    problemEn: '"Leaving means failure, staying means success."',
+                    correction: '這是錯誤的二元目標函數。真正問題是：哪一種結構能讓生命長期維持安全、尊嚴、健康、成長與自主？',
+                    correctionEn: 'This is wrong binary thinking. Real question: Which structure allows long-term safety, dignity, health, growth, and autonomy?'
+                }
+            ];
+
+            let html = '<div class="section"><div class="section-title">婚姻最大的7個Prediction Error <button class="tts-btn" onclick="speakEnglish(\'Seven Major Prediction Errors in Marriage\', this)">🔊 EN</button></div>';
+
+            errors.forEach(err => {
+                html += `
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">${err.title}</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div style="margin-bottom: 15px;">
+                                <div class="chinese-text"><strong>❌ 常見想法：</strong><br>${err.problem}</div>
+                                <div class="english-text"><strong>Common belief:</strong> ${err.problemEn} <button class="tts-btn" onclick="speakEnglish('${err.problemEn}', this)">🔊</button></div>
+                            </div>
+                            <div style="padding-top: 15px; border-top: 1px solid rgba(201, 150, 12, 0.3);">
+                                <div class="chinese-text"><strong style="color: var(--teal);">✓ 修正：</strong><br>${err.correction}</div>
+                                <div class="english-text"><strong>Correction:</strong> ${err.correctionEn} <button class="tts-btn" onclick="speakEnglish('${err.correctionEn}', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        function showPriority(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">婚姻最值得先找的Priority Node <button class="tts-btn" onclick="speakEnglish('Marriage Priority Node', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">❌ 不要一次處理所有問題</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                愛。性生活。婆媳。孩子。錢。家事。溝通。浪漫。<strong style="color: var(--gold);">全部。</strong>
+                            </div>
+                            <div class="english-text">
+                                Love. Sex. In-laws. Kids. Money. Chores. Communication. Romance. <strong>Everything.</strong> <button class="tts-btn" onclick="speakEnglish('Love. Sex. In-laws. Kids. Money. Chores. Communication. Romance. Everything', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">✅ 先問：現在最大的瓶頸是什麼？</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                <strong>如果是安全：</strong>先處理安全。<br>
+                                <strong>如果是人格羞辱：</strong>先建立界線。<br>
+                                <strong>如果是溝通：</strong>先改對話結構。<br>
+                                <strong>如果是信任：</strong>先看行為一致性。<br>
+                                <strong>如果是家務：</strong>先改分工。<br>
+                                <strong>如果是金錢：</strong>先建立財務規則。<br>
+                                <strong>如果是疏離：</strong>先增加低壓共同時間。<br>
+                                <strong>如果是一方完全沒有更新意願：</strong>那本身就是最重要的資料。
+                            </div>
+                            <div class="english-text">
+                                <strong>If safety:</strong> Address safety first.<br>
+                                <strong>If personality humiliation:</strong> Set boundaries first.<br>
+                                <strong>If communication:</strong> Change dialogue structure first.<br>
+                                <strong>If trust:</strong> Check behavior consistency first.<br>
+                                <strong>If chores:</strong> Change division of labor first.<br>
+                                <strong>If money:</strong> Establish financial rules first.<br>
+                                <strong>If distance:</strong> Add low-pressure shared time first.<br>
+                                <strong>If one lacks update willingness:</strong> That itself is important data. <button class="tts-btn" onclick="speakEnglish('If safety address it first. If personality humiliation set boundaries first. If communication change dialogue structure first. If trust check behavior consistency first. If chores change division of labor first. If money establish financial rules first. If distance add low pressure shared time first. If one lacks update willingness that itself is important data', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showMinimum(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">最小介入原則 (Minimum Intervention) <button class="tts-btn" onclick="speakEnglish('Minimum Intervention Principle', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">📉 今天先少做一件事</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                • 少猜一次。<br>
+                                • 少忍一次。<br>
+                                • 少翻一次舊帳。<br>
+                                • 少一次人格攻擊。<br>
+                                • 少一次情緒高峰時硬談。
+                            </div>
+                            <div class="english-text">
+                                • Guess less once.<br>
+                                • Endure less once.<br>
+                                • Bring up past less once.<br>
+                                • Attack personality less once.<br>
+                                • Force talk at peak emotion less once. <button class="tts-btn" onclick="speakEnglish('Guess less. Endure less. Bring up past less. Attack personality less. Force talk at peak emotion less', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">📈 再多做一件事</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                • 多確認一次。<br>
+                                • 多表達一個具體需求。<br>
+                                • 多設定一條界線。<br>
+                                • 多完成一個小承諾。<br>
+                                • 多觀察一次對方真實行為。<br>
+                                • 多保留一點自己的生活。
+                            </div>
+                            <div class="english-text">
+                                • Confirm once more.<br>
+                                • Express one concrete need.<br>
+                                • Set one boundary.<br>
+                                • Complete one small promise.<br>
+                                • Observe partner's real behavior once more.<br>
+                                • Preserve some personal life. <button class="tts-btn" onclick="speakEnglish('Confirm once more. Express one concrete need. Set one boundary. Complete one small promise. Observe partners real behavior once more. Preserve some personal life', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">💡 真正的最小介入</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                不是：<strong>「今天重新愛上對方。」</strong><br><br>
+                                而是：<strong style="color: var(--gold);">【今天讓關係少產生一點新的熵。】</strong>
+                            </div>
+                            <div class="english-text">
+                                Not: <strong>"Fall in love with partner today."</strong><br><br>
+                                Rather: <strong>"Let the relationship generate a little less new entropy today."</strong> <button class="tts-btn" onclick="speakEnglish('Let the relationship generate a little less new entropy today', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showAgency(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">高Agency演算法 <button class="tts-btn" onclick="speakEnglish('High Agency Algorithm', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">🔄 完整流程</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                <strong>事件發生。</strong><br><br>
+                                ↓<br>
+                                先不要問：「他為什麼這樣對我？」<br>
+                                先問：「客觀發生什麼？」<br>
+                                ↓<br>
+                                這是偶發事件，還是長期Pattern？<br>
+                                ↓<br>
+                                什麼Mechanism一直生成它？<br>
+                                ↓<br>
+                                真正Bottleneck是什麼？（尊重？信任？安全？溝通？互惠？親密？責任？）<br>
+                                ↓<br>
+                                哪一個Priority Node最值得先動？<br>
+                                ↓<br>
+                                我能控制什麼？<br>
+                                ↓<br>
+                                Minimum Intervention。<br>
+                                ↓<br>
+                                Action。<br>
+                                ↓<br>
+                                觀察對方真實Feedback。<br>
+                                ↓<br>
+                                Prediction Error。<br>
+                                ↓<br>
+                                原本哪個假設不成立？<br>
+                                ↓<br>
+                                Model Update。<br>
+                                ↓<br>
+                                Retest。
+                            </div>
+                            <div class="english-text">
+                                <strong>Event occurs.</strong><br><br>
+                                Don't ask: "Why did he do this to me?"<br>
+                                Ask: "What objectively happened?"<br>
+                                ↓<br>
+                                Is it one-off or long-term pattern?<br>
+                                ↓<br>
+                                What mechanism generates it?<br>
+                                ↓<br>
+                                What's the true bottleneck?<br>
+                                ↓<br>
+                                Which priority node to address first?<br>
+                                ↓<br>
+                                What can I control?<br>
+                                ↓<br>
+                                Minimum intervention.<br>
+                                ↓<br>
+                                Action.<br>
+                                ↓<br>
+                                Observe real feedback.<br>
+                                ↓<br>
+                                Prediction error.<br>
+                                ↓<br>
+                                Which assumption failed?<br>
+                                ↓<br>
+                                Model update.<br>
+                                ↓<br>
+                                Retest. <button class="tts-btn" onclick="speakEnglish('High Agency Algorithm complete flow', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showHealth(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">婚姻真正的健康指標 <button class="tts-btn" onclick="speakEnglish('True Marriage Health Indicators', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">❌ 不要只問</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="bilingual-text">
+                                <div class="chinese-text">「我們還愛不愛？」</div>
+                                <div class="english-text">"Do we still love each other?" <button class="tts-btn" onclick="speakEnglish('Do we still love each other', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">✅ 可以改問的真正指標</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                • 我能不能安全表達？<br>
+                                • 我有沒有被尊重？<br>
+                                • 我的需求能不能被聽見？<br>
+                                • 對方犯錯後會不會修正？<br>
+                                • 我犯錯後能不能修正？<br>
+                                • 我們能不能談不同意見？<br>
+                                • 承諾和行動是否一致？<br>
+                                • 付出是否長期只有單向？<br>
+                                • 關係是否允許彼此成長？<br>
+                                • 我在這段關係裡越來越像自己，還是越來越需要縮小自己？
+                            </div>
+                            <div class="english-text">
+                                • Can I express myself safely?<br>
+                                • Am I respected?<br>
+                                • Are my needs heard?<br>
+                                • Does partner correct mistakes?<br>
+                                • Can I correct my mistakes?<br>
+                                • Can we discuss differences?<br>
+                                • Do promises match actions?<br>
+                                • Is effort one-sided?<br>
+                                • Does relationship allow growth?<br>
+                                • Am I becoming more myself or shrinking? <button class="tts-btn" onclick="speakEnglish('Can I express myself safely? Am I respected? Are my needs heard? Does partner correct mistakes? Can I correct my mistakes? Can we discuss differences? Do promises match actions? Is effort one-sided? Does relationship allow growth? Am I becoming more myself or shrinking', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">💡 為什麼這些更有用</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="bilingual-text">
+                                <div class="chinese-text">這些問題比一句「他到底愛不愛我？」提供更多可用資料。</div>
+                                <div class="english-text">These questions provide more actionable data than "Does he love me?" <button class="tts-btn" onclick="speakEnglish('These questions provide more actionable data than does he love me', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showEvolution(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">婚姻真正的五階進化 <button class="tts-btn" onclick="speakEnglish('Five Stages of Marriage Evolution', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">第一階｜生存型婚姻</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">不要吵。不要離婚。撐住就好。</div>
+                            <div class="english-text">Don't fight. Don't divorce. Just survive. <button class="tts-btn" onclick="speakEnglish('Don\'t fight. Don\'t divorce. Just survive', this)">🔊</button></div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">第二階｜交易型婚姻</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">我做這些，你就應該給我那些。</div>
+                            <div class="english-text">I do this, you should do that. <button class="tts-btn" onclick="speakEnglish('I do this you should do that', this)">🔊</button></div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">第三階｜修復型婚姻</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">我們開始看見Pattern。承認問題。修改互動。</div>
+                            <div class="english-text">We begin seeing patterns. Acknowledge issues. Change interactions. <button class="tts-btn" onclick="speakEnglish('We begin seeing patterns. Acknowledge issues. Change interactions', this)">🔊</button></div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">第四階｜合作型婚姻</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">兩個獨立的人，共同治理生活。</div>
+                            <div class="english-text">Two independent people co-governing life. <button class="tts-btn" onclick="speakEnglish('Two independent people co-governing life', this)">🔊</button></div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">第五階｜生成型婚姻</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">我沒有因為愛你失去自己。你也不需要縮小自己才能愛我。兩個人的存在，讓彼此擁有更多生命可能性。</div>
+                            <div class="english-text">I didn't lose myself by loving you. You don't need to shrink to love me. Two people's existence creates more life possibilities for each other. <button class="tts-btn" onclick="speakEnglish('I did not lose myself by loving you. You do not need to shrink to love me. Two peoples existence creates more life possibilities for each other', this)">🔊</button></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showFormula(content) {
+            content.innerHTML = `
+                <div class="section">
+                    <div class="section-title">最後公式 <button class="tts-btn" onclick="speakEnglish('Final Formula', this)">🔊 EN</button></div>
+                    
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">📋 婚姻決策流程</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                婚姻事件<br>
+                                → 不是立即人格化<br>
+                                ↓ 取得資料<br>
+                                ↓ 找Pattern<br>
+                                ↓ 找Mechanism<br>
+                                ↓ 找Bottleneck<br>
+                                ↓ 找Priority Node<br>
+                                ↓ Minimum Intervention<br>
+                                ↓ Action<br>
+                                ↓ Feedback<br>
+                                ↓ Prediction Error<br>
+                                ↓ Model Update<br>
+                                ↓ Retest
+                            </div>
+                            <div class="english-text">
+                                Marriage event<br>
+                                → Not immediately personalized<br>
+                                ↓ Gather data<br>
+                                ↓ Find pattern<br>
+                                ↓ Find mechanism<br>
+                                ↓ Find bottleneck<br>
+                                ↓ Find priority node<br>
+                                ↓ Minimum intervention<br>
+                                ↓ Action<br>
+                                ↓ Feedback<br>
+                                ↓ Prediction error<br>
+                                ↓ Model update<br>
+                                ↓ Retest <button class="tts-btn" onclick="speakEnglish('Marriage event not immediately personalized. Gather data find pattern find mechanism find bottleneck find priority node minimum intervention action feedback prediction error model update retest', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">❌ 真正問題不是</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="bilingual-text">
+                                <div class="chinese-text">【這段婚姻有沒有問題？】<br>因為所有長期關係都會出現問題。</div>
+                                <div class="english-text">"Does this marriage have problems?" Because all long-term relationships have problems. <button class="tts-btn" onclick="speakEnglish('Does this marriage have problems? Because all long-term relationships have problems', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">✅ 真正問題是</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="bilingual-text">
+                                <div class="chinese-text"><strong style="color: var(--gold);">【這段關係還有沒有更新能力？】</strong></div>
+                                <div class="english-text"><strong>"Does this relationship still have update capacity?"</strong> <button class="tts-btn" onclick="speakEnglish('Does this relationship still have update capacity', this)">🔊</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">💚 有問題也能活著</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                有問題 ＋ 能說 ＋ 能修 ＋ 能更新<br>
+                                ↓<br>
+                                系統仍然具有生命力。
+                            </div>
+                            <div class="english-text">
+                                Problems + Can speak + Can repair + Can update<br>
+                                ↓<br>
+                                System still has vitality. <button class="tts-btn" onclick="speakEnglish('Problems can speak can repair can update system still has vitality', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">❌ 無法繼續</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                有問題 ＋ 不能說 ＋ 不能改 ＋ 不允許設界線 ＋ 長期重複傷害<br>
+                                ↓<br>
+                                問題就不只是一次衝突，而是結構本身正在生成傷害。
+                            </div>
+                            <div class="english-text">
+                                Problems + Can't speak + Can't change + Can't set boundaries + Repeated harm<br>
+                                ↓<br>
+                                Problem is not one conflict, but structure itself generating harm. <button class="tts-btn" onclick="speakEnglish('Problem is not one conflict but structure itself generating harm', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">🌱 真正成熟的婚姻</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                不是：永遠沒有Prediction Error。<br><br>
+                                而是：<strong style="color: var(--gold);">【每一次Prediction Error，都有機會讓兩個人重新理解彼此、修改模型、調整邊界，再決定下一步。】</strong>
+                            </div>
+                            <div class="english-text">
+                                Not: Never having prediction errors.<br><br>
+                                Rather: <strong>Each prediction error is a chance to understand each other anew, revise the model, adjust boundaries, decide next steps.</strong> <button class="tts-btn" onclick="speakEnglish('Each prediction error is a chance to understand each other anew, revise the model, adjust boundaries, decide next steps', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card expanded" onclick="toggleCard(this)">
+                        <div class="card-header">
+                            <div class="card-title">🕊️ 真正的自由</div>
+                            <span class="card-toggle">▼</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="chinese-text">
+                                不是一定留下，或一定離開。<br><br>
+                                真正的自由是：<strong style="color: var(--gold);">【不再被恐懼、習慣、舊承諾或舊模型綁架，而能根據現在的真實資料，做出符合安全、尊嚴、健康、成長與長期生命品質的選擇。】</strong>
+                            </div>
+                            <div class="english-text">
+                                Not: definitely stay or definitely leave.<br><br>
+                                <strong>True freedom: Make choices based on real data now, aligned with safety, dignity, health, growth, and long-term life quality—not bound by fear, habit, old promises, or old models.</strong> <button class="tts-btn" onclick="speakEnglish('True freedom make choices based on real data now aligned with safety, dignity, health, growth, and long-term life quality not bound by fear, habit, old promises, or old models', this)">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize
+        showPhenomena(document.getElementById('mainContent'));
+    </script>
+</body>
+</html>
