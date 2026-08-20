@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Management × Problem Diagnosis OS | 空間管理高效系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --navy: #1A2B5F;
+            --gold: #C9960C;
+            --teal: #0A7A72;
+            --light-navy: #2D4A8E;
+            --bg-light: #F8F9FA;
+            --border: #E0E4E8;
+        }
+        
+        body {
+            font-family: "Microsoft JhengHei", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: white;
+            color: var(--navy);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--light-navy) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 3px solid var(--gold);
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 1rem;
+        }
+        
+        .header-meta {
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+        
+        /* Navigation */
+        .nav-bar {
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border);
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-button {
+            flex: 1;
+            min-width: 120px;
+            padding: 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-left: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--navy);
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .nav-button:first-child {
+            border-left: 1px solid var(--border);
+        }
+        
+        .nav-button.active {
+            background: var(--navy);
+            color: white;
+            border-color: var(--navy);
+        }
+        
+        .nav-button:hover {
+            background: var(--bg-light);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        .section {
+            display: none;
+            padding: 2rem;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Problem Diagnosis Section */
+        .search-bar {
+            background: var(--bg-light);
+            padding: 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(201, 150, 12, 0.1);
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tag {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .filter-tag.active {
+            background: var(--teal);
+            color: white;
+            border-color: var(--teal);
+        }
+        
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 2rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        thead {
+            background: var(--navy);
+            color: white;
+        }
+        
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        
+        tr:hover {
+            background: var(--bg-light);
+        }
+        
+        tr.hidden {
+            display: none;
+        }
+        
+        .issue-zh {
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 0.3rem;
+        }
+        
+        .issue-en {
+            font-size: 0.9rem;
+            color: #666;
+            font-family: Georgia, serif;
+        }
+        
+        .tts-btn {
+            background: var(--teal);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .tts-btn:hover {
+            background: #089580;
+        }
+        
+        .tts-btn.playing {
+            background: var(--gold);
+        }
+        
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            padding: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            background: var(--navy);
+            color: white;
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .card-header:hover {
+            background: var(--light-navy);
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .card-toggle {
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .card.expanded .card-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+            display: none;
+            max-height: 0;
+            overflow: hidden;
+        }
+        
+        .card.expanded .card-body {
+            display: block;
+            max-height: 2000px;
+        }
+        
+        .card-content-zh {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+        
+        .card-content-en {
+            font-family: Georgia, serif;
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        /* Six Systems */
+        .system-block {
+            background: var(--bg-light);
+            border-left: 4px solid var(--gold);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+        
+        .system-num {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+        }
+        
+        .system-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+        
+        .system-zh {
+            margin-bottom: 1.5rem;
+        }
+        
+        .system-en {
+            font-family: Georgia, serif;
+            color: #555;
+            border-top: 1px solid var(--border);
+            padding-top: 1rem;
+        }
+        
+        /* Lists */
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: var(--teal);
+            font-weight: bold;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--navy);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.95rem;
+        }
+        
+        .footer-meta {
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .nav-button {
+                font-size: 0.8rem;
+                padding: 0.75rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                width: 100%;
+            }
+            
+            th, td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>空間管理 × Problem Diagnosis</h1>
+        <div class="subtitle">Space Management High Agency OS</div>
+        <div class="header-meta">從「收東西」升級成「環境自動支持你想成為的人」</div>
+    </div>
+    
+    <div class="nav-bar">
+        <button class="nav-button active" data-section="diagnosis">50 Problem Diagnosis | 50項診斷</button>
+        <button class="nav-button" data-section="frameworks">6 Core Systems | 6大系統</button>
+        <button class="nav-button" data-section="leverage">10 Levers | 10大槓桿</button>
+        <button class="nav-button" data-section="errors">Prediction Errors | 認知更新</button>
+        <button class="nav-button" data-section="evolution">5 Stages | 5階進化</button>
+        <button class="nav-button" data-section="algorithm">High Agency OS | 算法框架</button>
+    </div>
+    
+    <div class="container">
+        <!-- Section 1: Problem Diagnosis -->
+        <div class="section active" id="diagnosis">
+            <div class="search-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="搜尋 Problem 或 Pattern... Search by issue or pattern...">
+                <div class="filter-group">
+                    <span class="filter-tag active" data-filter="all">All | 全部</span>
+                    <span class="filter-tag" data-filter="input">Input System</span>
+                    <span class="filter-tag" data-filter="home">Home System</span>
+                    <span class="filter-tag" data-filter="flow">Flow/動線</span>
+                    <span class="filter-tag" data-filter="cue">Cue/提示</span>
+                    <span class="filter-tag" data-filter="reset">Reset/復位</span>
+                </div>
+            </div>
+            
+            <div class="table-wrapper">
+                <table id="problemTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%">No.</th>
+                            <th style="width: 20%">Phenomenon | 現象</th>
+                            <th style="width: 20%">Pattern | 規律</th>
+                            <th style="width: 20%">Mechanism | 機制</th>
+                            <th style="width: 15%">Bottleneck | 瓶頸</th>
+                            <th style="width: 20%">Minimum Intervention | 最小介入</th>
+                        </tr>
+                    </thead>
+                    <tbody id="problemBody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Section 2: Six Core Systems -->
+        <div class="section" id="frameworks">
+            <div style="padding: 2rem;">
+                <h2 style="font-size: 2rem; color: var(--navy); margin-bottom: 2rem; text-align: center;">
+                    6 Core Systems | 空間的6大系統結構層
+                </h2>
+                
+                <div id="systemsContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Section 3: 10 Levers -->
+        <div class="section" id="leverage">
+            <div style="padding: 2rem;">
+                <h2 style="font-size: 2rem; color: var(--navy); margin-bottom: 2rem; text-align: center;">
+                    10 Levers for Space Transformation | 空間的10大槓桿
+                </h2>
+                
+                <div id="leversContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Section 4: Prediction Errors -->
+        <div class="section" id="errors">
+            <div style="padding: 2rem;">
+                <h2 style="font-size: 2rem; color: var(--navy); margin-bottom: 2rem; text-align: center;">
+                    10 Prediction Errors & Model Updates | 10大認知偏差與更新
+                </h2>
+                
+                <div id="errorsContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Section 5: Evolution Stages -->
+        <div class="section" id="evolution">
+            <div style="padding: 2rem;">
+                <h2 style="font-size: 2rem; color: var(--navy); margin-bottom: 2rem; text-align: center;">
+                    5 Evolution Stages | 5階空間管理進化
+                </h2>
+                
+                <div id="evolutionContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Section 6: High Agency Algorithm -->
+        <div class="section" id="algorithm">
+            <div style="padding: 2rem;">
+                <h2 style="font-size: 2rem; color: var(--navy); margin-bottom: 2rem; text-align: center;">
+                    Space High Agency Algorithm | 空間高效能算法
+                </h2>
+                
+                <div id="algorithmContainer"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <strong>Space Management High Agency OS</strong><br>
+        <div class="footer-meta">Copyright © 2026 Anne Wang (王欣蓉) | All content bilingual Chinese-English with TTS support</div>
+    </div>
+    
+    <script>
+        // Problem Diagnosis Data
+        const problemsData = [
+            { num: 1, zh: "房間很亂", en: "Room is cluttered", pattern: "東西持續進入 | Things keep entering", mechanism: "Input > Output", bottleneck: "入口失控 | Entrance uncontrolled", intervention: "今天丟5件 | Discard 5 items today", category: "input" },
+            { num: 2, zh: "整理完又亂", en: "Organized space becomes messy again", pattern: "每次大整理 | Major reorganization each time", mechanism: "沒有維持機制 | No maintenance mechanism", bottleneck: "Reset不足 | Insufficient reset", intervention: "每晚復位5分鐘 | 5-min reset every night", category: "reset" },
+            { num: 3, zh: "桌面堆滿", en: "Desk surface is piled up", pattern: "用完就放桌上 | Items left on desk after use", mechanism: "物品沒有Home | Items have no home", bottleneck: "歸位系統不足 | Insufficient homing system", intervention: "每類物品指定位置 | Designate location per category", category: "home" },
+            { num: 4, zh: "找不到東西", en: "Cannot find things", pattern: "每次放不同地方 | Placed in different location each time", mechanism: "Retrieval Cost高 | High retrieval cost", bottleneck: "固定位置不足 | Insufficient fixed positions", intervention: "常用品固定位置 | Fixed spot for frequently used items", category: "home" },
+            { num: 5, zh: "常常買重複", en: "Buy duplicate items often", pattern: "不知道自己有什麼 | Unaware of inventory", mechanism: "Inventory不透明 | Opaque inventory", bottleneck: "庫存資訊不足 | Insufficient inventory info", intervention: "同類物品集中 | Consolidate similar items", category: "input" },
+            { num: 6, zh: "衣服很多仍沒衣服穿", en: "Many clothes but nothing to wear", pattern: "選項過多 | Too many options", mechanism: "Decision Cost增加 | Increased decision cost", bottleneck: "篩選不足 | Insufficient filtering", intervention: "淘汰5件不穿的 | Eliminate 5 unworn pieces", category: "input" },
+            { num: 7, zh: "抽屜塞爆", en: "Drawers are packed", pattern: "看不到就塞進去 | Out of sight stuffed inside", mechanism: "隱藏≠整理 | Hiding ≠ organizing", bottleneck: "分類不足 | Insufficient categorization", intervention: "一次清一個抽屜 | Clear one drawer at a time", category: "home" },
+            { num: 8, zh: "櫃子很多仍不夠", en: "Many cabinets still insufficient", pattern: "收納增加速度低於物品增加 | Storage growth < item growth", mechanism: "Storage Trap", bottleneck: "減量不足 | Insufficient reduction", intervention: "先減物，再買櫃 | Reduce items before buying cabinets", category: "input" },
+            { num: 9, zh: "捨不得丟", en: "Cannot bring self to discard", pattern: "物品綁記憶 | Items tied to memories", mechanism: "Loss Aversion", bottleneck: "決策成本高 | High decision cost", intervention: "拍照後留下最重要代表物 | Photo then keep key representative", category: "input" },
+            { num: 10, zh: "免費東西都拿", en: "Take everything free", pattern: "免費＝值得 | Free = valuable", mechanism: "價格取代空間成本 | Price replaces space cost", bottleneck: "Input Gate不足 | Insufficient input gate", intervention: "問「它值得占我的空間嗎？」 | Ask: 'Worth my space?'", category: "input" },
+            { num: 11, zh: "網購很多", en: "Excessive online shopping", pattern: "購買容易 | Purchasing is easy", mechanism: "Input摩擦太低 | Input friction too low", bottleneck: "入口過大 | Entrance too wide", intervention: "放購物車24小時 | Keep in cart 24 hours", category: "input" },
+            { num: 12, zh: "包裹一直堆", en: "Packages keep piling up", pattern: "買進速度>整理速度 | Purchase speed > organizing speed", mechanism: "Inventory累積 | Inventory accumulation", bottleneck: "流量失衡 | Flow imbalance", intervention: "一進一出 | One in, one out", category: "input" },
+            { num: 13, zh: "文件很多", en: "Many documents", pattern: "不敢刪 | Afraid to delete", mechanism: "不確定未來用途 | Uncertain future use", bottleneck: "分類規則不足 | Insufficient classification rules", intervention: "留存／掃描／丟棄三分法 | Keep/scan/discard triage", category: "input" },
+            { num: 14, zh: "紙本找不到", en: "Cannot find physical documents", pattern: "沒有索引 | No index", mechanism: "Retrieval System弱 | Weak retrieval system", bottleneck: "定位不足 | Insufficient locating", intervention: "每類只設一個入口 | Single entry per category", category: "home" },
+            { num: 15, zh: "電腦桌面很亂", en: "Computer desktop is messy", pattern: "檔案隨手存 | Files saved casually", mechanism: "Digital Home缺失 | Digital home missing", bottleneck: "數位歸位不足 | Insufficient digital homing", intervention: "建立固定資料夾 | Create fixed folders", category: "home" },
+            { num: 16, zh: "手機照片爆滿", en: "Phone camera roll overflowing", pattern: "只拍不整理 | Shoot but don't organize", mechanism: "Digital Input過量 | Excessive digital input", bottleneck: "Delete不足 | Insufficient deletion", intervention: "每天刪20張 | Delete 20 photos daily", category: "input" },
+            { num: 17, zh: "LINE資料找不到", en: "Cannot find info in chat history", pattern: "資訊散落聊天室 | Info scattered in chats", mechanism: "Retrieval Cost高 | High retrieval cost", bottleneck: "知識庫不足 | Insufficient knowledge base", intervention: "重要資料集中一處 | Consolidate important data", category: "home" },
+            { num: 18, zh: "APP裝很多", en: "Too many installed apps", pattern: "工具持續增加 | Tools keep increasing", mechanism: "Tool Overload", bottleneck: "工具重複 | Tool redundancy", intervention: "同功能只留主工具 | Keep only primary tool per function", category: "input" },
+            { num: 19, zh: "書很多沒讀", en: "Many books unread", pattern: "收藏取代學習 | Collection replaces learning", mechanism: "Input > Processing", bottleneck: "消化不足 | Insufficient digestion", intervention: "未讀完先不增加 | Don't add before finishing current", category: "input" },
+            { num: 20, zh: "教材很多找不到", en: "Cannot find teaching materials", pattern: "每次建立新版本 | Create new version each time", mechanism: "Version Entropy", bottleneck: "版本管理不足 | Insufficient version control", intervention: "每主題保留主版本 | One master version per topic", category: "home" },
+            { num: 21, zh: "工作桌一直被占滿", en: "Work desk always full", pattern: "多專案同時展開 | Multiple projects open simultaneously", mechanism: "WIP過高 | WIP too high", bottleneck: "開放迴路太多 | Too many open loops", intervention: "桌面只留當前專案 | Keep only current project on desk", category: "flow" },
+            { num: 22, zh: "想讀書卻容易分心", en: "Want to read but easily distracted", pattern: "視覺刺激太多 | Too much visual stimulus", mechanism: "Attention被環境劫持 | Attention hijacked by environment", bottleneck: "專注Cue不足 | Insufficient focus cue", intervention: "桌面只留正在讀的書 | Only current book on desk", category: "cue" },
+            { num: 23, zh: "手機放桌上", en: "Phone on desk", pattern: "視覺Cue一直存在 | Visual cue constantly present", mechanism: "行動被提示 | Behavior cued", bottleneck: "誘惑距離太近 | Temptation too close", intervention: "手機移出視線 | Move phone out of sight", category: "cue" },
+            { num: 24, zh: "想運動卻懶得開始", en: "Want exercise but too lazy to start", pattern: "器材藏起來 | Equipment hidden away", mechanism: "啟動摩擦高 | High activation friction", bottleneck: "Action Cue不足 | Insufficient action cue", intervention: "運動鞋直接放門口 | Exercise shoes at entrance", category: "cue" },
+            { num: 25, zh: "常忘記吃藥或補充", en: "Forget to take meds or supplements", pattern: "物品藏在看不到處 | Item hidden from view", mechanism: "Cue不足 | Insufficient cue", bottleneck: "提醒系統弱 | Weak reminder system", intervention: "放在固定可見位置 | Fixed visible position", category: "cue" },
+            { num: 26, zh: "常忘記帶東西", en: "Often forget to bring things", pattern: "出門用品分散 | Departure items scattered", mechanism: "出門流程不固定 | Non-fixed departure routine", bottleneck: "Launch Zone不足 | Insufficient launch zone", intervention: "門口建立出門區 | Create launch zone at door", category: "cue" },
+            { num: 27, zh: "早上一直找東西", en: "Spend morning searching", pattern: "前晚沒有復位 | No reset previous night", mechanism: "晨間搜尋成本高 | High morning search cost", bottleneck: "Preparation不足 | Insufficient preparation", intervention: "睡前準備隔天用品 | Prep next day's items before sleep", category: "reset" },
+            { num: 28, zh: "廚房很亂", en: "Kitchen is messy", pattern: "使用流程與物品位置不符 | Workflow mismatched with location", mechanism: "動線錯配 | Workflow-location mismatch", bottleneck: "Workflow不足 | Insufficient workflow design", intervention: "常用品靠近使用點 | Frequent items near use point", category: "flow" },
+            { num: 29, zh: "做飯很麻煩", en: "Cooking is troublesome", pattern: "每次都要找工具 | Search for tools each time", mechanism: "摩擦累積 | Friction accumulation", bottleneck: "動線過長 | Workflow too long", intervention: "按使用流程排列 | Arrange by use sequence", category: "flow" },
+            { num: 30, zh: "健康食物常忘記吃", en: "Forget to eat healthy foods", pattern: "看不到 | Out of sight", mechanism: "Visibility低 | Low visibility", bottleneck: "環境提示不足 | Insufficient environmental cue", intervention: "健康食物放前面 | Healthy foods in front", category: "cue" },
+            { num: 31, zh: "零食一直吃", en: "Keep eating snacks", pattern: "高刺激食物最容易拿 | High-stimulus food easiest to grab", mechanism: "Choice Architecture失衡 | Unbalanced choice architecture", bottleneck: "誘惑摩擦太低 | Temptation friction too low", intervention: "零食移出視線 | Move snacks out of sight", category: "cue" },
+            { num: 32, zh: "回家東西亂丟", en: "Dump things when arriving home", pattern: "沒有落點 | No designated spot", mechanism: "Transition Zone缺失 | Transition zone missing", bottleneck: "入口設計不足 | Insufficient entrance design", intervention: "門口設包包鑰匙區 | Create bag-keys zone at entrance", category: "cue" },
+            { num: 33, zh: "客廳愈來愈亂", en: "Living room gets messier", pattern: "公共空間沒有責任歸屬 | No accountability in shared space", mechanism: "Ownership不清 | Unclear ownership", bottleneck: "責任配置不足 | Insufficient responsibility assignment", intervention: "每區設定負責人 | Assign owner per area", category: "home" },
+            { num: 34, zh: "家人整理方式不同", en: "Different family members organize differently", pattern: "每人分類模型不同 | Different classification model per person", mechanism: "Shared Model不足 | Insufficient shared model", bottleneck: "共識不足 | Insufficient consensus", intervention: "建立共同歸位規則 | Establish shared homing rules", category: "home" },
+            { num: 35, zh: "小孩東西到處都是", en: "Child's things everywhere", pattern: "收納太複雜 | Storage too complex", mechanism: "歸位成本高 | High homing cost", bottleneck: "系統超過能力 | System exceeds capability", intervention: "使用簡單開放式分類 | Use simple open-category system", category: "home" },
+            { num: 36, zh: "教室一直亂", en: "Classroom always messy", pattern: "學生不知道東西去哪 | Students don't know where things go", mechanism: "空間規則不透明 | Opaque space rules", bottleneck: "Visual Management不足 | Insufficient visual management", intervention: "每區直接標示用途 | Label each area purpose directly", category: "cue" },
+            { num: 37, zh: "教室手機管理困難", en: "Difficult to manage phones in class", pattern: "手機一直在身邊 | Phones always with students", mechanism: "誘惑Cue持續存在 | Temptation cue persistent", bottleneck: "環境設計不足 | Insufficient environment design", intervention: "建立固定手機停放區 | Create dedicated phone parking area", category: "cue" },
+            { num: 38, zh: "辦公桌文件堆積", en: "Piles of documents on desk", pattern: "每件事都是未完成提醒 | Every item is unfinished reminder", mechanism: "Open Loop累積 | Open loop accumulation", bottleneck: "任務流不清 | Unclear task flow", intervention: "待處理只留一個入口 | Single inbox for pending items", category: "home" },
+            { num: 39, zh: "一看到房間就焦慮", en: "Anxious just looking at room", pattern: "視覺訊息過量 | Visual information overload", mechanism: "認知負荷提高 | Increased cognitive load", bottleneck: "Visual Noise高 | High visual noise", intervention: "先清一個可視平面 | Clear one visible surface first", category: "input" },
+            { num: 40, zh: "家裡東西很多很累", en: "Many things in home, feels exhausting", pattern: "每件物品都需要管理 | Every item requires management", mechanism: "Maintenance Cost累積 | Maintenance cost accumulation", bottleneck: "物品總量過高 | Item quantity too high", intervention: "減少10%物品 | Reduce items by 10%", category: "input" },
+            { num: 41, zh: "整理花很多時間", en: "Organizing takes lots of time", pattern: "每件都個別決策 | Individual decision per item", mechanism: "Decision Cost高 | High decision cost", bottleneck: "規則不足 | Insufficient rules", intervention: "建立「留／移／丟」規則 | Establish keep/move/discard rules", category: "input" },
+            { num: 42, zh: "一整理就半天", en: "Organizing takes half a day", pattern: "一次處理整間房 | Handle entire room at once", mechanism: "任務過大 | Task too large", bottleneck: "啟動摩擦高 | High activation friction", intervention: "只整理1平方公尺 | Organize just 1 sq meter", category: "reset" },
+            { num: 43, zh: "沒空間休息", en: "No space to rest", pattern: "所有地方都功能化 | Everything is functionalized", mechanism: "Recovery Zone＝0 | Zero recovery zone", bottleneck: "恢復空間不足 | Insufficient recovery space", intervention: "建立一個純休息角落 | Create pure rest corner", category: "home" },
+            { num: 44, zh: "睡房像辦公室", en: "Bedroom like office", pattern: "工作與睡眠Cue混合 | Work and sleep cues mixed", mechanism: "Context切換失敗 | Failed context switching", bottleneck: "功能混雜 | Mixed functions", intervention: "床上不工作 | No work on bed", category: "cue" },
+            { num: 45, zh: "在家很難專心", en: "Hard to concentrate at home", pattern: "工作、娛樂同區 | Work and entertainment in same space", mechanism: "Context Cue混亂 | Confused context cues", bottleneck: "場景邊界不足 | Insufficient scenario boundaries", intervention: "設固定工作位置 | Establish fixed work location", category: "cue" },
+            { num: 46, zh: "家裡漂亮卻不好用", en: "Beautiful home but awkward to use", pattern: "美感優先於流程 | Aesthetics prioritized over process", mechanism: "Form > Function", bottleneck: "使用者需求失配 | Mismatched user needs", intervention: "先看真實動線 | First observe real workflow", category: "flow" },
+            { num: 47, zh: "空間很多卻覺得擠", en: "Lots of space but feels cramped", pattern: "動線被物品占據 | Workflow blocked by items", mechanism: "可用空間下降 | Usable space decreased", bottleneck: "流動性不足 | Insufficient flow", intervention: "優先清通道 | Clear pathways first", category: "flow" },
+            { num: 48, zh: "搬家非常痛苦", en: "Moving is very painful", pattern: "長年沒有淘汰 | Years without elimination", mechanism: "累積熵一次爆發 | Accumulated entropy bursts", bottleneck: "更新頻率不足 | Insufficient update frequency", intervention: "每月小型清理 | Small monthly cleanup", category: "reset" },
+            { num: 49, zh: "整理後人生沒有改變", en: "Life unchanged after organizing", pattern: "只改外觀 | Only changed appearance", mechanism: "行為系統沒改 | Behavior system unchanged", bottleneck: "Cue沒有重設 | Cues not reset", intervention: "用空間支持一個新習慣 | Use space to support new habit", category: "cue" },
+            { num: 50, zh: "不知道為何重要", en: "Don't know why it matters", pattern: "把空間當背景 | Treat space as background", mechanism: "忽略環境→行為 | Ignore environment-behavior link", bottleneck: "Environment Model不足 | Insufficient environment model", intervention: "觀察空間如何影響一天 | Observe space's daily impact", category: "input" }
+        ];
+
+        // Six Systems Data
+        const systemsData = [
+            {
+                num: 1,
+                title: "Input System | 入口系統",
+                zh: "什麼可以進來？衣服、書、文件、商品、APP、照片、資訊。如果入口永遠開著，再強的整理能力也追不上熵增。\n\n所以第一原則不是：更會收。\n\n而是：【降低不必要Input。】",
+                en: "What can enter? Clothes, books, documents, products, apps, photos, information. If the entrance is always open, no organizational skill can outpace entropy increase.\n\nSo the first principle is NOT: get better at storing.\n\nRather: 【Reduce unnecessary inputs.】"
+            },
+            {
+                num: 2,
+                title: "Home System | 歸位系統",
+                zh: "每件重要物品都要回答：「你的家在哪裡？」\n\n沒有Home，東西就會漂流。\n漂流→搜尋→耗能→煩躁。",
+                en: "Every important item must answer: \"Where is your home?\"\n\nWithout a home, things drift.\nDrift → Search → Energy waste → Frustration."
+            },
+            {
+                num: 3,
+                title: "Flow System | 動線系統",
+                zh: "最常用的東西，最靠近使用點。\n每天使用：一伸手就拿到。\n偶爾使用：放遠。\n幾乎不用：移除。\n\n空間不是按照：「看起來整齊」\n而是按照：【真實行為頻率。】",
+                en: "Most-used items closest to use point.\nDaily use: arm's reach away.\nOccasional use: keep distant.\nRarely used: remove.\n\nSpace organized NOT by: 'looking neat'\nBUT by: 【actual behavior frequency.】"
+            },
+            {
+                num: 4,
+                title: "Cue System | 提示系統",
+                zh: "想增加的行為：讓Cue變明顯。\n想減少的行為：讓Cue消失。\n\n想讀書→書放桌上。\n想運動→鞋放門口。\n想少滑手機→手機離開視線。\n\n這叫：【Choice Architecture。】",
+                en: "Behaviors to increase: make cue obvious.\nBehaviors to decrease: remove cue.\n\nWant to read → book on desk.\nWant to exercise → shoes at door.\nWant less phone time → phone out of sight.\n\nThis is: 【Choice Architecture.】"
+            },
+            {
+                num: 5,
+                title: "Recovery System | 復位系統",
+                zh: "真正好的空間不是：永遠不亂。\n而是：【亂了之後很容易恢復。】\n\n所以關鍵不是：Perfect Order。\n而是：Low-Cost Reset。",
+                en: "A truly good space is NOT: forever neat.\nBut: 【Easily restored after becoming messy.】\n\nThe key is NOT: Perfect Order.\nBut: Low-Cost Reset."
+            },
+            {
+                num: 6,
+                title: "Update System | 更新系統",
+                zh: "人生一直改變。\n學生變大學生。單身變家庭。孩子長大。工作改變。興趣改變。身體改變。\n\n如果人生版本已經5.0，空間還停在2.0，摩擦一定增加。\n\n所以空間也需要：Model Update。",
+                en: "Life constantly changes.\nStudent → adult. Single → family. Child growth. Job changes. Interests shift. Body ages.\n\nIf your life is version 5.0 but space is 2.0, friction will increase.\n\nSo space needs: Model Update."
+            }
+        ];
+
+        // 10 Levers Data
+        const leversData = [
+            { num: 1, title: "Delete | 刪除", zh: "不用的離開。", en: "Let unused things go." },
+            { num: 2, title: "Reduce | 減量", zh: "降低物品總量。", en: "Lower total item quantity." },
+            { num: 3, title: "Group | 分組", zh: "同類集中。", en: "Consolidate similar items." },
+            { num: 4, title: "Home | 歸位", zh: "每件重要物品有固定位置。", en: "Fixed position for every important item." },
+            { num: 5, title: "Visibility | 可見度", zh: "需要提醒的看得見。", en: "Things that need reminding must be visible." },
+            { num: 6, title: "Distance | 距離", zh: "想增加的行為靠近。想減少的行為拉遠。", en: "Desired behaviors near. Undesired behaviors far." },
+            { num: 7, title: "Flow | 動線", zh: "按照真實使用流程排列。", en: "Arrange by actual use sequence." },
+            { num: 8, title: "Label | 標籤", zh: "讓位置不用靠記憶。", en: "Let labels replace memory." },
+            { num: 9, title: "Reset | 復位", zh: "建立快速復位流程。", en: "Establish fast reset routine." },
+            { num: 10, title: "Update | 更新", zh: "生活改變，空間跟著改。", en: "As life evolves, space evolves." }
+        ];
+
+        // Prediction Errors Data
+        const errorsData = [
+            {
+                num: 1,
+                error: "亂是因為我懶 | Messiness is because I'm lazy",
+                update: "很多亂是空間流程設計失敗 | Much mess is failed space-process design",
+                enError: "It's because I'm lazy",
+                enUpdate: "Most messiness stems from failed space-process design, not laziness"
+            },
+            {
+                num: 2,
+                error: "東西多就買收納櫃 | Buy storage for too much stuff",
+                update: "收納只能重新排列物品，不能解決Input過量 | Storage only rearranges items, doesn't fix excessive input",
+                enError: "Buy storage cabinets to solve clutter",
+                enUpdate: "Storage only rearranges items; it doesn't solve input overload"
+            },
+            {
+                num: 3,
+                error: "看不到就是乾淨 | Out of sight = clean",
+                update: "把東西塞進櫃子只是把熵藏起來 | Stuffing items in cabinets just hides entropy",
+                enError: "Out of sight means clean",
+                enUpdate: "Hiding things in cabinets only masks entropy, doesn't reduce it"
+            },
+            {
+                num: 4,
+                error: "整理一次就好了 | Organizing once is enough",
+                update: "沒有Reset Mechanism，熵會重新增加 | Without reset mechanism, entropy returns",
+                enError: "One organizing session solves it",
+                enUpdate: "Without a reset mechanism, entropy inevitably returns"
+            },
+            {
+                num: 5,
+                error: "我需要更強意志力 | I need stronger willpower",
+                update: "環境Cue可以直接改變行為發生機率 | Environmental cues directly alter behavior probability",
+                enError: "I need more willpower",
+                enUpdate: "Environmental cues directly change behavior probability—no willpower required"
+            },
+            {
+                num: 6,
+                error: "空間漂亮就代表空間好 | Beautiful space = good space",
+                update: "美感重要，但功能、動線與摩擦同樣重要 | Aesthetics matter, but function, flow, and friction matter equally",
+                enError: "A beautiful space is a good space",
+                enUpdate: "Beauty matters, but so do function, flow, and friction equally"
+            },
+            {
+                num: 7,
+                error: "東西以後可能會用到 | Might use it someday",
+                update: "保留也有空間、搜尋、維護與注意力成本 | Keeping also costs space, searching, maintenance, and attention",
+                enError: "I might use it someday",
+                enUpdate: "Keeping unused items costs space, search effort, maintenance, and attention"
+            },
+            {
+                num: 8,
+                error: "免費就拿 | Take it because it's free",
+                update: "免費商品仍然需要支付空間成本與管理成本 | Free items still incur space and management costs",
+                enError: "Free means I should take it",
+                enUpdate: "Free items still carry space and management costs"
+            },
+            {
+                num: 9,
+                error: "大房子自然比較整齊 | Bigger house = naturally neater",
+                update: "如果Input與淘汰機制不變，更大空間也可能只是容納更多物品 | If input and elimination don't change, bigger space just holds more stuff",
+                enError: "A bigger house will be naturally neater",
+                enUpdate: "If input and elimination patterns don't change, bigger space just holds more stuff"
+            },
+            {
+                num: 10,
+                error: "整理就是把東西放好 | Organizing = arranging things nicely",
+                update: "最高階空間管理是在設計未來行為 | Highest-level space management designs future behavior",
+                enError: "Organizing is just arranging things",
+                enUpdate: "The highest-level space management is designing future behavior"
+            }
+        ];
+
+        // Evolution Stages
+        const evolutionData = [
+            {
+                stage: 1,
+                title: "堆放型 | Piling",
+                zh: "哪裡有位置，就放哪裡。",
+                en: "Put things wherever there's space."
+            },
+            {
+                stage: 2,
+                title: "收納型 | Storage",
+                zh: "開始：櫃子、盒子、分類。",
+                en: "Begin using: cabinets, boxes, categories."
+            },
+            {
+                stage: 3,
+                title: "流程型 | Process-based",
+                zh: "按照：頻率、動線、功能、位置。設計空間。",
+                en: "Design based on: frequency, workflow, function, position."
+            },
+            {
+                stage: 4,
+                title: "High Agency型",
+                zh: "開始問：「這個環境正在控制我什麼？」「我要增加哪種行為？」「我要降低哪種行為？」",
+                en: "Begin asking: \"What is this environment controlling about me?\" \"What behavior do I want to increase?\" \"What should I decrease?\""
+            },
+            {
+                stage: 5,
+                title: "生成型 | Generative",
+                zh: "空間開始主動支持：健康、學習、專注、關係、睡眠、創造、High Agency。",
+                en: "Space actively supports: health, learning, focus, relationships, sleep, creativity, high agency."
+            }
+        ];
+
+        // Algorithms Data
+        const algorithmSteps = [
+            { step: "Input", zh: "哪個空間最讓我煩？", en: "Which space frustrates me most?" },
+            { step: "Diagnosis", zh: "真正問題是什麼？", en: "What is the real problem?" },
+            { step: "Pattern", zh: "什麼東西一直累積？", en: "What keeps accumulating?" },
+            { step: "Mechanism", zh: "為什麼一直回到原狀？", en: "Why does it return to this state?" },
+            { step: "Bottleneck", zh: "Input？物品量？位置？動線？Cue？Reset？", en: "Is it input? Item quantity? Position? Flow? Cue? Reset?" },
+            { step: "Priority Node", zh: "現在最值得改哪一點？", en: "What's worth changing first?" },
+            { step: "Skill", zh: "刪除？分類？定位？減量？環境設計？", en: "Delete? Categorize? Position? Reduce? Design?" },
+            { step: "Minimum Intervention", zh: "今天只改哪一小區？", en: "What small area to change today?" },
+            { step: "Action", zh: "執行。", en: "Execute." },
+            { step: "Feedback", zh: "找東西更快了嗎？啟動更容易了嗎？注意力更穩了嗎？", en: "Faster to find? Easier to start? More stable focus?" },
+            { step: "Prediction Error", zh: "原本以為問題是什麼？真正問題又是什麼？", en: "What did I think? What actually is?" },
+            { step: "Model Update", zh: "更新模型。", en: "Update mental model." },
+            { step: "Retest", zh: "重新檢驗。", en: "Retest." }
+        ];
+
+        // TTS Function
+        function speakText(text, lang = 'en-US') {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = lang;
+            utterance.rate = 0.85;
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Initialize Problem Table
+        function initProblems() {
+            const tbody = document.getElementById('problemBody');
+            problemsData.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = 'problem-row';
+                tr.dataset.category = p.category;
+                tr.innerHTML = `
+                    <td>${p.num}</td>
+                    <td>
+                        <div class="issue-zh">${p.zh}</div>
+                        <div class="issue-en">${p.en}</div>
+                    </td>
+                    <td>
+                        <div style="margin-bottom: 0.3rem;">${p.pattern}</div>
+                    </td>
+                    <td>
+                        <div style="margin-bottom: 0.3rem;">${p.mechanism}</div>
+                    </td>
+                    <td>${p.bottleneck}</td>
+                    <td>
+                        <div>${p.intervention}</div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Initialize Systems
+        function initSystems() {
+            const container = document.getElementById('systemsContainer');
+            systemsData.forEach(sys => {
+                const block = document.createElement('div');
+                block.className = 'system-block';
+                block.innerHTML = `
+                    <div class="system-num">⓪${sys.num}</div>
+                    <div class="system-title">${sys.title}</div>
+                    <div class="system-zh">${sys.zh}</div>
+                    <div class="system-en">${sys.en}</div>
+                    <button class="tts-btn" onclick="speakText('${sys.en.replace(/'/g, "\\'")}')">🔊 EN TTS</button>
+                `;
+                container.appendChild(block);
+            });
+        }
+
+        // Initialize Levers
+        function initLevers() {
+            const container = document.getElementById('leversContainer');
+            leversData.forEach(lever => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="card-title">
+                            #${lever.num} ${lever.title}
+                        </div>
+                        <div class="card-toggle">▼</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-content-zh">${lever.zh}</div>
+                        <div class="card-content-en">${lever.en}
+                            <button class="tts-btn" onclick="speakText('${lever.en.replace(/'/g, "\\'")}')">🔊 Speak</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            document.getElementById('leverage').appendChild(document.getElementById('leversContainer'));
+        }
+
+        // Initialize Prediction Errors
+        function initErrors() {
+            const container = document.getElementById('errorsContainer');
+            errorsData.forEach(err => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="card-title">#${err.num} Prediction Error</div>
+                        <div class="card-toggle">▼</div>
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 1rem;">
+                            <strong style="color: var(--gold);">❌ Error:</strong><br>
+                            <div style="margin: 0.5rem 0; padding-left: 1rem;">${err.error}</div>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <strong style="color: var(--teal);">✓ Update:</strong><br>
+                            <div style="margin: 0.5rem 0; padding-left: 1rem;">${err.update}</div>
+                        </div>
+                        <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+                            <strong>English Version:</strong><br>
+                            <div style="margin: 0.5rem 0; color: #999;">❌ ${err.enError}</div>
+                            <div style="margin: 0.5rem 0; color: #555;">✓ ${err.enUpdate}
+                                <button class="tts-btn" onclick="speakText('${err.enUpdate.replace(/'/g, "\\'")}')">🔊</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize Evolution
+        function initEvolution() {
+            const container = document.getElementById('evolutionContainer');
+            evolutionData.forEach(ev => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="card-title">Level ${ev.stage}: ${ev.title}</div>
+                        <div class="card-toggle">▼</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-content-zh">${ev.zh}</div>
+                        <div class="card-content-en">${ev.en}
+                            <button class="tts-btn" onclick="speakText('${ev.en.replace(/'/g, "\\'")}')">🔊 Speak</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Initialize Algorithm
+        function initAlgorithm() {
+            const container = document.getElementById('algorithmContainer');
+            algorithmSteps.forEach((step, idx) => {
+                const card = document.createElement('div');
+                card.style.marginBottom = '1.5rem';
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="width: 40px; height: 40px; background: var(--gold); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">${idx + 1}</div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 1.1rem; color: var(--navy);">${step.step}</div>
+                            <div style="color: #666; margin-top: 0.3rem;">${step.zh}</div>
+                        </div>
+                    </div>
+                    <div style="margin-left: 56px; padding: 1rem; background: var(--bg-light); border-radius: 4px; border-left: 3px solid var(--teal);">
+                        <div style="font-family: Georgia, serif; color: #555;">${step.en}
+                            <button class="tts-btn" onclick="speakText('${step.en.replace(/'/g, "\\'")}')">🔊</button>
+                        </div>
+                    </div>
+                    ${idx < algorithmSteps.length - 1 ? '<div style="text-align: center; margin: 1rem 0; color: var(--gold);">↓</div>' : ''}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Search & Filter
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            document.querySelectorAll('.problem-row').forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.classList.toggle('hidden', !text.includes(query));
+            });
+        });
+
+        document.querySelectorAll('.filter-tag').forEach(tag => {
+            tag.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+                tag.classList.add('active');
+                
+                const filter = tag.dataset.filter;
+                document.querySelectorAll('.problem-row').forEach(row => {
+                    if (filter === 'all') {
+                        row.classList.remove('hidden');
+                    } else {
+                        row.classList.toggle('hidden', row.dataset.category !== filter);
+                    }
+                });
+            });
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.section).classList.add('active');
+            });
+        });
+
+        // Initialize All
+        window.addEventListener('DOMContentLoaded', () => {
+            initProblems();
+            initSystems();
+            initLevers();
+            initErrors();
+            initEvolution();
+            initAlgorithm();
+        });
+    </script>
+</body>
+</html>
