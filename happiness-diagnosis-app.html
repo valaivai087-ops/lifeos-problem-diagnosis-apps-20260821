@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幸福 × Problem Diagnosis | Happiness × Problem Diagnosis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --navy: #1A2B5F;
+            --gold: #C9960C;
+            --teal: #0A7A72;
+            --light: #F8F9FA;
+            --border: #E0E0E0;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', 'Arial Unicode MS', sans-serif;
+            background-color: var(--light);
+            color: var(--navy);
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .nav-tabs button {
+            padding: 12px 24px;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--navy);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            font-family: 'Microsoft JhengHei', sans-serif;
+        }
+        
+        .nav-tabs button:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+        
+        .nav-tabs button.active {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .search-box button {
+            padding: 10px 20px;
+            background: var(--gold);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .table-wrapper {
+            background: white;
+            border-radius: 8px;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th {
+            background: var(--navy);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tr:hover {
+            background-color: #F0F7FF;
+        }
+        
+        .id-col {
+            width: 50px;
+            font-weight: bold;
+            color: var(--gold);
+        }
+        
+        .bilingual-text {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .bilingual-text.single {
+            grid-template-columns: 1fr;
+        }
+        
+        .text-group {
+            padding: 12px;
+            background: #FAFAFA;
+            border-left: 3px solid var(--gold);
+        }
+        
+        .text-group label {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--teal);
+            display: block;
+            margin-bottom: 6px;
+        }
+        
+        .text-group .zh {
+            font-size: 14px;
+            color: var(--navy);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .text-group .en {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.4;
+        }
+        
+        .tts-btn {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-left: 8px;
+            transition: all 0.2s;
+        }
+        
+        .tts-btn:hover {
+            background: #058965;
+            transform: scale(1.05);
+        }
+        
+        .tts-btn.playing {
+            background: var(--gold);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--navy);
+        }
+        
+        .card-toggle {
+            width: 30px;
+            height: 30px;
+            background: var(--gold);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        
+        .card-toggle.open {
+            transform: rotate(180deg);
+        }
+        
+        .card-content {
+            display: none;
+            padding-top: 15px;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .card-content.open {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .row-field {
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 15px;
+        }
+        
+        .row-label {
+            font-weight: bold;
+            color: var(--teal);
+            min-width: 100px;
+        }
+        
+        .row-value {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .row-value.single {
+            grid-template-columns: 1fr;
+        }
+        
+        .zh-text {
+            color: var(--navy);
+        }
+        
+        .en-text {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            font-size: 12px;
+        }
+        
+        .footer p {
+            margin: 5px 0;
+        }
+        
+        .author {
+            color: var(--gold);
+            font-weight: bold;
+        }
+        
+        .stat-badge {
+            display: inline-block;
+            background: var(--gold);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .bilingual-text {
+                grid-template-columns: 1fr;
+            }
+            
+            .row-value {
+                grid-template-columns: 1fr !important;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            td, th {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>幸福 × Problem Diagnosis</h1>
+        <p>Happiness × Problem Diagnosis</p>
+        <p style="margin-top: 10px; font-size: 12px;">從「追求快樂」升級成「建立能持續生成幸福的生命系統」</p>
+        <p style="font-size: 12px;">Upgrading from 'Chasing Joy' to 'Building a Life System That Continuously Generates Happiness'</p>
+    </div>
+    
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="diagnosis">50 項幸福診斷 <span class="stat-badge">50</span></button>
+            <button class="tab-btn" data-tab="systems">5 大系統 <span class="stat-badge">5</span></button>
+            <button class="tab-btn" data-tab="errors">12 個 Prediction Error</button>
+            <button class="tab-btn" data-tab="algorithms">High Agency Algorithm</button>
+            <button class="tab-btn" data-tab="formula">幸福公式</button>
+        </div>
+        
+        <!-- Section 1: 50 項診斷 -->
+        <div id="diagnosis" class="section active">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜尋現象、模式、機制...">
+                <button onclick="searchTable()">搜尋</button>
+                <button onclick="resetSearch()" style="background: var(--teal);">重置</button>
+            </div>
+            
+            <div class="table-wrapper">
+                <table id="diagnosisTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>幸福現象<br>Phenomenon</th>
+                            <th>規律模式<br>Pattern</th>
+                            <th>生成機制<br>Mechanism</th>
+                            <th>瓶頸<br>Bottleneck</th>
+                            <th>最小化干預<br>Minimum Intervention</th>
+                        </tr>
+                    </thead>
+                    <tbody id="diagnosisBody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Section 2: 5 大系統 -->
+        <div id="systems" class="section">
+            <div style="background: white; padding: 20px; border-radius: 8px;">
+                <h2 style="color: var(--navy); margin-bottom: 20px;">幸福的結構層｜五大系統 <span class="stat-badge">5</span></h2>
+                <div id="systemsContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Section 3: Prediction Errors -->
+        <div id="errors" class="section">
+            <div style="background: white; padding: 20px; border-radius: 8px;">
+                <h2 style="color: var(--navy); margin-bottom: 20px;">幸福最大的 Prediction Error <span class="stat-badge">12</span></h2>
+                <div id="errorsContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Section 4: High Agency Algorithm -->
+        <div id="algorithms" class="section">
+            <div style="background: white; padding: 20px; border-radius: 8px;">
+                <h2 style="color: var(--navy); margin-bottom: 20px;">幸福 High Agency Algorithm</h2>
+                <div id="algorithmContainer"></div>
+            </div>
+        </div>
+        
+        <!-- Section 5: 幸福公式 -->
+        <div id="formula" class="section">
+            <div style="background: white; padding: 20px; border-radius: 8px;">
+                <h2 style="color: var(--navy); margin-bottom: 20px;">幸福公式與進化階層</h2>
+                <div id="formulaContainer"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p><strong>幸福 × Problem Diagnosis | Happiness × Problem Diagnosis</strong></p>
+        <p>Data Creator & Author: <span class="author">王欣蓉 Anne Wang</span></p>
+        <p>Bilingual Educational Framework | Fully English TTS Enabled</p>
+        <p>© 2026 | Developed for Happiness System Diagnosis & Life Navigation</p>
+    </div>
+    
+    <script type="application/json" id="appData">
+    {
+  "title_zh": "幸福 × Problem Diagnosis",
+  "title_en": "Happiness × Problem Diagnosis",
+  "subtitle_zh": "從「追求快樂」升級成「建立能持續生成幸福的生命系統」",
+  "subtitle_en": "Upgrading from 'Chasing Joy' to 'Building a Life System That Continuously Generates Happiness'",
+  "diagnosis_50": [
+    {"id": 1, "phenomenon_zh": "明明很好卻不快樂", "phenomenon_en": "Everything is good yet unhappy", "pattern_zh": "好事很快習慣", "pattern_en": "Good things quickly become normalized", "mechanism_zh": "快樂適應", "mechanism_en": "Hedonic Adaptation", "bottleneck_zh": "感受力下降", "bottleneck_en": "Diminished capacity to appreciate", "intervention_zh": "每天記一件值得珍惜的事", "intervention_en": "Record one thing worth cherishing daily"},
+    {"id": 2, "phenomenon_zh": "一直覺得不夠", "phenomenon_en": "Always feels insufficient", "pattern_zh": "得到後又想更多", "pattern_en": "After getting, want more", "mechanism_zh": "欲望目標持續上移", "mechanism_en": "Continuous upward shift of desire targets", "bottleneck_zh": "Enough Point不存在", "bottleneck_en": "No 'Enough Point' exists", "intervention_zh": "定義什麼叫「已經夠」", "intervention_en": "Define what 'enough' means"},
+    {"id": 3, "phenomenon_zh": "很容易羨慕別人", "phenomenon_en": "Easily envies others", "pattern_zh": "看別人的高光時刻", "pattern_en": "See only others' highlight moments", "mechanism_zh": "社會比較", "mechanism_en": "Social comparison", "bottleneck_zh": "注意力外包", "bottleneck_en": "Attention outsourced", "intervention_zh": "少看比較型資訊", "intervention_en": "Reduce exposure to comparison content"},
+    {"id": 4, "phenomenon_zh": "很在意別人眼光", "phenomenon_en": "Cares greatly about others' opinions", "pattern_zh": "決策先想別人怎麼看", "pattern_en": "Decisions prioritize how others see you", "mechanism_zh": "外部評價控制", "mechanism_en": "Controlled by external evaluation", "bottleneck_zh": "自我判準不足", "bottleneck_en": "Insufficient internal standards", "intervention_zh": "問「如果沒人知道，我還會選嗎？」", "intervention_en": "Ask 'Would I choose this if no one knew?'"},
+    {"id": 5, "phenomenon_zh": "達成目標仍空虛", "phenomenon_en": "Still empty after achieving goals", "pattern_zh": "快樂全部延後到未來", "pattern_en": "All happiness postponed to future", "mechanism_zh": "幸福與成就綁定", "mechanism_en": "Happiness bound to achievement", "bottleneck_zh": "當下消失", "bottleneck_en": "Present disappears", "intervention_zh": "今天安排一件本身就喜歡的事", "intervention_en": "Schedule one thing you genuinely enjoy today"},
+    {"id": 6, "phenomenon_zh": "每天很忙", "phenomenon_en": "Busy every day", "pattern_zh": "行程塞滿", "pattern_en": "Schedule completely packed", "mechanism_zh": "忙碌取代意義", "mechanism_en": "Busyness replaces meaning", "bottleneck_zh": "Priority失焦", "bottleneck_en": "Priority out of focus", "intervention_zh": "刪除一件低價值任務", "intervention_en": "Delete one low-value task"},
+    {"id": 7, "phenomenon_zh": "休息有罪惡感", "phenomenon_en": "Guilt about resting", "pattern_zh": "不產出就焦慮", "pattern_en": "Anxiety when not producing", "mechanism_zh": "價值＝生產力", "mechanism_en": "Value equals productivity", "bottleneck_zh": "恢復不足", "bottleneck_en": "Insufficient recovery", "intervention_zh": "安排20分鐘無目的休息", "intervention_en": "Schedule 20 minutes of purposeless rest"},
+    {"id": 8, "phenomenon_zh": "一停下來就空虛", "phenomenon_en": "Empty when pausing", "pattern_zh": "需要持續刺激", "pattern_en": "Requires continuous stimulation", "mechanism_zh": "無法與自己相處", "mechanism_en": "Cannot be with oneself", "bottleneck_zh": "內在連結不足", "bottleneck_en": "Insufficient internal connection", "intervention_zh": "每天10分鐘無手機", "intervention_en": "10 minutes phone-free daily"},
+    {"id": 9, "phenomenon_zh": "手機停不下來", "phenomenon_en": "Cannot put phone down", "pattern_zh": "無聊就滑", "pattern_en": "Scroll when bored", "mechanism_zh": "即時獎賞循環", "mechanism_en": "Immediate reward loop", "bottleneck_zh": "高刺激依賴", "bottleneck_en": "High-stimulation dependency", "intervention_zh": "手機離開休息空間", "intervention_en": "Remove phone from rest space"},
+    {"id": 10, "phenomenon_zh": "短影音越看越累", "phenomenon_en": "More tired watching short videos", "pattern_zh": "刺激不斷切換", "pattern_en": "Constant stimulus switching", "mechanism_zh": "注意力碎片化", "mechanism_en": "Attention fragmentation", "bottleneck_zh": "神經系統過載", "bottleneck_en": "Nervous system overload", "intervention_zh": "設定固定停止點", "intervention_en": "Set fixed stopping point"},
+    {"id": 11, "phenomenon_zh": "睡不好心情差", "phenomenon_en": "Poor sleep, poor mood", "pattern_zh": "疲累時特別負面", "pattern_en": "Especially negative when exhausted", "mechanism_zh": "生理狀態影響情緒調節", "mechanism_en": "Physiological state affects emotional regulation", "bottleneck_zh": "恢復不足", "bottleneck_en": "Insufficient recovery", "intervention_zh": "先穩定睡眠節律", "intervention_en": "Stabilize sleep rhythm first"},
+    {"id": 12, "phenomenon_zh": "身體不舒服就不快樂", "phenomenon_en": "Physical discomfort = unhappiness", "pattern_zh": "健康狀態影響生活能力", "pattern_en": "Health status affects life capacity", "mechanism_zh": "身心系統耦合", "mechanism_en": "Body-mind system coupling", "bottleneck_zh": "健康瓶頸", "bottleneck_en": "Health bottleneck", "intervention_zh": "先處理可改善的健康節點", "intervention_en": "Address improvable health nodes first"},
+    {"id": 13, "phenomenon_zh": "很容易焦慮", "phenomenon_en": "Easily anxious", "pattern_zh": "大腦一直模擬最壞結果", "pattern_en": "Brain constantly simulates worst outcome", "mechanism_zh": "威脅預測過高", "mechanism_en": "Threat prediction too high", "bottleneck_zh": "不確定性耐受低", "bottleneck_en": "Low uncertainty tolerance", "intervention_zh": "分開可控／不可控", "intervention_en": "Separate controllable/uncontrollable"},
+    {"id": 14, "phenomenon_zh": "一直想很多", "phenomenon_en": "Thinks too much", "pattern_zh": "思考沒有轉成決策", "pattern_en": "Thinking doesn't convert to decision", "mechanism_zh": "認知迴圈空轉", "mechanism_en": "Cognitive loop spinning empty", "bottleneck_zh": "缺少Action", "bottleneck_en": "Missing action", "intervention_zh": "寫下一個可做步驟", "intervention_en": "Write one doable step"},
+    {"id": 15, "phenomenon_zh": "常後悔過去", "phenomenon_en": "Often regrets past", "pattern_zh": "反覆重播不可改事件", "pattern_en": "Replays unchangeable events repeatedly", "mechanism_zh": "注意力被過去占用", "mechanism_en": "Attention occupied by past", "bottleneck_zh": "更新不足", "bottleneck_en": "Insufficient updating", "intervention_zh": "問「這件事教會我什麼？」", "intervention_en": "Ask 'What did this teach me?'"},
+    {"id": 16, "phenomenon_zh": "很怕未來", "phenomenon_en": "Fears the future", "pattern_zh": "一次預測十年", "pattern_en": "Predicts ten years at once", "mechanism_zh": "時間尺度過大", "mechanism_en": "Timescale too large", "bottleneck_zh": "未知過多", "bottleneck_en": "Too much unknown", "intervention_zh": "只處理下一個節點", "intervention_en": "Only address next node"},
+    {"id": 17, "phenomenon_zh": "害怕變老", "phenomenon_en": "Fears aging", "pattern_zh": "老＝失去", "pattern_en": "Old = loss", "mechanism_zh": "單一衰退模型", "mechanism_en": "Single decline model", "bottleneck_zh": "成長模型不足", "bottleneck_en": "Insufficient growth model", "intervention_zh": "建立下一階段的新能力", "intervention_en": "Build new capabilities for next stage"},
+    {"id": 18, "phenomenon_zh": "害怕死亡", "phenomenon_en": "Fears death", "pattern_zh": "希望控制終極不可控", "pattern_en": "Wants to control ultimate uncontrollable", "mechanism_zh": "控制範圍錯置", "mechanism_en": "Control boundaries misplaced", "bottleneck_zh": "接納不足", "bottleneck_en": "Insufficient acceptance", "intervention_zh": "回到今天真正重要的人事物", "intervention_en": "Return to today's truly important things"},
+    {"id": 19, "phenomenon_zh": "很怕失去", "phenomenon_en": "Fears loss", "pattern_zh": "擁有＝安全", "pattern_en": "Possession = safety", "mechanism_zh": "把穩定建立在外部", "mechanism_en": "Builds stability externally", "bottleneck_zh": "內部穩定不足", "bottleneck_en": "Insufficient internal stability", "intervention_zh": "練習區分擁有與存在", "intervention_en": "Practice distinguishing possession from being"},
+    {"id": 20, "phenomenon_zh": "一個人就孤單", "phenomenon_en": "Alone = lonely", "pattern_zh": "陪伴完全依賴外部", "pattern_en": "Companionship entirely external", "mechanism_zh": "自我連結不足", "mechanism_en": "Insufficient self-connection", "bottleneck_zh": "獨處能力低", "bottleneck_en": "Low capacity for solitude", "intervention_zh": "做一件自己喜歡的事", "intervention_en": "Do something you genuinely enjoy"},
+    {"id": 21, "phenomenon_zh": "很多人陪仍孤單", "phenomenon_en": "Many people yet still lonely", "pattern_zh": "關係多但連結淺", "pattern_en": "Many relationships but shallow connection", "mechanism_zh": "數量≠品質", "mechanism_en": "Quantity ≠ quality", "bottleneck_zh": "真實連結不足", "bottleneck_en": "Insufficient authentic connection", "intervention_zh": "和一個人深聊一次", "intervention_en": "Deep talk with one person"},
+    {"id": 22, "phenomenon_zh": "婚姻讓自己不快樂", "phenomenon_en": "Marriage makes unhappy", "pattern_zh": "幸福全部綁在伴侶", "pattern_en": "All happiness bound to partner", "mechanism_zh": "單點依賴", "mechanism_en": "Single-point dependency", "bottleneck_zh": "幸福來源過度集中", "bottleneck_en": "Happiness sources over-concentrated", "intervention_zh": "重建自己的生活節點", "intervention_en": "Rebuild your own life nodes"},
+    {"id": 23, "phenomenon_zh": "孩子不好自己就不好", "phenomenon_en": "Child's state = own state", "pattern_zh": "自我與孩子過度綁定", "pattern_en": "Self overly bound to child", "mechanism_zh": "邊界模糊", "mechanism_en": "Blurred boundaries", "bottleneck_zh": "控制不可控", "bottleneck_en": "Controlling uncontrollable", "intervention_zh": "區分孩子人生與自己人生", "intervention_en": "Separate child's life from your own"},
+    {"id": 24, "phenomenon_zh": "一直討好別人", "phenomenon_en": "Always people-pleasing", "pattern_zh": "害怕不被喜歡", "pattern_en": "Fears not being liked", "mechanism_zh": "關係安全依賴服從", "mechanism_en": "Relationship safety requires compliance", "bottleneck_zh": "邊界不足", "bottleneck_en": "Insufficient boundaries", "intervention_zh": "練習一次小拒絕", "intervention_en": "Practice one small refusal"},
+    {"id": 25, "phenomenon_zh": "不敢做自己", "phenomenon_en": "Afraid to be yourself", "pattern_zh": "長期自我壓縮", "pattern_en": "Long-term self-compression", "mechanism_zh": "外部模型支配選擇", "mechanism_en": "External model dominates choices", "bottleneck_zh": "自主不足", "bottleneck_en": "Insufficient autonomy", "intervention_zh": "說出一個真實偏好", "intervention_en": "Express one genuine preference"},
+    {"id": 26, "phenomenon_zh": "很容易生氣", "phenomenon_en": "Easily angry", "pattern_zh": "現實不符合預期", "pattern_en": "Reality doesn't match expectation", "mechanism_zh": "Prediction Error被人格化", "mechanism_en": "Prediction Error personified", "bottleneck_zh": "彈性不足", "bottleneck_en": "Insufficient flexibility", "intervention_zh": "先描述事件，不急著評價", "intervention_en": "Describe event first, don't rush to judge"},
+    {"id": 27, "phenomenon_zh": "很容易受傷", "phenomenon_en": "Easily hurt", "pattern_zh": "他人反應＝自己的價值", "pattern_en": "Others' response = your value", "mechanism_zh": "自我價值外包", "mechanism_en": "Self-worth outsourced", "bottleneck_zh": "Self-worth不穩", "bottleneck_en": "Unstable self-worth", "intervention_zh": "分開事件與自我價值", "intervention_en": "Separate event from self-worth"},
+    {"id": 28, "phenomenon_zh": "一直想證明自己", "phenomenon_en": "Always proving yourself", "pattern_zh": "成就用來換認可", "pattern_en": "Achievement traded for approval", "mechanism_zh": "Validation Loop", "mechanism_en": "Validation loop", "bottleneck_zh": "內在判準不足", "bottleneck_en": "Insufficient internal standards", "intervention_zh": "做一件不需要被看見的事", "intervention_en": "Do something that needs no visibility"},
+    {"id": 29, "phenomenon_zh": "成功後還想更成功", "phenomenon_en": "Always want more success", "pattern_zh": "成就基準持續提高", "pattern_en": "Achievement baseline continuously rises", "mechanism_zh": "Hedonic Adaptation", "mechanism_en": "Hedonic Adaptation", "bottleneck_zh": "終點函數不存在", "bottleneck_en": "End function doesn't exist", "intervention_zh": "定義成功的上限與用途", "intervention_en": "Define success ceiling and purpose"},
+    {"id": 30, "phenomenon_zh": "賺很多仍焦慮", "phenomenon_en": "Earn much, still anxious", "pattern_zh": "錢＝安全", "pattern_en": "Money = safety", "mechanism_zh": "安全需求沒有上限", "mechanism_en": "Safety needs limitless", "bottleneck_zh": "Enough Point不明", "bottleneck_en": "'Enough Point' unclear", "intervention_zh": "算出自己的「夠」", "intervention_en": "Calculate your 'enough'"},
+    {"id": 31, "phenomenon_zh": "買東西才開心", "phenomenon_en": "Only happy when shopping", "pattern_zh": "消費提供短期獎賞", "pattern_en": "Consumption provides short-term reward", "mechanism_zh": "快樂外包給消費", "mechanism_en": "Happiness outsourced to consumption", "bottleneck_zh": "內在獎賞不足", "bottleneck_en": "Insufficient internal reward", "intervention_zh": "延遲購買24小時", "intervention_en": "Delay purchase 24 hours"},
+    {"id": 32, "phenomenon_zh": "旅行回來又空虛", "phenomenon_en": "Empty after travel", "pattern_zh": "快樂依賴特殊事件", "pattern_en": "Happiness depends on special events", "mechanism_zh": "日常幸福密度低", "mechanism_en": "Low happiness density in daily life", "bottleneck_zh": "平日生活品質不足", "bottleneck_en": "Insufficient weekday life quality", "intervention_zh": "優化普通的一天", "intervention_en": "Optimize an ordinary day"},
+    {"id": 33, "phenomenon_zh": "一直等退休才幸福", "phenomenon_en": "Wait for retirement to be happy", "pattern_zh": "幸福被延後", "pattern_en": "Happiness postponed", "mechanism_zh": "未來幸福模型", "mechanism_en": "Future happiness model", "bottleneck_zh": "當下成本太高", "bottleneck_en": "Present cost too high", "intervention_zh": "每週放進一件退休後想做的事", "intervention_en": "Do one retirement thing weekly"},
+    {"id": 34, "phenomenon_zh": "工作沒有意義", "phenomenon_en": "Work has no meaning", "pattern_zh": "只剩任務與薪水", "pattern_en": "Only tasks and salary remain", "mechanism_zh": "工作與價值斷線", "mechanism_en": "Work disconnected from value", "bottleneck_zh": "Purpose不足", "bottleneck_en": "Insufficient purpose", "intervention_zh": "找出工作真正服務誰", "intervention_en": "Find who work truly serves"},
+    {"id": 35, "phenomenon_zh": "覺得人生沒有方向", "phenomenon_en": "Feel life has no direction", "pattern_zh": "選項很多卻沒有判準", "pattern_en": "Many options but no criteria", "mechanism_zh": "目標函數模糊", "mechanism_en": "Objective function unclear", "bottleneck_zh": "Values不足", "bottleneck_en": "Insufficient values clarity", "intervention_zh": "寫下最重要的3件事", "intervention_en": "Write three most important things"},
+    {"id": 36, "phenomenon_zh": "什麼都想要", "phenomenon_en": "Want everything", "pattern_zh": "多目標互相競爭", "pattern_en": "Multiple goals compete", "mechanism_zh": "資源分散", "mechanism_en": "Resources scattered", "bottleneck_zh": "Priority不足", "bottleneck_en": "Insufficient priority", "intervention_zh": "現階段只選一個主軸", "intervention_en": "Choose one main axis now"},
+    {"id": 37, "phenomenon_zh": "很怕選錯", "phenomenon_en": "Fear choosing wrong", "pattern_zh": "希望一次選到完美答案", "pattern_en": "Want perfect answer on first try", "mechanism_zh": "不允許Model Update", "mechanism_en": "No model updating allowed", "bottleneck_zh": "決策僵化", "bottleneck_en": "Frozen decision-making", "intervention_zh": "選可逆的小實驗", "intervention_en": "Choose reversible small experiment"},
+    {"id": 38, "phenomenon_zh": "犯錯就責怪自己", "phenomenon_en": "Blame self for mistakes", "pattern_zh": "Error＝失敗", "pattern_en": "Error = failure", "mechanism_zh": "錯誤人格化", "mechanism_en": "Error personified", "bottleneck_zh": "學習迴路中斷", "bottleneck_en": "Learning loop interrupted", "intervention_zh": "改問「哪個模型錯了？」", "intervention_en": "Ask 'Which model was wrong?'"},
+    {"id": 39, "phenomenon_zh": "遇到失敗就崩", "phenomenon_en": "Collapse at failure", "pattern_zh": "結果＝自我價值", "pattern_en": "Outcome = self-worth", "mechanism_zh": "Identity與Outcome綁定", "mechanism_en": "Identity bound to outcome", "bottleneck_zh": "心理彈性不足", "bottleneck_en": "Insufficient psychological flexibility", "intervention_zh": "把結果改寫成Feedback", "intervention_en": "Rewrite outcome as feedback"},
+    {"id": 40, "phenomenon_zh": "生活一成不變", "phenomenon_en": "Life unchanging", "pattern_zh": "系統長期沒有新輸入", "pattern_en": "System lacks new input long-term", "mechanism_zh": "探索下降", "mechanism_en": "Exploration declined", "bottleneck_zh": "新鮮度不足", "bottleneck_en": "Insufficient novelty", "intervention_zh": "每週做一件新事情", "intervention_en": "Do one new thing weekly"},
+    {"id": 41, "phenomenon_zh": "每天都很累", "phenomenon_en": "Tired every day", "pattern_zh": "輸出大於恢復", "pattern_en": "Output exceeds recovery", "mechanism_zh": "長期高耗散", "mechanism_en": "Long-term high dissipation", "bottleneck_zh": "能量不足", "bottleneck_en": "Insufficient energy", "intervention_zh": "找最大耗能源", "intervention_en": "Find biggest energy drain"},
+    {"id": 42, "phenomenon_zh": "社交很多卻疲累", "phenomenon_en": "Much socializing yet exhausted", "pattern_zh": "低品質互動過多", "pattern_en": "Too much low-quality interaction", "mechanism_zh": "關係耗散", "mechanism_en": "Relationship dissipation", "bottleneck_zh": "邊界不足", "bottleneck_en": "Insufficient boundaries", "intervention_zh": "減少一個低價值社交", "intervention_en": "Remove one low-value social"},
+    {"id": 43, "phenomenon_zh": "沒有人懂自己", "phenomenon_en": "No one understands", "pattern_zh": "很少真正表達", "pattern_en": "Rarely truly express", "mechanism_zh": "他人只能猜測", "mechanism_en": "Others only guess", "bottleneck_zh": "真實訊號不足", "bottleneck_en": "Insufficient authentic signal", "intervention_zh": "說出一個真實感受", "intervention_en": "Express one genuine feeling"},
+    {"id": 44, "phenomenon_zh": "總覺得別人比較幸運", "phenomenon_en": "Feel others more fortunate", "pattern_zh": "只看到結果", "pattern_en": "See only results", "mechanism_zh": "忽略隱藏成本", "mechanism_en": "Ignore hidden costs", "bottleneck_zh": "資訊失真", "bottleneck_en": "Information distortion", "intervention_zh": "比較完整人生而非單點", "intervention_en": "Compare whole life, not single point"},
+    {"id": 45, "phenomenon_zh": "覺得人生太晚了", "phenomenon_en": "Feel it's too late", "pattern_zh": "年齡＝機會減少", "pattern_en": "Age = fewer opportunities", "mechanism_zh": "固定型時間模型", "mechanism_en": "Fixed time model", "bottleneck_zh": "未來可能性被關閉", "bottleneck_en": "Future possibilities closed", "intervention_zh": "問「現在還能生成什麼？」", "intervention_en": "Ask 'What can still be created?'"},
+    {"id": 46, "phenomenon_zh": "過去不好所以不會幸福", "phenomenon_en": "Bad past = unhappy future", "pattern_zh": "過去＝命運", "pattern_en": "Past = fate", "mechanism_zh": "舊模型綁架未來", "mechanism_en": "Old model hijacks future", "bottleneck_zh": "更新能力不足", "bottleneck_en": "Insufficient updating", "intervention_zh": "找一個反例", "intervention_en": "Find one counterexample"},
+    {"id": 47, "phenomenon_zh": "要等環境變好才幸福", "phenomenon_en": "Wait for environment to improve", "pattern_zh": "幸福控制權全部外包", "pattern_en": "Happiness control fully outsourced", "mechanism_zh": "External Control過高", "mechanism_en": "External control too high", "bottleneck_zh": "Agency不足", "bottleneck_en": "Insufficient agency", "intervention_zh": "今天改一個可控變數", "intervention_en": "Change one controllable variable today"},
+    {"id": 48, "phenomenon_zh": "努力很多仍不幸福", "phenomenon_en": "Effort much, happiness none", "pattern_zh": "Output很高，生命品質低", "pattern_en": "High output, low life quality", "mechanism_zh": "目標函數設定錯誤", "mechanism_en": "Objective function wrong", "bottleneck_zh": "把效率當幸福", "bottleneck_en": "Efficiency mistaken for happiness", "intervention_zh": "重算真正重要的輸出", "intervention_en": "Recalculate truly important output"},
+    {"id": 49, "phenomenon_zh": "不知道自己要什麼", "phenomenon_en": "Don't know what you want", "pattern_zh": "長期回應別人的需求", "pattern_en": "Long-term responding to others' needs", "mechanism_zh": "自我訊號變弱", "mechanism_en": "Self-signal weakened", "bottleneck_zh": "自我感知不足", "bottleneck_en": "Insufficient self-awareness", "intervention_zh": "每天問一次「我現在需要什麼？」", "intervention_en": "Ask daily 'What do I need now?'"},
+    {"id": 50, "phenomenon_zh": "不知道幸福是什麼", "phenomenon_en": "Don't know what happiness is", "pattern_zh": "幸福＝永遠開心", "pattern_en": "Happiness = always happy", "mechanism_zh": "定義錯誤", "mechanism_en": "Wrong definition", "bottleneck_zh": "Happiness Model失真", "bottleneck_en": "Happiness model distorted", "intervention_zh": "重新定義幸福", "intervention_en": "Redefine happiness"}
+  ],
+  "five_systems": [
+    {"id": 1, "name_zh": "①身體系統", "name_en": "① Body System", "content_zh": "睡眠、能量、運動、健康、感官、恢復。身體是幸福的底層硬體之一。", "content_en": "Sleep, energy, exercise, health, senses, recovery. Body is foundational hardware for happiness."},
+    {"id": 2, "name_zh": "②認知系統", "name_en": "② Cognitive System", "content_zh": "我怎麼解讀事情？我把失敗看成什麼？我把年齡看成什麼？我把別人的反應看成什麼？很多痛苦不是事件本身，而是事件進入舊模型後產生的預測。", "content_en": "How do I interpret events? What do I make of failure? What do I make of age? What do I make of others' reactions? Much suffering isn't the event itself, but prediction generated when events enter old models."},
+    {"id": 3, "name_zh": "③情緒系統", "name_en": "③ Emotional System", "content_zh": "不是消滅負面情緒。而是：能辨識、能容納、能調節、能恢復、能讀懂情緒提供的訊號。", "content_en": "Not eliminating negative emotions. Rather: identify, contain, regulate, recover, read signals emotions provide."},
+    {"id": 4, "name_zh": "④關係系統", "name_en": "④ Relationship System", "content_zh": "有人可以分享、求助、真正理解。自己也能愛、支持與貢獻別人。高品質關係通常比大量弱連結更有價值。", "content_en": "Someone to share with, seek help from, be truly understood. Capacity to love, support, contribute. High-quality connection typically more valuable than many weak ties."},
+    {"id": 5, "name_zh": "⑤意義/Agency系統", "name_en": "⑤ Meaning/Agency System", "content_zh": "知道什麼重要、能做選擇、能採取行動、能創造價值、能讓今天比昨天多一點可能性。", "content_en": "Know what matters, make choices, take action, create value, add possibility to today beyond yesterday."}
+  ],
+  "prediction_errors": [
+    {"id": 1, "error_zh": "「有錢就會幸福。」", "error_en": "'Money brings happiness.'", "update_zh": "錢能降低很多現實壓力並增加選擇權，但不是幸福的全部生成機制。", "update_en": "Money reduces pressure and increases choice, but isn't the complete happiness-generation mechanism."},
+    {"id": 2, "error_zh": "「結婚就會幸福。」", "error_en": "'Marriage brings happiness.'", "update_zh": "關係品質比關係形式重要。", "update_en": "Relationship quality matters more than relationship form."},
+    {"id": 3, "error_zh": "「孩子成功，我就幸福。」", "error_en": "'Child's success = my happiness.'", "update_zh": "把幸福綁在另一個人的結果上，會降低自己的控制權。", "update_en": "Binding happiness to another's outcome reduces your control."},
+    {"id": 4, "error_zh": "「成功之後我就可以休息。」", "error_en": "'Rest after success.'", "update_zh": "如果成功模型本身沒有終點，休息永遠不會到來。", "update_en": "Without an end point in the success model, rest never arrives."},
+    {"id": 5, "error_zh": "「等退休就自由了。」", "error_en": "'Freedom comes at retirement.'", "update_zh": "如果現在沒有建立生活能力，退休不一定自動產生幸福。", "update_en": "Without building life capacity now, retirement won't automatically generate happiness."},
+    {"id": 6, "error_zh": "「正向思考就不會痛苦。」", "error_en": "'Positive thinking eliminates suffering.'", "update_zh": "成熟不是禁止痛苦，而是提高處理痛苦與恢復的能力。", "update_en": "Maturity isn't preventing suffering, but increasing capacity to process and recover."},
+    {"id": 7, "error_zh": "「幸福的人不會難過。」", "error_en": "'Happy people don't grieve.'", "update_zh": "悲傷、失望、恐懼本來就是正常生命訊號。", "update_en": "Sadness, disappointment, fear are normal life signals."},
+    {"id": 8, "error_zh": "「別人喜歡我，我才有價值。」", "error_en": "'Others' approval = my value.'", "update_zh": "他人的評價是Feedback，不是你的本體價值。", "update_en": "Others' evaluation is feedback, not your core value."},
+    {"id": 9, "error_zh": "「選錯一次，人生就毀了。」", "error_en": "'One wrong choice = ruined life.'", "update_zh": "很多人生選擇可以透過Feedback持續修正。", "update_en": "Many life choices can be continuously adjusted through feedback."},
+    {"id": 10, "error_zh": "「我的個性就是這樣。」", "error_en": "'My personality is fixed.'", "update_zh": "部分模式具有穩定性，但行為、能力、環境與應對方式仍然可以學習與調整。", "update_en": "Some patterns are stable, but behavior, ability, environment, responses can still be learned and adjusted."},
+    {"id": 11, "error_zh": "「我的過去決定我的未來。」", "error_en": "'My past determines my future.'", "update_zh": "過去影響初始條件，不等於鎖死所有未來狀態。", "update_en": "Past affects initial conditions, doesn't lock all future states."},
+    {"id": 12, "error_zh": "「幸福就是沒有問題。」", "error_en": "'Happiness = no problems.'", "update_zh": "更穩定的幸福來自：【即使問題出現，我仍具有更新能力。】", "update_en": "More stable happiness comes from: even when problems appear, I have updating capacity."}
+  ]
+}
+    </script>
+    
+    <script>
+        // 初始化應用
+        const appData = JSON.parse(document.getElementById('appData').textContent);
+        let currentSearch = '';
+        
+        // Tab 切換
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                
+                // 移除所有 active 類別
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                
+                // 添加 active 類別
+                this.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+        
+        // 初始化診斷表格
+        function initDiagnosisTable() {
+            const tbody = document.getElementById('diagnosisBody');
+            tbody.innerHTML = '';
+            
+            appData.diagnosis_50.forEach((item, idx) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="id-col">${item.id}</td>
+                    <td>
+                        <div class="zh-text">${item.phenomenon_zh}</div>
+                        <div class="en-text">${item.phenomenon_en}</div>
+                    </td>
+                    <td>
+                        <div class="zh-text">${item.pattern_zh}</div>
+                        <div class="en-text">${item.pattern_en}</div>
+                    </td>
+                    <td>
+                        <div class="zh-text">${item.mechanism_zh}</div>
+                        <div class="en-text">${item.mechanism_en}</div>
+                    </td>
+                    <td>
+                        <div class="zh-text">${item.bottleneck_zh}</div>
+                        <div class="en-text">${item.bottleneck_en}</div>
+                    </td>
+                    <td>
+                        <div class="zh-text">${item.intervention_zh}</div>
+                        <div class="en-text">${item.intervention_en}
+                            <button class="tts-btn" data-text="${item.intervention_en}" onclick="speakText(this)">🔊 Say</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 搜尋功能
+        function searchTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const table = document.getElementById('diagnosisTable');
+            const rows = table.getElementsByTagName('tr');
+            let count = 0;
+            
+            for (let i = 1; i < rows.length; i++) {
+                const row = rows[i];
+                const text = row.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    row.style.display = '';
+                    count++;
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+            
+            currentSearch = input;
+        }
+        
+        function resetSearch() {
+            document.getElementById('searchInput').value = '';
+            currentSearch = '';
+            const table = document.getElementById('diagnosisTable');
+            const rows = table.getElementsByTagName('tr');
+            for (let i = 1; i < rows.length; i++) {
+                rows[i].style.display = '';
+            }
+        }
+        
+        // 初始化5大系統
+        function initSystems() {
+            const container = document.getElementById('systemsContainer');
+            container.innerHTML = '';
+            
+            appData.five_systems.forEach((system, idx) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">${system.name_zh} / ${system.name_en}</div>
+                        <button class="card-toggle" onclick="this.classList.toggle('open'); this.parentElement.nextElementSibling.classList.toggle('open')">▼</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="text-group">
+                            <label>中文</label>
+                            <div class="zh">${system.content_zh}</div>
+                        </div>
+                        <div class="text-group">
+                            <label>English</label>
+                            <div class="en">${system.content_en}
+                                <button class="tts-btn" data-text="${system.content_en}" onclick="speakText(this)">🔊 Say</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // 初始化Prediction Errors
+        function initErrors() {
+            const container = document.getElementById('errorsContainer');
+            container.innerHTML = '';
+            
+            appData.prediction_errors.forEach((error, idx) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">Prediction Error ${error.id}</div>
+                        <button class="card-toggle" onclick="this.classList.toggle('open'); this.parentElement.nextElementSibling.classList.toggle('open')">▼</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="row-field">
+                            <div class="row-label">Error:</div>
+                            <div class="row-value single">
+                                <div class="zh-text">${error.error_zh}</div>
+                                <div class="en-text">${error.error_en}</div>
+                            </div>
+                        </div>
+                        <div class="row-field">
+                            <div class="row-label">Update:</div>
+                            <div class="row-value">
+                                <div>
+                                    <div class="zh-text">${error.update_zh}</div>
+                                </div>
+                                <div>
+                                    <div class="en-text">${error.update_en}
+                                        <button class="tts-btn" data-text="${error.update_en}" onclick="speakText(this)">🔊 Say</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        // 初始化Algorithm
+        function initAlgorithm() {
+            const container = document.getElementById('algorithmContainer');
+            const algorithmText = `
+                <div style="line-height: 2; font-size: 15px; color: var(--navy);">
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Input:</strong> 我現在真正感受到什麼？<br>
+                        <span style="color: #666; font-size: 13px;">What do I truly feel right now?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Diagnosis:</strong> 身體？情緒？關係？工作？財富？意義？哪裡出了問題？<br>
+                        <span style="color: #666; font-size: 13px;">Body? Emotion? Relationship? Work? Wealth? Meaning? What's wrong?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Pattern:</strong> 什麼事情一直重複？<br>
+                        <span style="color: #666; font-size: 13px;">What keeps repeating?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Mechanism:</strong> 什麼結構一直生成這個結果？<br>
+                        <span style="color: #666; font-size: 13px;">What structure generates this repeatedly?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Bottleneck:</strong> 最大的生命耗損在哪？<br>
+                        <span style="color: #666; font-size: 13px;">Where's the biggest life drain?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Priority Node:</strong> 如果只改善一件事，哪件最值得？<br>
+                        <span style="color: #666; font-size: 13px;">If improving one thing, which matters most?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Skill:</strong> 我要補哪個能力？<br>
+                        <span style="color: #666; font-size: 13px;">Which skill to develop: sleep? emotion? communication? boundaries? finance? time? decision?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Minimum Intervention:</strong> 今天只做什麼？<br>
+                        <span style="color: #666; font-size: 13px;">What's the smallest action today?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Action</strong>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Feedback:</strong> 我的能量、情緒、關係、生活品質有沒有改變？<br>
+                        <span style="color: #666; font-size: 13px;">Did energy, emotion, relationship, life quality change?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Prediction Error:</strong> 我原本以為什麼會讓我幸福，結果沒有？<br>
+                        <span style="color: #666; font-size: 13px;">What did I predict would work that didn't?</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Model Update:</strong> 重新修改幸福模型<br>
+                        <span style="color: #666; font-size: 13px;">Update happiness model</span>
+                    </div>
+                    <div style="text-align: center; color: var(--gold); margin: 15px 0;">↓</div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <strong style="color: var(--gold);">Retest</strong>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = algorithmText;
+        }
+        
+        // 初始化公式
+        function initFormula() {
+            const container = document.getElementById('formulaContainer');
+            const formulaHTML = `
+                <div style="background: #F5F9FC; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: var(--navy); margin-bottom: 15px;">幸福公式 | Happiness Formula</h3>
+                    <div style="font-size: 15px; line-height: 2; color: var(--navy);">
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: var(--gold);">幸福品質 / Happiness Quality</strong><br>
+                            = 健康 × 自主 × 高品質關係 × 意義 × 成長 × 恢復能力<br>
+                            = Health × Autonomy × Quality Relationships × Meaning × Growth × Recovery Capacity
+                        </div>
+                        <div style="background: white; padding: 15px; border-left: 4px solid var(--gold); margin: 15px 0;">
+                            <span style="color: var(--teal);">※ 其中任何重要變數長期接近零，整體幸福都可能受到限制</span><br>
+                            <span style="font-size: 13px; color: #666;">Any key variable approaching zero will limit overall happiness</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #F5F9FC; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: var(--navy); margin-bottom: 15px;">幸福效能 | Happiness Efficiency</h3>
+                    <div style="font-size: 15px; line-height: 2; color: var(--navy);">
+                        <strong style="color: var(--gold);">幸福效能 / Happiness Efficiency</strong><br>
+                        = 生命價值輸出 ÷ 不必要生命耗損<br>
+                        = Life Value Output ÷ Unnecessary Life Dissipation
+                    </div>
+                </div>
+                
+                <div style="background: #F5F9FC; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: var(--navy); margin-bottom: 15px;">幸福優化方向 | Happiness Optimization</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 14px;">
+                        <div>
+                            <strong style="color: var(--gold);">增加 / Increase:</strong>
+                            <ul style="margin: 10px 0 0 20px; color: var(--navy);">
+                                <li>健康 / Health</li>
+                                <li>能量 / Energy</li>
+                                <li>自主 / Autonomy</li>
+                                <li>連結 / Connection</li>
+                                <li>意義 / Meaning</li>
+                                <li>創造 / Creation</li>
+                                <li>成長 / Growth</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <strong style="color: var(--gold);">降低 / Decrease:</strong>
+                            <ul style="margin: 10px 0 0 20px; color: var(--navy);">
+                                <li>內耗 / Internal friction</li>
+                                <li>比較 / Comparison</li>
+                                <li>討好 / People-pleasing</li>
+                                <li>無效社交 / Low-value socializing</li>
+                                <li>高刺激依賴 / High-stimulation dependency</li>
+                                <li>錯誤目標 / Wrong targets</li>
+                                <li>不可控執念 / Uncontrollable attachment</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: #F5F9FC; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: var(--navy); margin-bottom: 15px;">幸福最高階的進化 | Highest Evolution</h3>
+                    <div style="font-size: 15px; line-height: 2; color: var(--navy);">
+                        <div style="background: #FFF8E7; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <strong style="color: var(--navy);">真正成長 / True Growth</strong><br>
+                            <span style="color: #666;">= 預測精度提高 / Prediction accuracy improves</span>
+                        </div>
+                        <div style="background: #FFF8E7; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <strong style="color: var(--navy);">真正自由 / True Freedom</strong><br>
+                            <span style="color: #666;">= 不再被舊模型綁架 / No longer hijacked by old models</span>
+                        </div>
+                        <div style="background: #FFF8E7; padding: 15px; border-radius: 6px;">
+                            <strong style="color: var(--navy);">真正幸福 / True Happiness</strong><br>
+                            <span style="color: #666;">= 即使世界持續變動，我仍然擁有調節、連結、選擇、創造與更新自己的能力</span><br>
+                            <span style="font-size: 13px; color: #888;">Even as world changes, I maintain capacity to regulate, connect, choose, create, and update myself</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = formulaHTML;
+        }
+        
+        // TTS 功能 (英文)
+        function speakText(btn) {
+            const text = btn.dataset.text;
+            
+            if ('speechSynthesis' in window) {
+                // 停止現在播放
+                window.speechSynthesis.cancel();
+                
+                // 建立新的 utterance
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                btn.classList.add('playing');
+                
+                utterance.onend = function() {
+                    btn.classList.remove('playing');
+                };
+                
+                utterance.onerror = function() {
+                    btn.classList.remove('playing');
+                };
+                
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Speech Synthesis not supported in this browser');
+            }
+        }
+        
+        // 初始化所有部分
+        window.addEventListener('load', function() {
+            initDiagnosisTable();
+            initSystems();
+            initErrors();
+            initAlgorithm();
+            initFormula();
+        });
+    </script>
+</body>
+</html>
