@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stress × Problem Diagnosis 壓力診斷系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --navy: #1A2B5F;
+            --gold: #C9960C;
+            --teal: #0A7A72;
+            --light-bg: #F8F9FA;
+        }
+        
+        body {
+            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            background: var(--light-bg);
+            color: var(--navy);
+            line-height: 1.8;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        
+        header p {
+            font-size: 1rem;
+            opacity: 0.95;
+            margin-bottom: 0.3rem;
+        }
+        
+        .author {
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            opacity: 0.8;
+            color: var(--gold);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            background: white;
+            border: 2px solid var(--navy);
+            color: var(--navy);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: var(--navy);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: white;
+            border-left: 4px solid var(--gold);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            color: white;
+            padding: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+        
+        .card-header:hover {
+            background: linear-gradient(135deg, var(--teal) 0%, var(--navy) 100%);
+        }
+        
+        .card-header-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .card-toggle {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .card.open .card-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .card-body {
+            display: none;
+            padding: 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .card.open .card-body {
+            display: block;
+            max-height: 5000px;
+        }
+        
+        .bilingual-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            align-items: start;
+        }
+        
+        .bilingual-row.full {
+            grid-template-columns: 1fr;
+        }
+        
+        .cn-text {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: var(--navy);
+            font-weight: 500;
+        }
+        
+        .en-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #444;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .tts-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin-top: 0.5rem;
+        }
+        
+        .tts-btn:hover {
+            background: #065C54;
+            transform: translateY(-2px);
+        }
+        
+        .tts-btn:active {
+            transform: translateY(0);
+        }
+        
+        .tts-btn.playing {
+            background: var(--gold);
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        th {
+            background: var(--navy);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid #E0E0E0;
+        }
+        
+        tr:hover {
+            background: #F5F5F5;
+        }
+        
+        .id-col {
+            color: var(--gold);
+            font-weight: bold;
+            min-width: 50px;
+        }
+        
+        .highlight-gold {
+            color: var(--gold);
+            font-weight: 600;
+        }
+        
+        .highlight-teal {
+            color: var(--teal);
+            font-weight: 600;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--navy);
+            margin: 2rem 0 1.5rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--gold);
+            font-weight: bold;
+        }
+        
+        .subsection-title {
+            font-size: 1.2rem;
+            color: var(--teal);
+            margin: 1.5rem 0 1rem 0;
+            font-weight: 600;
+        }
+        
+        .flow-diagram {
+            background: white;
+            border: 2px solid var(--teal);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: monospace;
+            line-height: 2;
+            color: var(--navy);
+        }
+        
+        .formula-box {
+            background: linear-gradient(135deg, rgba(26,43,95,0.05) 0%, rgba(10,122,114,0.05) 100%);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: "Courier New", monospace;
+            line-height: 2;
+        }
+        
+        .quote-box {
+            border-left: 4px solid var(--gold);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            background: #FFF9E6;
+            border-radius: 4px;
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: var(--navy);
+            font-style: italic;
+        }
+        
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .grid-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--teal);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        
+        .grid-item-title {
+            color: var(--navy);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            font-size: 1.05rem;
+        }
+        
+        footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 3rem;
+            font-size: 0.95rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .bilingual-row {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-btn {
+                width: 100%;
+            }
+        }
+        
+        .search-box {
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--navy);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 8px rgba(201, 150, 12, 0.3);
+        }
+        
+        .summary-box {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-box h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .summary-box p {
+            margin-bottom: 0.8rem;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>壓力 × 問題診斷</h1>
+        <p>Stress × Problem Diagnosis</p>
+        <p style="font-size: 0.95rem; margin-top: 0.5rem;">從「我要消滅壓力」升級成「壓力＝需求＞資源的系統警報」</p>
+        <div class="author">作者 / Author: 王欣蓉 Anne Wang</div>
+    </header>
+    
+    <div class="container">
+        <div class="summary-box">
+            <h3>核心洞見 / Core Insight</h3>
+            <p><strong>壓力不是敵人。</strong> Stress is not the enemy.</p>
+            <p><strong>壓力＝系統預測「眼前需求可能超過目前可用資源」時，啟動的動員反應。</strong></p>
+            <p><strong>Stress = the mobilization response triggered when the system predicts that current demands may exceed available resources.</strong></p>
+        </div>
+        
+        <div class="nav-tabs" id="navTabs"></div>
+        
+        <!-- Section 1: Diagnosis Table -->
+        <div class="section active" id="section-1">
+            <div class="section-title">50項壓力現象診斷表 / 50 Stress Phenomena Diagnosis Table</div>
+            
+            <div class="search-box">
+                <input type="text" id="searchDiagnosis" placeholder="搜尋症狀 / Search symptoms...">
+            </div>
+            
+            <div class="table-container">
+                <table id="diagnosisTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>壓力現象 / Phenomenon</th>
+                            <th>容易形成的舊模型 / Old Model</th>
+                            <th>高解析度模型 / High-Resolution Model</th>
+                            <th>Priority Node</th>
+                            <th>最小介入 / Minimum Intervention</th>
+                        </tr>
+                    </thead>
+                    <tbody id="diagnosisBody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Section 2: Foundational Layer -->
+        <div class="section" id="section-2">
+            <div class="section-title">本體層 / Foundational Layer：壓力到底是什麼？</div>
+            <div class="section-title" style="border-bottom-color: var(--teal); font-size: 1.2rem; margin-top: 0;">What is Stress Really?</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">低階、高階、再高階 / Progression of Understanding</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>低階：</strong><br>壓力＝壞東西。<br><br>
+                            <strong>更高階：</strong><br>壓力＝身心面對需求時的動員。<br><br>
+                            <strong>再高階：</strong><br>壓力＝需求、資源、預測與控制感之間的動態關係。
+                        </div>
+                        <div class="en-text">
+                            <strong>Level 1:</strong><br>Stress = Something Bad.<br><br>
+                            <strong>Level 2:</strong><br>Stress = Mobilization in response to demand.<br><br>
+                            <strong>Level 3:</strong><br>Stress = Dynamic relationship between demand, resources, prediction, and sense of control.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力公式 / Stress Formula</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="formula-box">
+                        <strong>壓力負荷 ≈ 感知需求 ÷ (可用資源 + 控制感 + 恢復能力)</strong><br><br>
+                        <strong>Stress Load ≈ Perceived Demand ÷ (Available Resources + Sense of Control + Recovery Capacity)</strong><br><br>
+                        <em style="color: #666;">※ Not a medical calculation formula, but a systems thinking model.</em>
+                    </div>
+                    
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>例子：同一場考試</strong><br><br>
+                            A覺得：「完蛋了。」<br><br>
+                            B覺得：「有挑戰，但我準備過。」<br><br>
+                            事件相同。壓力輸出可能完全不同。因為中間還有：<br>
+                            Interpretation. Prediction. Skill. Experience. Control. Support. Energy.
+                        </div>
+                        <div class="en-text">
+                            <strong>Example: Same Exam</strong><br><br>
+                            Person A thinks: "I'm doomed."<br><br>
+                            Person B thinks: "This is challenging, but I've prepared."<br><br>
+                            Same event. Completely different stress output. Because between them lies:<br>
+                            Interpretation. Prediction. Skill. Experience. Control. Support. Energy.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 3: Structural Layer -->
+        <div class="section" id="section-3">
+            <div class="section-title">結構層 / Structural Layer：壓力的12大來源</div>
+            <div class="section-title" style="border-bottom-color: var(--teal); font-size: 1.2rem; margin-top: 0;">12 Major Sources of Stress</div>
+            
+            <div class="grid-2">
+                <div class="grid-item">
+                    <div class="grid-item-title">01. 任務壓力 / Task Stress</div>
+                    <p style="color: #666;">事情太多。 Too many things to do.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">02. 時間壓力 / Time Pressure</div>
+                    <p style="color: #666;">期限太近。 Deadlines too close.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">03. 能力壓力 / Capability Gap</div>
+                    <p style="color: #666;">需求高於Skill。 Demand exceeds skill.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">04. 資訊壓力 / Information Overload</div>
+                    <p style="color: #666;">輸入超過處理容量。 Input exceeds processing capacity.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">05. 不確定壓力 / Uncertainty</div>
+                    <p style="color: #666;">不知道會發生什麼。 Not knowing what will happen.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">06. 控制壓力 / Lack of Control</div>
+                    <p style="color: #666;">事情重要卻不可控。 Important but uncontrollable.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">07. 評價壓力 / Evaluation Anxiety</div>
+                    <p style="color: #666;">害怕被否定。 Fear of rejection.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">08. 關係壓力 / Relationship Conflict</div>
+                    <p style="color: #666;">衝突、冷漠、界線問題。 Conflict, coldness, boundaries.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">09. 財務壓力 / Financial Stress</div>
+                    <p style="color: #666;">資源與未來安全感不足。 Insufficient resources and security.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">10. 健康壓力 / Health Concerns</div>
+                    <p style="color: #666;">疾病、症狀、照顧負荷。 Illness, symptoms, caregiving.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">11. 價值衝突 / Value Conflict</div>
+                    <p style="color: #666;">做的事情與內在價值不一致。 Actions misaligned with values.</p>
+                </div>
+                <div class="grid-item">
+                    <div class="grid-item-title">12. 存在壓力 / Existential Stress</div>
+                    <p style="color: #666;">不知道自己為何而忙。 Not knowing why you're busy.</p>
+                </div>
+            </div>
+            
+            <div class="quote-box">
+                <strong>不同壓力，不能只用同一個「放鬆」處理。</strong><br>
+                Different stress types require different interventions. One-size-fits-all relaxation won't work.
+            </div>
+        </div>
+        
+        <!-- Section 4: Mechanism -->
+        <div class="section" id="section-4">
+            <div class="section-title">機制層 / Mechanism Layer：壓力是怎麼生成的？</div>
+            <div class="section-title" style="border-bottom-color: var(--teal); font-size: 1.2rem; margin-top: 0;">How is Stress Generated?</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力生成流程 / Stress Generation Flow</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="flow-diagram">
+Event
+  ↓
+大腦快速評估 / Brain Rapid Assessment:
+  重要嗎？Is it important?
+  危險嗎？Is it dangerous?
+  可控嗎？Can I control it?
+  我有能力嗎？Do I have the capability?
+  資源夠嗎？Do I have enough resources?
+  ↓
+Prediction
+  ↓
+如果預測：Demand > Resources
+If prediction: Need exceeds resources
+  ↓
+威脅系統提高警戒
+Threat system raises alert
+  ↓
+交感神經與壓力反應系統參與動員
+Sympathetic nervous system & stress response mobilize
+  ↓
+心跳、呼吸、肌肉張力、注意力等可能改變
+Heart rate, breathing, muscle tension, attention may change
+  ↓
+短期：幫助你應付挑戰
+Short-term: Helps you cope with challenges
+  ↓
+長期若缺乏恢復：成本開始累積
+Long-term without recovery: Costs accumulate
+                    </div>
+                    
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>重點：</strong><br>
+                            壓力本身不是Bug。它原本就是「生存與適應功能」。<br><br>
+                            真正的問題是：「警報長期開著，卻沒有關機與修復。」
+                        </div>
+                        <div class="en-text">
+                            <strong>Key Point:</strong><br>
+                            Stress itself is not a bug. It's originally a "survival and adaptation function."<br><br>
+                            The real problem is: "The alarm stays on long-term without shutting off and recovering."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 5: Five Key Rules -->
+        <div class="section" id="section-5">
+            <div class="section-title">壓力的五大規律 / Five Key Laws of Stress</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">第一規律 / Law 1: Short-term vs Chronic Stress</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>短期壓力：</strong>考試、演講、比賽、截止日。可能提高警覺、動員、注意力、行動速度。<br><br>
+                            <strong>但長期高負荷＋恢復不足：</strong>可能影響睡眠、情緒、專注、記憶、飲食、身體不適、工作效率、關係品質。<br><br>
+                            <strong>真正要管理的是：</strong>Load × Duration × Recovery
+                        </div>
+                        <div class="en-text">
+                            <strong>Short-term stress:</strong> Exams, presentations, competitions, deadlines. May increase alertness, mobilization, attention, action speed.<br><br>
+                            <strong>But long-term high load + insufficient recovery:</strong> May affect sleep, mood, focus, memory, diet, physical discomfort, work efficiency, relationship quality.<br><br>
+                            <strong>What really needs management:</strong> Load × Duration × Recovery
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">第二規律 / Law 2: Stress Comes from Interpretation</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>真正流程：</strong><br>
+                            事件 → 解讀 → 預測 → 壓力反應<br><br>
+                            <strong>例如：主管說「明天找你談一下」</strong><br>
+                            Reality只有一句話。<br><br>
+                            模型A：「我要被罵了。」<br>
+                            模型B：「可能只是討論工作。」<br>
+                            模型C：「不知道，明天再確認。」<br><br>
+                            三個模型，可能生成三種完全不同的壓力。
+                        </div>
+                        <div class="en-text">
+                            <strong>Real process:</strong><br>
+                            Event → Interpretation → Prediction → Stress Response<br><br>
+                            <strong>Example: Manager says "Let's talk tomorrow"</strong><br>
+                            Reality is just one sentence.<br><br>
+                            Model A: "I'm going to be scolded."<br>
+                            Model B: "Probably just discussing work."<br>
+                            Model C: "Not sure, I'll find out tomorrow."<br><br>
+                            Three models can generate three completely different stress responses.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">第三規律 / Law 3: Unpredictability is Most Draining</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>人通常比較能承受：</strong><br>
+                            辛苦但知道怎麼做。<br><br>
+                            <strong>最耗能的是：</strong><br>
+                            不知道會發生什麼。<br>
+                            不知道什麼時候發生。<br>
+                            不知道自己能做什麼。<br><br>
+                            <strong>因此降低壓力的重要方法包括：</strong><br>
+                            增加資訊、增加結構、增加可預測性、增加選擇權、增加控制感。
+                        </div>
+                        <div class="en-text">
+                            <strong>People can usually endure:</strong><br>
+                            Difficult work when you know how to do it.<br><br>
+                            <strong>Most draining is:</strong><br>
+                            Not knowing what will happen.<br>
+                            Not knowing when it will happen.<br>
+                            Not knowing what you can do about it.<br><br>
+                            <strong>Therefore, important ways to reduce stress include:</strong><br>
+                            Increase information, structure, predictability, choices, and sense of control.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">第四規律 / Law 4: Resources Change Stress</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>同樣100分的需求，只有30分資源 = 壓力很高</strong><br><br>
+                            如果增加：Skill、時間、工具、AI、金錢、支援、健康、睡眠、經驗、SOP<br><br>
+                            需求沒有消失，但系統承載力提高。<br><br>
+                            <strong>所以：壓力管理不只是減少Demand，也可以增加Capacity。</strong>
+                        </div>
+                        <div class="en-text">
+                            <strong>Same 100-point demand with only 30-point resources = high stress</strong><br><br>
+                            If you increase: Skill, time, tools, AI, money, support, health, sleep, experience, SOP<br><br>
+                            The demand doesn't disappear, but system capacity increases.<br><br>
+                            <strong>So: Stress management isn't just reducing demand, it's also increasing capacity.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">第五規律 / Law 5: Recovery is Essential Process</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>低階模型：</strong>做完才能休息。<br><br>
+                            <strong>高階模型：</strong>恢復本來就是工作的其中一部分。<br><br>
+                            <strong>肌肉類比：</strong><br>
+                            負荷 → 恢復 → 適應<br><br>
+                            只有負荷、沒有恢復 = 持續耗損，不叫訓練。<br><br>
+                            <strong>人生也是：</strong><br>
+                            Challenge → Recovery → Adaptation<br><br>
+                            缺少Recovery，成長迴路就斷掉。
+                        </div>
+                        <div class="en-text">
+                            <strong>Level 1 model:</strong> Rest only after you're done.<br><br>
+                            <strong>Level 2 model:</strong> Recovery is inherently part of the work.<br><br>
+                            <strong>Muscle analogy:</strong><br>
+                            Load → Recovery → Adaptation<br><br>
+                            Load without recovery = continuous depletion, not training.<br><br>
+                            <strong>Same for life:</strong><br>
+                            Challenge → Recovery → Adaptation<br><br>
+                            Without recovery, the growth loop breaks.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 6: Diagnosis & Intervention -->
+        <div class="section" id="section-6">
+            <div class="section-title">診斷與介入 / Diagnosis & Intervention</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">最大瓶頸 / The Biggest Bottleneck</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            很多人的問題不是：壓力太多。<br><br>
+                            而是：所有壓力都被叫做「壓力」。<br><br>
+                            其實可能是：
+                            <ul style="margin: 1rem 0 0 1.5rem;">
+                                <li>事情太多</li>
+                                <li>Skill不足</li>
+                                <li>睡眠不足</li>
+                                <li>不敢拒絕</li>
+                                <li>財務不確定</li>
+                                <li>婚姻衝突</li>
+                                <li>健康問題</li>
+                                <li>資訊過載</li>
+                                <li>完美主義</li>
+                                <li>工作沒有SOP</li>
+                                <li>沒有支持</li>
+                                <li>目標太多</li>
+                            </ul><br>
+                            每一種需要不同介入。<br><br>
+                            <strong>所以第一步不是：Relax。而是：Diagnosis。</strong>
+                        </div>
+                        <div class="en-text">
+                            Many people's problem isn't: Too much stress.<br><br>
+                            It's: Everything gets called "stress."<br><br>
+                            It might actually be:
+                            <ul style="margin: 1rem 0 0 1.5rem;">
+                                <li>Too many things to do</li>
+                                <li>Insufficient skills</li>
+                                <li>Insufficient sleep</li>
+                                <li>Can't say no</li>
+                                <li>Financial uncertainty</li>
+                                <li>Marital conflict</li>
+                                <li>Health problems</li>
+                                <li>Information overload</li>
+                                <li>Perfectionism</li>
+                                <li>No SOP for work</li>
+                                <li>No support system</li>
+                                <li>Too many goals</li>
+                            </ul><br>
+                            Each requires different intervention.<br><br>
+                            <strong>So step one isn't: Relax. It's: Diagnose.</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">Priority Node 與 Minimum Intervention</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>假設一個人同時：</strong><br>
+                            睡不好、工作忙、脾氣差、注意力下降、一直滑手機<br><br>
+                            不要五個一起改。往上找：<br><br>
+                            最近每天工作到凌晨1點 → 睡眠不足 → 白天能量下降 → 工作效率下降 → 工作拖更晚 → 壓力更大 → 晚上滑手機逃避<br><br>
+                            <strong>Priority Node：停止工作的時間</strong><br><br>
+                            只改一點，可能同時影響五個結果。<br>
+                            這就是：High Leverage Intervention。
+                        </div>
+                        <div class="en-text">
+                            <strong>Suppose someone has:</strong><br>
+                            Poor sleep, busy work, irritability, declining focus, constant phone use<br><br>
+                            Don't fix all five at once. Trace upward:<br><br>
+                            Working until 1 AM daily → Sleep deprivation → Low daytime energy → Declining work efficiency → Work drags later → More stress → Evening phone escape<br><br>
+                            <strong>Priority Node: Work stop time</strong><br><br>
+                            Change one thing, potentially affecting five outcomes.<br>
+                            This is: High Leverage Intervention.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">Minimum Intervention 例子 / Examples</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>不要：</strong>我要徹底改變人生。<br>
+                            <strong>改成：</strong>今天少接一件事。<br><br>
+                            <strong>不要：</strong>我要完全不焦慮。<br>
+                            <strong>改成：</strong>把真正擔心的事情寫成一句話。<br><br>
+                            <strong>不要：</strong>我要學會時間管理。<br>
+                            <strong>改成：</strong>今天只設定一個Top Priority。<br><br>
+                            <strong>不要：</strong>我要改善睡眠。<br>
+                            <strong>改成：</strong>今晚提前30分鐘停止工作。<br><br>
+                            <strong>不要：</strong>我要處理所有問題。<br>
+                            <strong>改成：</strong>現在只處理最限制整體系統的一個節點。
+                        </div>
+                        <div class="en-text">
+                            <strong>Instead of:</strong> I'll completely change my life.<br>
+                            <strong>Do:</strong> Decline one thing today.<br><br>
+                            <strong>Instead of:</strong> I'll never be anxious.<br>
+                            <strong>Do:</strong> Write what you're worried about in one sentence.<br><br>
+                            <strong>Instead of:</strong> I'll master time management.<br>
+                            <strong>Do:</strong> Set one top priority today.<br><br>
+                            <strong>Instead of:</strong> I'll improve my sleep.<br>
+                            <strong>Do:</strong> Stop work 30 minutes earlier tonight.<br><br>
+                            <strong>Instead of:</strong> I'll fix everything.<br>
+                            <strong>Do:</strong> Fix the one node most constraining the whole system.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 7: Prediction Error & Loops -->
+        <div class="section" id="section-7">
+            <div class="section-title">Prediction Error 與迴路 / Prediction Error & Loops</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">Prediction Error 案例 / Examples</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="quote-box">
+                        <strong>案例1 / Example 1</strong><br>
+                        Prediction: 「只要更努力，我壓力就會下降。」<br>
+                        Reality: 做更多，事情反而更多。→ Prediction Error → Update: 需要Priority＋Boundary<br><br>
+                        Prediction: "The harder I work, the lower my stress."<br>
+                        Reality: Doing more creates more things. → Update: Need Priority + Boundary
+                    </div>
+                    
+                    <div class="quote-box">
+                        <strong>案例2 / Example 2</strong><br>
+                        Prediction: 「放假就會恢復。」<br>
+                        Reality: 放假仍然一直想工作。→ Update: 問題可能不只是時間不足，而是神經系統沒有真正退出工作模式。<br><br>
+                        Prediction: "I'll recover on vacation."<br>
+                        Reality: Still thinking about work on vacation. → Update: Not just time, but nervous system hasn't truly exited work mode.
+                    </div>
+                    
+                    <div class="quote-box">
+                        <strong>案例3 / Example 3</strong><br>
+                        Prediction: 「只要把事情做完就不焦慮。」<br>
+                        Reality: 做完一件又開始擔心下一件。→ Update: 可能是Threat Prediction Pattern<br><br>
+                        Prediction: "I'll stop worrying once I finish everything."<br>
+                        Reality: Finish one thing, start worrying about the next. → Update: Threat Prediction Pattern
+                    </div>
+                    
+                    <div class="quote-box">
+                        <strong>案例4 / Example 4</strong><br>
+                        Prediction: 「別人滿意，我就不會有壓力。」<br>
+                        Reality: 越迎合，責任越多。→ Update: 需要Boundary<br><br>
+                        Prediction: "I'll have no stress if everyone's satisfied."<br>
+                        Reality: More appeasement = more responsibility. → Update: Need Boundary
+                    </div>
+                    
+                    <div class="quote-box">
+                        <strong>案例5 / Example 5</strong><br>
+                        Prediction: 「滑手機可以讓我放鬆。」<br>
+                        Reality: 短期舒服，晚睡後隔天更累。→ Update: 短期Reward正在增加長期Stress<br><br>
+                        Prediction: "Phone scrolling helps me relax."<br>
+                        Reality: Short-term comfort, next day exhaustion. → Update: Short-term reward increasing long-term stress
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">高熵迴路 vs 低熵迴路 / High-Entropy vs Low-Entropy Loop</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>高熵 Loop（系統崩潰）：</strong><br>
+                            壓力 → 疲累 → 滑手機 → 晚睡 → 睡眠不足 → 注意力下降 → 效率下降 → 事情堆積 → 壓力增加 → 更想逃避<br><br>
+                            系統會自己把問題越滾越大。真正介入點可能不是「更自律」，而是：手機環境、睡眠時間、任務拆解、工作量。
+                        </div>
+                        <div class="en-text">
+                            <strong>High-Entropy Loop (System Collapse):</strong><br>
+                            Stress → Fatigue → Phone scrolling → Late sleep → Sleep deprivation → Declining focus → Declining efficiency → Task accumulation → Increased stress → More escape<br><br>
+                            The system spirals on its own. The intervention point isn't "be more disciplined" but rather: phone environment, sleep time, task breakdown, workload.
+                        </div>
+                    </div>
+                    
+                    <div class="bilingual-row" style="margin-top: 2rem;">
+                        <div class="cn-text">
+                            <strong>低熵 Loop（系統自調）：</strong><br>
+                            壓力訊號 → 停下辨識 → 找到來源 → 找Bottleneck → 選Priority Node → Minimum Intervention → Action → Recovery → Feedback → Prediction Error → Model Update → 下次更早辨識 → 恢復速度提高<br><br>
+                            這叫：Stress Self-Regulation Loop。
+                        </div>
+                        <div class="en-text">
+                            <strong>Low-Entropy Loop (System Self-Regulation):</strong><br>
+                            Stress signal → Pause to identify → Find source → Find bottleneck → Choose priority node → Minimum intervention → Action → Recovery → Feedback → Prediction error → Model update → Earlier detection next time → Faster recovery<br><br>
+                            This is: Stress Self-Regulation Loop.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 8: Contextual Applications -->
+        <div class="section" id="section-8">
+            <div class="section-title">壓力的應用脈絡 / Contextual Applications</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力 × 健康 / Stress × Health</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>不能簡化成：</strong>「所有疾病都是壓力造成。」<br><br>
+                            <strong>更精確是：</strong>長期壓力可能透過睡眠、行為、自律神經、內分泌、免疫調節、飲食、運動、物質使用、醫療遵從性等路徑影響健康。<br><br>
+                            但疾病通常是多變數生成。<br><br>
+                            <strong>正確方向：</strong>把壓力當成值得管理的一個變數，而不是所有疾病的唯一答案。
+                        </div>
+                        <div class="en-text">
+                            <strong>Can't simplify to:</strong> "All disease is stress-caused."<br><br>
+                            <strong>More accurate:</strong> Chronic stress may affect health through sleep, behavior, autonomic nervous system, hormones, immune regulation, diet, exercise, substance use, medical adherence, etc.<br><br>
+                            But disease is usually multifactorial.<br><br>
+                            <strong>Correct direction:</strong> Treat stress as one manageable variable, not the sole cause.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力 × 情緒 / Stress × Emotion</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>壓力不是情緒。</strong>壓力可能生成焦慮、憤怒、悲傷、煩躁、無力、麻木。<br><br>
+                            但這些情緒又會反過來影響Interpretation、Prediction、Action。<br><br>
+                            壓力 → 情緒 → 解讀 → 行動 → 結果 → 新壓力<br><br>
+                            真正要改的可能不是情緒本身，而是：生成情緒的結構。
+                        </div>
+                        <div class="en-text">
+                            <strong>Stress is not emotion.</strong> Stress may generate anxiety, anger, sadness, irritability, helplessness, numbness.<br><br>
+                            But these emotions then affect interpretation, prediction, action.<br><br>
+                            Stress → Emotion → Interpretation → Action → Result → New stress<br><br>
+                            What needs changing may not be emotion itself, but the structure generating it.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力 × 關係 / Stress × Relationships</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>壓力最容易流向最安全的人。</strong><br><br>
+                            工作被主管罵 → 不能回嘴 → 回家 → 對家人不耐煩<br><br>
+                            所以關係問題有時不是愛消失了，而是：Stress Spillover。<br><br>
+                            <strong>成熟的做法：</strong><br>
+                            1. 辨識來源<br>
+                            2. 先調節<br>
+                            3. 再溝通<br>
+                            4. 不把外部壓力轉嫁成對家人的攻擊
+                        </div>
+                        <div class="en-text">
+                            <strong>Stress flows toward the safest person.</strong><br><br>
+                            Scolded at work → Can't respond → Go home → Irritable with family<br><br>
+                            So relationship problems sometimes aren't about lost love, but: Stress spillover.<br><br>
+                            <strong>Mature approach:</strong><br>
+                            1. Identify source<br>
+                            2. Self-regulate first<br>
+                            3. Then communicate<br>
+                            4. Don't transfer external pressure as attacks
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力 × 學習 / Stress × Learning</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>學生說：「學測壓力很大。」</strong><br><br>
+                            不要只回答「放輕鬆」。拆開：<br>
+                            範圍太大？不知道從哪開始？單字不足？閱讀太慢？作文不會？時間不夠？成績波動？父母期待？害怕落榜？<br><br>
+                            <strong>例如：「英文很多都不會。」</strong><br>
+                            Diagnosis → 主要卡在高頻單字 → Priority Node: 每天20個高頻字<br><br>
+                            壓力從「巨大模糊威脅」變成「今天可以處理的20個單字」。結構一出現，壓力通常就比較可控。
+                        </div>
+                        <div class="en-text">
+                            <strong>Student says: "College entrance stress is huge."</strong><br><br>
+                            Don't just say "relax." Break it down:<br>
+                            Scope too large? Don't know where to start? Vocabulary insufficient? Reading too slow? Can't write essays? No time? Fluctuating grades? Parent expectations? Fear of failure?<br><br>
+                            <strong>Example: "I don't know a lot of English."</strong><br>
+                            Diagnosis → Main bottleneck is high-frequency words → Priority node: 20 words daily<br><br>
+                            Stress shifts from "massive vague threat" to "20 words I can handle today." Structure creates control.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力 × 工作 / Stress × Work</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>工作壓力不能永遠靠個人抗壓。</strong><br><br>
+                            如果同一個團隊每個人都加班、疲累、救火、離職，那就要問：<br><br>
+                            是不是流程問題？人力問題？角色問題？目標問題？資訊問題？管理問題？制度問題？<br><br>
+                            <strong>真正高階：</strong>不是訓練員工忍耐壞系統，而是修改持續生成壓力的System。
+                        </div>
+                        <div class="en-text">
+                            <strong>Work stress can't be managed only with personal resilience.</strong><br><br>
+                            If everyone on the team works overtime, is exhausted, firefights constantly, and quits, ask:<br><br>
+                            Process problems? Staffing? Roles? Goals? Information? Management? Systems?<br><br>
+                            <strong>Truly high-level:</strong> Not training people to endure bad systems, but fixing the systems that generate stress.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力 × AI / Stress × AI</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>AI可以降低：</strong><br>
+                            搜尋成本、整理成本、寫作成本、重複工作成本、決策資訊成本<br><br>
+                            <strong>但AI也可能增加：</strong><br>
+                            資訊過載、比較焦慮、學習焦慮、產量焦慮、「別人都比我快」的壓力<br><br>
+                            <strong>真正的高階用途：</strong>不是讓你一天做100件事。而是讓你更少把生命浪費在低價值認知工作。<br><br>
+                            AI應該降低熵。不是增加輸出垃圾。
+                        </div>
+                        <div class="en-text">
+                            <strong>AI can reduce:</strong><br>
+                            Search costs, organization costs, writing costs, repetitive work, decision information costs<br><br>
+                            <strong>But AI might increase:</strong><br>
+                            Information overload, comparison anxiety, learning anxiety, output anxiety, "everyone's faster" stress<br><br>
+                            <strong>True high-level use:</strong> Not to do 100 things daily. But to waste less of life on low-value cognitive work.<br><br>
+                            AI should reduce entropy. Not increase garbage output.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 9: Evolution & Formulas -->
+        <div class="section" id="section-9">
+            <div class="section-title">壓力進化與公式 / Stress Evolution & Formulas</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力的五階進化 / Five Stages of Stress Evolution</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>第一階｜逃避型</strong> Avoidance<br>
+                            壓力來了 → 逃<br><br>
+                            <strong>第二階｜硬撐型</strong> Resistance<br>
+                            壓力來了 → 忍<br><br>
+                            <strong>第三階｜調節型</strong> Regulation<br>
+                            壓力來了 → 讓自己穩定<br><br>
+                            <strong>第四階｜診斷型</strong> Diagnosis<br>
+                            壓力來了 → 找來源與Bottleneck<br><br>
+                            <strong>第五階｜生成型</strong> Generation<br>
+                            壓力來了 → 讀取系統訊號 → 更新模型 → 修改結構 → 形成Skill → 提高Capacity<br><br>
+                            <strong>這時壓力從：Enemy 升級成：System Feedback</strong>
+                        </div>
+                        <div class="en-text">
+                            <strong>Stage 1 | Avoidance</strong><br>
+                            Stress comes → Escape<br><br>
+                            <strong>Stage 2 | Resistance</strong><br>
+                            Stress comes → Endure<br><br>
+                            <strong>Stage 3 | Regulation</strong><br>
+                            Stress comes → Stabilize self<br><br>
+                            <strong>Stage 4 | Diagnosis</strong><br>
+                            Stress comes → Find source & bottleneck<br><br>
+                            <strong>Stage 5 | Generation</strong><br>
+                            Stress comes → Read system signal → Update model → Modify structure → Build skill → Increase capacity<br><br>
+                            <strong>Now stress shifts from: Enemy to: System Feedback</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力的五大公式 / Five Key Formulas</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="formula-box">
+                        <strong>公式1 / Formula 1：壓力負荷</strong><br>
+                        壓力負荷 ≈ 感知需求 ÷ (可用資源 + 控制感 + 恢復能力)<br>
+                        Stress Load ≈ Perceived Demand ÷ (Available Resources + Sense of Control + Recovery Capacity)
+                    </div>
+                    
+                    <div class="formula-box">
+                        <strong>公式2 / Formula 2：長期耗損</strong><br>
+                        長期耗損 ≈ 壓力強度 × 持續時間 ÷ 恢復品質<br>
+                        Long-term Depletion ≈ Stress Intensity × Duration ÷ Recovery Quality
+                    </div>
+                    
+                    <div class="formula-box">
+                        <strong>公式3 / Formula 3：壓力韌性</strong><br>
+                        壓力韌性 ≈ 健康 × Skill × 資源 × 支持 × 恢復能力 × Model Update能力<br>
+                        Stress Resilience ≈ Health × Skill × Resources × Support × Recovery Capacity × Model Update Ability
+                    </div>
+                    
+                    <div class="formula-box">
+                        <strong>公式4 / Formula 4：壓力熵</strong><br>
+                        壓力熵 ≈ (未完成事項 × 不確定性 × 資訊噪音 × 角色衝突) ÷ 結構清晰度<br>
+                        Stress Entropy ≈ (Incomplete Items × Uncertainty × Info Noise × Role Conflict) ÷ Structural Clarity
+                    </div>
+                    
+                    <div class="formula-box">
+                        <strong>公式5 / Formula 5：壓力調節效率</strong><br>
+                        壓力調節效率 ≈ 恢復速度 ÷ 總耗能<br>
+                        Stress Regulation Efficiency ≈ Recovery Speed ÷ Total Cost<br><br>
+                        <strong>真正抗壓：</strong><br>
+                        真正抗壓 ≠ 忍耐時間<br>
+                        真正抗壓 ≈ 辨識速度 × 調節能力 × 問題解決能力 × 恢復能力 × 模型更新能力
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 10: Critical Questions & Final -->
+        <div class="section" id="section-10">
+            <div class="section-title">10大核心問題與最終升維 / 10 Critical Questions & Final Evolution</div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">壓力最重要的10問 / 10 Most Important Questions</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div style="background: #F5F5F5; padding: 1.5rem; border-radius: 8px;">
+                        <div class="bilingual-row">
+                            <div class="cn-text">
+                                <strong>01. 現在真正發生什麼？</strong><br>
+                                Reality vs 解讀 vs 預測<br><br>
+                                <strong>02. 我正在預測什麼可怕結果？</strong><br>
+                                把害怕的細節寫出來<br><br>
+                                <strong>03. 這個預測有多少是Reality，有多少是Interpretation？</strong><br>
+                                區分事實與恐懼<br><br>
+                                <strong>04. 需求是不是已經超過資源？</strong><br>
+                                冷靜評估Gap<br><br>
+                                <strong>05. 我要降低Demand，還是增加Capacity？</strong><br>
+                                選擇介入方向<br><br>
+                                <strong>06. 什麼壓力一直重複？</strong><br>
+                                找Pattern<br><br>
+                                <strong>07. 真正Bottleneck在哪？</strong><br>
+                                找最大限制點<br><br>
+                                <strong>08. 今天最小可改變的節點是什麼？</strong><br>
+                                Minimum Intervention<br><br>
+                                <strong>09. 實際結果與我的Prediction差在哪？</strong><br>
+                                Prediction Error<br><br>
+                                <strong>10. 這次壓力可以讓系統更新什麼？</strong><br>
+                                Model Update
+                            </div>
+                            <div class="en-text">
+                                <strong>01. What's really happening now?</strong><br>
+                                Reality vs Interpretation vs Prediction<br><br>
+                                <strong>02. What scary outcome am I predicting?</strong><br>
+                                Write the fear details<br><br>
+                                <strong>03. How much is fact vs interpretation?</strong><br>
+                                Separate facts from fear<br><br>
+                                <strong>04. Has demand already exceeded resources?</strong><br>
+                                Calmly assess the gap<br><br>
+                                <strong>05. Should I reduce demand or increase capacity?</strong><br>
+                                Choose intervention direction<br><br>
+                                <strong>06. What stress repeats?</strong><br>
+                                Find pattern<br><br>
+                                <strong>07. Where's the real bottleneck?</strong><br>
+                                Find the biggest constraint<br><br>
+                                <strong>08. What's the smallest change node today?</strong><br>
+                                Minimum intervention<br><br>
+                                <strong>09. How do actual results differ from prediction?</strong><br>
+                                Prediction error<br><br>
+                                <strong>10. What can this stress update in the system?</strong><br>
+                                Model update
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-header-title">最終升維 / Final Evolution</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-body">
+                    <div class="bilingual-row">
+                        <div class="cn-text">
+                            <strong>真正的抗壓，</strong><br>
+                            不是：永遠感覺不到壓力。<br>
+                            而是：壓力出現時，你越來越快知道它在告訴你什麼，也越來越知道該改哪一個節點。<br><br>
+                            <strong>真正的休息，</strong><br>
+                            不是逃離人生。<br>
+                            而是：讓系統重新取得下一輪運作需要的資源。<br><br>
+                            <strong>真正的成長，</strong><br>
+                            不是讓壓力越來越多還能硬撐。<br>
+                            而是：同樣的問題再次出現時，你需要付出的耗能越來越少。<br><br>
+                            <strong>真正的自由，</strong><br>
+                            不是人生再也沒有壓力。<br>
+                            而是：不再被舊的威脅模型、完美模型、討好模型與失控模型自動綁架。
+                        </div>
+                        <div class="en-text">
+                            <strong>True stress resilience</strong><br>
+                            is not: Never feeling stress.<br>
+                            It's: When stress appears, increasingly understanding what it's telling you and which node to adjust.<br><br>
+                            <strong>True rest</strong><br>
+                            is not: Escaping life.<br>
+                            It's: Replenishing resources the system needs for the next cycle.<br><br>
+                            <strong>True growth</strong><br>
+                            is not: Enduring more stress.<br>
+                            It's: When the same problems recur, paying increasingly lower costs.<br><br>
+                            <strong>True freedom</strong><br>
+                            is not: A stress-free life.<br>
+                            It's: Not being automatically controlled by old threat models, perfection models, people-pleasing models, and loss-of-control models.
+                        </div>
+                    </div>
+                    
+                    <div class="quote-box" style="margin-top: 2rem; font-size: 1.1rem;">
+                        <strong>最後一句 / Final Insight：</strong><br><br>
+                        壓力不是生命在告訴你「你不行」；很多時候，它是在告訴你「現在的需求、資源或模型，有一個地方需要重新配置」。<br><br>
+                        Stress isn't life telling you "you can't." Often, it's telling you "something in current demands, resources, or your model needs recalibration."
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p><strong>作者 / Author: 王欣蓉 Anne Wang</strong></p>
+        <p>壓力診斷系統 / Stress Diagnosis System</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem;">
+            © 2026 | 雙語完整版 / Bilingual Complete Edition<br>
+            <span style="color: #C9960C;">從壓力的敵人升級成系統的導師</span><br>
+            <span style="color: #C9960C;">From stress as enemy to system as teacher</span>
+        </p>
+    </footer>
+    
+    <script type="application/json" id="diagnosisData">
+    [
+        {"id":"01","cn":"工作很多","old":"我撐不住","new":"需求可能超過容量","priority":"負荷","intervention":"刪一件低價值事","en_id":"01","en_cn":"Too much work","en_old":"I can't handle it","en_new":"Demand may exceed capacity","en_priority":"Load","en_intervention":"Delete one low-value task"},
+        {"id":"02","cn":"時間不夠","old":"我要更快","new":"可能是優先順序錯","priority":"Priority","intervention":"今天只抓一件事","en_id":"02","en_cn":"Not enough time","en_old":"I need to be faster","en_new":"Priority order may be wrong","en_priority":"Priority","en_intervention":"Focus on one thing today"},
+        {"id":"03","cn":"一直焦慮","old":"我太脆弱","new":"系統持續預測威脅","priority":"Trigger","intervention":"寫出真正擔心什麼","en_id":"03","en_cn":"Constant anxiety","en_old":"I'm too fragile","en_new":"System continuously predicts threat","en_priority":"Trigger","en_intervention":"Write what you really fear"},
+        {"id":"04","cn":"睡不好","old":"我要逼自己睡","new":"高喚醒尚未關閉","priority":"降刺激","intervention":"睡前減少刺激","en_id":"04","en_cn":"Poor sleep","en_old":"I must force myself to sleep","en_new":"High arousal hasn't shut down","en_priority":"Reduce stimulation","en_intervention":"Reduce stimuli before sleep"},
+        {"id":"05","cn":"一想到工作就累","old":"我懶","new":"大腦已把工作標記為高成本","priority":"任務大小","intervention":"切成10分鐘","en_id":"05","en_cn":"Exhausted just thinking of work","en_old":"I'm lazy","en_new":"Brain marked work as high cost","en_priority":"Task size","en_intervention":"Break into 10-minute chunks"},
+        {"id":"06","cn":"事情一直拖","old":"我沒自律","new":"任務可能太模糊/太大","priority":"下一步","intervention":"寫出第一步","en_id":"06","en_cn":"Procrastinating constantly","en_old":"I lack discipline","en_new":"Task too vague or large","en_priority":"Next step","en_intervention":"Write the first step"},
+        {"id":"07","cn":"很怕犯錯","old":"我要做到完美","new":"錯誤成本被高估","priority":"Prediction","intervention":"先做可修改版本","en_id":"07","en_cn":"Fear of making mistakes","en_old":"I must be perfect","en_new":"Error cost overestimated","en_priority":"Prediction","en_intervention":"Do a correctable draft first"},
+        {"id":"08","cn":"怕別人批評","old":"我不能失敗","new":"社會評價被當成生存威脅","priority":"評價模型","intervention":"分開Feedback與人格","en_id":"08","en_cn":"Fear of criticism","en_old":"I can't fail","en_new":"Social evaluation = survival threat","en_priority":"Evaluation model","en_intervention":"Separate feedback from identity"},
+        {"id":"09","cn":"一直想很多","old":"想清楚才安全","new":"思考沒有形成決策出口","priority":"Decision","intervention":"設截止時間","en_id":"09","en_cn":"Overthinking constantly","en_old":"Must think clearly to be safe","en_new":"Thinking hasn't formed decision exit","en_priority":"Decision","en_intervention":"Set decision deadline"},
+        {"id":"10","cn":"手機停不下來","old":"我沒意志力","new":"高壓後尋找快速獎賞","priority":"環境","intervention":"手機移出視線","en_id":"10","en_cn":"Can't stop using phone","en_old":"I lack willpower","en_new":"Seeking quick reward after stress","en_priority":"Environment","en_intervention":"Move phone out of sight"},
+        {"id":"11","cn":"一直吃東西","old":"我嘴饞","new":"可能在做快速情緒調節","priority":"Trigger","intervention":"先辨識餓或壓力","en_id":"11","en_cn":"Eating constantly","en_old":"I'm gluttonous","en_new":"Rapid emotion regulation behavior","en_priority":"Trigger","en_intervention":"Identify hunger or stress first"},
+        {"id":"12","cn":"很容易生氣","old":"我脾氣差","new":"系統可能長期高喚醒","priority":"恢復","intervention":"暫停後再回應","en_id":"12","en_cn":"Getting angry easily","en_old":"I have a bad temper","en_new":"System may have chronic high arousal","en_priority":"Recovery","en_intervention":"Pause before responding"},
+        {"id":"13","cn":"對家人不耐煩","old":"他們很煩","new":"外部壓力溢出到安全關係","priority":"Spillover","intervention":"先處理原始壓力","en_id":"13","en_cn":"Impatient with family","en_old":"They're annoying","en_new":"Stress spillover to safe relationships","en_priority":"Spillover","en_intervention":"Address source stress first"},
+        {"id":"14","cn":"身體緊繃","old":"我想太多","new":"壓力也具有身體層反應","priority":"身體","intervention":"走路＋慢呼吸","en_id":"14","en_cn":"Body tension","en_old":"I think too much","en_new":"Stress has physical manifestation","en_priority":"Body","en_intervention":"Walk + slow breathing"},
+        {"id":"15","cn":"心跳加快","old":"一定出問題","new":"可能是壓力反應，也需依情境判斷","priority":"安全","intervention":"持續或嚴重就評估","en_id":"15","en_cn":"Racing heart","en_old":"Something's definitely wrong","en_new":"Stress response, context-dependent","en_priority":"Safety","en_intervention":"Assess if persistent or severe"},
+        {"id":"16","cn":"肩頸很硬","old":"年紀大了","new":"久坐＋姿勢＋壓力可能共同生成","priority":"動作","intervention":"起身活動","en_id":"16","en_cn":"Stiff shoulders and neck","en_old":"I'm getting old","en_new":"Prolonged sitting + posture + stress","en_priority":"Movement","en_intervention":"Get up and move"},
+        {"id":"17","cn":"腦袋空白","old":"我變笨了","new":"高壓可能降低工作記憶效率","priority":"降負荷","intervention":"一次只處理一項","en_id":"17","en_cn":"Mental blankness","en_old":"I'm becoming stupid","en_new":"High pressure reduces working memory","en_priority":"Reduce load","en_intervention":"Handle one thing at a time"},
+        {"id":"18","cn":"注意力下降","old":"我不夠專心","new":"認知資源被威脅監控占用","priority":"注意力","intervention":"關閉一個干擾源","en_id":"18","en_cn":"Declining attention","en_old":"I'm not focused enough","en_new":"Cognitive resources allocated to threat monitoring","en_priority":"Attention","en_intervention":"Close one distraction source"},
+        {"id":"19","cn":"記不住東西","old":"我退化了","new":"睡眠／壓力／負荷都可能影響","priority":"Baseline","intervention":"先看睡眠與負荷","en_id":"19","en_cn":"Poor memory","en_old":"I'm declining","en_new":"Sleep, stress, load all affect memory","en_priority":"Baseline","en_intervention":"Check sleep and load first"},
+        {"id":"20","cn":"考試緊張","old":"我抗壓差","new":"評估情境啟動威脅模型","priority":"模擬","intervention":"做一次限時練習","en_id":"20","en_cn":"Test anxiety","en_old":"I'm not resilient","en_new":"Situation assessment activates threat model","en_priority":"Simulation","en_intervention":"Do one timed practice"},
+        {"id":"21","cn":"上台緊張","old":"我不適合","new":"陌生＋評價＋不確定性","priority":"Exposure","intervention":"小規模練習","en_id":"21","en_cn":"Stage fright","en_old":"I'm not suited for this","en_new":"Unfamiliar + evaluation + uncertainty","en_priority":"Exposure","en_intervention":"Small-scale practice"},
+        {"id":"22","cn":"新環境不安","old":"我適應力差","new":"舊預測模型失效","priority":"探索","intervention":"熟悉一個固定流程","en_id":"22","en_cn":"New environment anxiety","en_old":"I'm not adaptable","en_new":"Old prediction models don't work","en_priority":"Exploration","en_intervention":"Learn one fixed routine"},
+        {"id":"23","cn":"換工作很累","old":"新工作不適合","new":"系統正在建立新模型","priority":"適應","intervention":"建一張工作地圖","en_id":"23","en_cn":"Job change exhaustion","en_old":"This job isn't right","en_new":"System building new model","en_priority":"Adaptation","en_intervention":"Create a job map"},
+        {"id":"24","cn":"升遷後壓力大","old":"我能力不足","new":"責任增加快於Skill更新","priority":"Skill","intervention":"找最大能力缺口","en_id":"24","en_cn":"Promotion stress","en_old":"I'm not capable","en_new":"Responsibility increases faster than skills","en_priority":"Skill","en_intervention":"Find biggest capability gap"},
+        {"id":"25","cn":"當父母很累","old":"我做不好","new":"長期多任務＋責任負荷","priority":"支援","intervention":"找一件可委派工作","en_id":"25","en_cn":"Parenting exhaustion","en_old":"I'm not a good parent","en_new":"Chronic multitasking + responsibility load","en_priority":"Support","en_intervention":"Find one delegable task"},
+        {"id":"26","cn":"婚姻壓力","old":"都是對方問題","new":"可能存在反覆互動Loop","priority":"Pattern","intervention":"找重複衝突模式","en_id":"26","en_cn":"Marriage stress","en_old":"It's all their fault","en_new":"Recurring interaction loops exist","en_priority":"Pattern","en_intervention":"Find conflict pattern"},
+        {"id":"27","cn":"關係內耗","old":"我要忍耐","new":"邊界不足會持續耗能","priority":"Boundary","intervention":"說清楚一個界線","en_id":"27","en_cn":"Relationship drain","en_old":"I must endure","en_new":"Weak boundaries cause continuous drain","en_priority":"Boundary","en_intervention":"Clearly state one boundary"},
+        {"id":"28","cn":"總怕拒絕別人","old":"拒絕＝自私","new":"社會成本預測過高","priority":"Boundary","intervention":"拒絕一件低價值要求","en_id":"28","en_cn":"Fear of refusing others","en_old":"Refusal = selfishness","en_new":"Social cost prediction overestimated","en_priority":"Boundary","en_intervention":"Refuse one low-value request"},
+        {"id":"29","cn":"訊息很多","old":"我要全部回","new":"資訊入口失控","priority":"Filter","intervention":"關閉非必要通知","en_id":"29","en_cn":"Too many messages","en_old":"I must respond to all","en_new":"Information input uncontrolled","en_priority":"Filter","en_intervention":"Turn off non-essential notifications"},
+        {"id":"30","cn":"行程排滿","old":"我很有效率","new":"沒有緩衝會降低韌性","priority":"Buffer","intervention":"留一段空白時間","en_id":"30","en_cn":"Packed schedule","en_old":"This shows efficiency","en_new":"No buffer reduces resilience","en_priority":"Buffer","en_intervention":"Leave blank time"},
+        {"id":"31","cn":"很忙卻沒成果","old":"我要更努力","new":"資源可能投錯節點","priority":"Bottleneck","intervention":"找最大限制點","en_id":"31","en_cn":"Busy but no results","en_old":"I must try harder","en_new":"Resources invested at wrong node","en_priority":"Bottleneck","en_intervention":"Find biggest constraint"},
+        {"id":"32","cn":"財務焦慮","old":"我要一直想","new":"不確定性需要資料化","priority":"現金流","intervention":"寫出收入支出","en_id":"32","en_cn":"Financial anxiety","en_old":"I must keep thinking","en_new":"Uncertainty needs data","en_priority":"Cash flow","en_intervention":"Write income and expenses"},
+        {"id":"33","cn":"健康焦慮","old":"每個症狀都危險","new":"風險預測可能過度放大","priority":"分流","intervention":"區分紅旗與一般訊號","en_id":"33","en_cn":"Health anxiety","en_old":"Every symptom is dangerous","en_new":"Risk prediction overestimated","en_priority":"Triage","en_intervention":"Distinguish red flags vs normal signals"},
+        {"id":"34","cn":"生病壓力","old":"我要保持正面","new":"真實風險需要處理，不是壓掉情緒","priority":"支持","intervention":"問醫療下一步","en_id":"34","en_cn":"Illness stress","en_old":"I must stay positive","en_new":"Real risks need management, not suppression","en_priority":"Support","en_intervention":"Ask about next medical steps"},
+        {"id":"35","cn":"照顧家人很累","old":"我不能休息","new":"照顧者也有容量限制","priority":"Recovery","intervention":"安排替代照顧","en_id":"35","en_cn":"Caregiver exhaustion","en_old":"I can't rest","en_new":"Caregivers have capacity limits","en_priority":"Recovery","en_intervention":"Arrange alternate care"},
+        {"id":"36","cn":"資訊看越多越怕","old":"我要再查清楚","new":"搜尋可能強化威脅Loop","priority":"資訊邊界","intervention":"固定查詢時間","en_id":"36","en_cn":"More information, more fear","en_old":"I need more clarity","en_new":"Searching may reinforce threat loop","en_priority":"Info boundary","en_intervention":"Fixed search times"},
+        {"id":"37","cn":"AI讓我焦慮","old":"我要學會全部","new":"工具變化速度高於學習容量","priority":"核心Skill","intervention":"只學一個用途","en_id":"37","en_cn":"AI anxiety","en_old":"I must learn everything","en_new":"Tool change outpaces learning capacity","en_priority":"Core skill","en_intervention":"Learn one use case"},
+        {"id":"38","cn":"工作被AI影響","old":"我要跟AI競爭","new":"應重新配置人機優勢","priority":"Leverage","intervention":"AI接手一個重複工作","en_id":"38","en_cn":"Work impacted by AI","en_old":"I must compete with AI","en_new":"Reconfigure human-AI advantage","en_priority":"Leverage","en_intervention":"Let AI handle one repetitive task"},
+        {"id":"39","cn":"社群讓我焦慮","old":"別人都比我好","new":"比較樣本嚴重偏差","priority":"Input","intervention":"減少比較性內容","en_id":"39","en_cn":"Social media anxiety","en_old":"Everyone's better","en_new":"Comparison sample severely biased","en_priority":"Input","en_intervention":"Reduce comparison content"},
+        {"id":"40","cn":"完美主義","old":"做不好不如不做","new":"成果標準過高造成凍結","priority":"Minimum Version","intervention":"先完成60分版","en_id":"40","en_cn":"Perfectionism","en_old":"If not perfect, don't do it","en_new":"High standards cause paralysis","en_priority":"Minimum version","en_intervention":"Complete 60-percent version first"},
+        {"id":"41","cn":"選擇很多","old":"我怕選錯","new":"選項增加決策熵","priority":"Criteria","intervention":"設3個判準","en_id":"41","en_cn":"Too many choices","en_old":"I fear choosing wrong","en_new":"Options increase decision entropy","en_priority":"Criteria","en_intervention":"Set 3 decision criteria"},
+        {"id":"42","cn":"不敢決定","old":"再等等比較安全","new":"延遲本身也有成本","priority":"Decision","intervention":"設決策期限","en_id":"42","en_cn":"Can't decide","en_old":"Waiting is safer","en_new":"Delay has its own cost","en_priority":"Decision","en_intervention":"Set decision deadline"},
+        {"id":"43","cn":"一直救火","old":"工作就是如此","new":"系統缺少預防機制","priority":"Prevention","intervention":"找最常發生問題","en_id":"43","en_cn":"Constant firefighting","en_old":"That's just how work is","en_new":"System lacks prevention","en_priority":"Prevention","en_intervention":"Find most frequent problems"},
+        {"id":"44","cn":"同樣壓力一直來","old":"人生很苦","new":"Pattern未被更新","priority":"Loop","intervention":"記錄3次重複事件","en_id":"44","en_cn":"Same stress recurring","en_old":"Life is hard","en_new":"Pattern not updated","en_priority":"Loop","en_intervention":"Log 3 repeat events"},
+        {"id":"45","cn":"放假仍很累","old":"再休息就好","new":"可能是恢復品質不足或負荷未解除","priority":"Recovery","intervention":"找真正耗能來源","en_id":"45","en_cn":"Still tired on vacation","en_old":"More rest will help","en_new":"Recovery quality or load incomplete","en_priority":"Recovery","en_intervention":"Find true cost source"},
+        {"id":"46","cn":"休息有罪惡感","old":"休息＝懶惰","new":"恢復被錯誤模型污名化","priority":"Belief","intervention":"把休息視為維護","en_id":"46","en_cn":"Rest guilt","en_old":"Rest = laziness","en_new":"Recovery stigmatized by wrong model","en_priority":"Belief","en_intervention":"View rest as maintenance"},
+        {"id":"47","cn":"壓力大就硬撐","old":"我不能倒","new":"缺少安全閥","priority":"Support","intervention":"告訴一個可信任的人","en_id":"47","en_cn":"Enduring when stressed","en_old":"I can't break","en_new":"Missing safety valve","en_priority":"Support","en_intervention":"Tell one trusted person"},
+        {"id":"48","cn":"壓力突然爆掉","old":"怎麼突然這樣","new":"通常是累積負荷超過閾值","priority":"Load","intervention":"回看前兩週","en_id":"48","en_cn":"Sudden stress breakdown","en_old":"How'd this happen?","en_new":"Accumulated load exceeded threshold","en_priority":"Load","en_intervention":"Review past two weeks"},
+        {"id":"49","cn":"壓力減少又復發","old":"方法沒用","new":"原始結構可能沒改","priority":"Mechanism","intervention":"找回復發Trigger","en_id":"49","en_cn":"Stress returns after improvement","en_old":"Methods don't work","en_new":"Original structure unchanged","en_priority":"Mechanism","en_intervention":"Find relapse trigger"},
+        {"id":"50","cn":"想完全沒有壓力","old":"才叫幸福","new":"零壓力不是生命目標","priority":"Regulation","intervention":"練習恢復而非消滅","en_id":"50","en_cn":"Wanting zero stress","en_old":"That's happiness","en_new":"Zero stress isn't life goal","en_priority":"Regulation","en_intervention":"Practice recovery, not elimination"}
+    ]
+    </script>
+    
+    <script>
+        // Initialize navigation tabs
+        function initNavigation() {
+            const sections = [
+                { id: 1, label: '50項診斷 / 50 Diagnosis' },
+                { id: 2, label: '本體層 / Foundational' },
+                { id: 3, label: '結構層 / Structural' },
+                { id: 4, label: '機制層 / Mechanism' },
+                { id: 5, label: '五大規律 / 5 Laws' },
+                { id: 6, label: '診斷介入 / Diagnosis' },
+                { id: 7, label: 'Error & Loops' },
+                { id: 8, label: '應用脈絡 / Applications' },
+                { id: 9, label: '進化公式 / Evolution' },
+                { id: 10, label: '核心問題 / Questions' }
+            ];
+            
+            const navTabs = document.getElementById('navTabs');
+            sections.forEach(section => {
+                const btn = document.createElement('button');
+                btn.className = section.id === 1 ? 'nav-btn active' : 'nav-btn';
+                btn.textContent = section.label;
+                btn.onclick = () => switchSection(section.id, btn);
+                navTabs.appendChild(btn);
+            });
+        }
+        
+        // Switch sections
+        function switchSection(sectionId, btn) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`section-${sectionId}`).classList.add('active');
+            btn.classList.add('active');
+        }
+        
+        // Populate diagnosis table
+        function populateDiagnosisTable() {
+            const data = JSON.parse(document.getElementById('diagnosisData').textContent);
+            const tbody = document.getElementById('diagnosisBody');
+            
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="id-col">${row.id}</td>
+                    <td><strong>${row.cn}</strong><br><em>${row.en_cn}</em></td>
+                    <td>${row.old}<br><em style="color: #999;">${row.en_old}</em></td>
+                    <td><span class="highlight-teal">${row.new}</span><br><em style="color: #999;">${row.en_new}</em></td>
+                    <td><span class="highlight-gold">${row.priority}</span></td>
+                    <td>${row.intervention}<br><em style="color: #999;">${row.en_intervention}</em></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+        
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDiagnosisTable();
+            initNavigation();
+            setupCardToggle();
+            setupTTS();
+            setupSearch();
+        });
+        
+        // Card toggle functionality
+        function setupCardToggle() {
+            document.querySelectorAll('.card-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    header.parentElement.classList.toggle('open');
+                });
+            });
+        }
+        
+        // TTS setup
+        function setupTTS() {
+            document.querySelectorAll('.tts-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const text = btn.dataset.text;
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.9;
+                    
+                    btn.classList.add('playing');
+                    btn.textContent = '🔊 Playing...';
+                    
+                    utterance.onend = () => {
+                        btn.classList.remove('playing');
+                        btn.innerHTML = '🔊 Listen';
+                    };
+                    
+                    speechSynthesis.speak(utterance);
+                });
+            });
+        }
+        
+        // Search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchDiagnosis');
+            const table = document.getElementById('diagnosisTable');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    document.querySelectorAll('#diagnosisBody tr').forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(query) ? '' : 'none';
+                    });
+                });
+            }
+        }
+    </script>
+</body>
+</html>
