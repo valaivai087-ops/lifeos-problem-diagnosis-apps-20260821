@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life OS - High Agency System 生命系統</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #1A2B5F;
+            --accent: #C9960C;
+            --secondary: #0A7A72;
+            --bg-light: #f9f9f9;
+            --border: #e0e0e0;
+        }
+        
+        body {
+            font-family: "Microsoft JhengHei", "PingFang SC", sans-serif;
+            background-color: white;
+            color: var(--primary);
+            line-height: 1.8;
+            font-size: 18px;
+            display: flex;
+        }
+        
+        /* 側邊菜單 */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, var(--primary) 0%, #0D1B3E 100%);
+            color: white;
+            padding: 30px 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent);
+            text-align: center;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+        }
+        
+        .sidebar-nav li {
+            margin-bottom: 8px;
+        }
+        
+        .sidebar-nav a {
+            display: block;
+            padding: 12px 15px;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-nav a:hover {
+            background-color: var(--accent);
+            color: var(--primary);
+            border-left-color: white;
+        }
+        
+        .sidebar-nav a.active {
+            background-color: var(--accent);
+            color: var(--primary);
+            font-weight: bold;
+            border-left-color: white;
+        }
+        
+        .sidebar-section-title {
+            color: var(--accent);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-weight: bold;
+            padding: 0 15px;
+        }
+        
+        /* 主要內容 */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            width: calc(100% - 280px);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 60px 40px;
+            border-bottom: 8px solid var(--accent);
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .header .subtitle {
+            font-size: 24px;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+        
+        .header .author {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        /* 章節卡片 */
+        .section {
+            margin-bottom: 80px;
+            scroll-margin-top: 100px;
+        }
+        
+        .section-header {
+            background: linear-gradient(90deg, rgba(26, 43, 95, 0.05), rgba(201, 150, 12, 0.1));
+            border-left: 6px solid var(--accent);
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-title {
+            font-size: 32px;
+            color: var(--primary);
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .section-subtitle {
+            font-size: 20px;
+            color: var(--secondary);
+            font-weight: 500;
+            margin-top: 8px;
+        }
+        
+        .section-badge {
+            background: var(--accent);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        
+        /* 欄位結構 */
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .field-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .field-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(201, 150, 12, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .field-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary);
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .field-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        
+        .field-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* 雙語配對 */
+        .bilingual-pair {
+            background: var(--bg-light);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent);
+        }
+        
+        .bilingual-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .lang-block {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .lang-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--secondary);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .lang-content {
+            color: var(--primary);
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        
+        .tts-button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+            font-weight: bold;
+        }
+        
+        .tts-button:hover {
+            background-color: #a67c08;
+        }
+        
+        /* 亮點框 */
+        .highlight-box {
+            background: linear-gradient(90deg, rgba(201, 150, 12, 0.15), rgba(10, 122, 114, 0.15));
+            border-left: 4px solid var(--accent);
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        /* 表格 */
+        .table-container {
+            overflow-x: auto;
+            margin: 30px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+        
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        
+        tr:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+        
+        tr:hover {
+            background-color: rgba(201, 150, 12, 0.08);
+        }
+        
+        /* 頁腳 */
+        .footer {
+            background-color: var(--bg-light);
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            border-top: 2px solid var(--border);
+            margin-top: 80px;
+            font-size: 13px;
+        }
+        
+        /* 進度指示器 */
+        .progress-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            padding: 0 10px;
+            position: relative;
+        }
+        
+        .progress-step::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 2px;
+            height: 20px;
+            background: var(--border);
+            transform: translateY(-50%);
+        }
+        
+        .progress-step:last-child::after {
+            display: none;
+        }
+        
+        .progress-dot {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            margin: 0 auto 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .progress-label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                box-shadow: none;
+                border-bottom: 2px solid var(--border);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .bilingual-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .fields-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 40px 20px;
+            }
+            
+            .header h1 {
+                font-size: 32px;
+            }
+            
+            .sidebar-nav a {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 側邊菜單 -->
+    <aside class="sidebar">
+        <div class="sidebar-header">🧠 Life OS</div>
+        
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-title">基礎理論</div>
+            <li><a href="#intro" class="nav-link">介紹</a></li>
+            <li><a href="#high-agency" class="nav-link">High Agency真諦</a></li>
+            <li><a href="#essence" class="nav-link">本體層</a></li>
+            <li><a href="#structure" class="nav-link">結構層</a></li>
+            <li><a href="#mechanism" class="nav-link">機制層</a></li>
+            
+            <div class="sidebar-section-title">診斷工具</div>
+            <li><a href="#phenomena" class="nav-link">50大現象診斷</a></li>
+            <li><a href="#algorithm" class="nav-link">Algorithm</a></li>
+            
+            <div class="sidebar-section-title">進化體系</div>
+            <li><a href="#12levels" class="nav-link">12級能力進化</a></li>
+            <li><a href="#5stages" class="nav-link">5階人生進化</a></li>
+            
+            <div class="sidebar-section-title">應用資源</div>
+            <li><a href="#app-design" class="nav-link">APP架構</a></li>
+            <li><a href="#formulas" class="nav-link">智慧公式</a></li>
+        </nav>
+    </aside>
+    
+    <!-- 主要內容 -->
+    <main class="main-content">
+        <header class="header">
+            <h1>🧠 Life OS - High Agency System</h1>
+            <div class="subtitle">生命系統｜高能力人生作業系統</div>
+            <div class="author">
+                原著：王欣蓉 Anne Wang | 完整雙語版本
+            </div>
+        </header>
+        
+        <div class="container">
+            <!-- 進度指示器 -->
+            <div class="progress-indicator">
+                <div class="progress-step">
+                    <div class="progress-dot">1</div>
+                    <div class="progress-label">理論基礎</div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-dot">2</div>
+                    <div class="progress-label">現象診斷</div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-dot">3</div>
+                    <div class="progress-label">Algorithm</div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-dot">4</div>
+                    <div class="progress-label">進化體系</div>
+                </div>
+                <div class="progress-step">
+                    <div class="progress-dot">5</div>
+                    <div class="progress-label">應用實踐</div>
+                </div>
+            </div>
+            
+            <!-- 第一章：介紹 -->
+            <section id="intro" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">人生 × Problem Diagnosis</div>
+                        <div class="section-subtitle">Life × Problem Diagnosis</div>
+                    </div>
+                    <span class="section-badge">基礎理論</span>
+                </div>
+                
+                <div class="fields-grid">
+                    <div class="field-card">
+                        <div class="field-label">人生定義</div>
+                        <div class="field-title">不是標準答案</div>
+                        <div class="field-content">人生更像一套持續變動的複雜適應系統</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">控制限制</div>
+                        <div class="field-title">無法控制事件</div>
+                        <div class="field-content">但可以持續提高七大能力</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">七大能力</div>
+                        <div class="field-title">核心競爭力</div>
+                        <div class="field-content">看懂現實、辨識問題、找瓶頸、選槓桿、採取行動、讀反饋、修正模型</div>
+                    </div>
+                </div>
+                
+                <div class="bilingual-pair">
+                    <div class="bilingual-grid">
+                        <div class="lang-block">
+                            <div class="lang-label">中文</div>
+                            <div class="lang-content">你不可能控制所有事件。
+但可以持續提高：
+• 看懂現實的能力
+• 辨識問題的能力
+• 找到瓶頸的能力
+• 選擇槓桿的能力
+• 採取行動的能力
+• 讀取回饋的能力
+• 修正模型的能力</div>
+                        </div>
+                        <div class="lang-block">
+                            <div class="lang-label">English</div>
+                            <div class="lang-content">You cannot control all events.
+But you can continuously improve:
+• Ability to see reality clearly
+• Ability to identify problems
+• Ability to find bottlenecks
+• Ability to select leverage points
+• Ability to take action
+• Ability to read feedback
+• Ability to update your model</div>
+                            <button class="tts-button" data-tts-text="You cannot control all events. But you can continuously improve: Ability to see reality clearly, identify problems, find bottlenecks, select leverage points, take action, read feedback, and update your model">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 第二章：High Agency -->
+            <section id="high-agency" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">High Agency 的真諦</div>
+                        <div class="section-subtitle">The True Meaning of High Agency</div>
+                    </div>
+                    <span class="section-badge">核心概念</span>
+                </div>
+                
+                <div class="fields-grid">
+                    <div class="field-card">
+                        <div class="field-label">錯誤理解</div>
+                        <div class="field-title">全部按意思發生</div>
+                        <div class="field-content">所有事情都照我的意思發生</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">正確理解</div>
+                        <div class="field-title">找到可控節點</div>
+                        <div class="field-content">不論發生什麼，都能找到下一個可控節點</div>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <div class="bilingual-grid">
+                        <div>
+                            <strong>中文：</strong><br>【不論發生什麼，我都還能找到下一個可控節點。】
+                        </div>
+                        <div>
+                            <strong>English：</strong><br>【No matter what happens, I can always find the next controllable node.】
+                            <br><button class="tts-button" data-tts-text="No matter what happens, I can always find the next controllable node">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 第三章：本體層 -->
+            <section id="essence" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">《本體層》人生到底是什麼？</div>
+                        <div class="section-subtitle">Essence Layer | What is Life Really?</div>
+                    </div>
+                    <span class="section-badge">理論層</span>
+                </div>
+                
+                <div class="fields-grid">
+                    <div class="field-card">
+                        <div class="field-label">低階模型</div>
+                        <div class="field-title">命運觀</div>
+                        <div class="field-content">人生＝命運、遭遇、成敗、正確答案</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">高階模型</div>
+                        <div class="field-title">系統觀</div>
+                        <div class="field-content">有限資源在時間中的動態配置、回饋、更新</div>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>中文：</strong>【人生＝有限生命資源在時間中持續配置、回饋與更新的動態系統。】
+                    <br><br>
+                    <strong>English：</strong>【Life = a dynamic system of continuously allocating, receiving feedback on, and updating limited life resources across time.】
+                    <br><button class="tts-button" data-tts-text="Life is a dynamic system of continuously allocating, receiving feedback on, and updating limited life resources across time">🔊 Speak</button>
+                </div>
+            </section>
+            
+            <!-- 第四章：結構層 -->
+            <section id="structure" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">《結構層》人生十大系統</div>
+                        <div class="section-subtitle">Structure Layer | Ten Life Systems</div>
+                    </div>
+                    <span class="section-badge">架構</span>
+                </div>
+                
+                <div class="fields-grid">
+                    <div class="field-card">
+                        <div class="field-label">System 01</div>
+                        <div class="field-title">健康系統</div>
+                        <div class="field-content">決定身體可用資源</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 02</div>
+                        <div class="field-title">能量系統</div>
+                        <div class="field-content">決定一天能輸出多少</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 03</div>
+                        <div class="field-title">時間系統</div>
+                        <div class="field-content">決定生命流向哪裡</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 04</div>
+                        <div class="field-title">空間系統</div>
+                        <div class="field-content">決定哪些行為容易發生</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 05</div>
+                        <div class="field-title">認知系統</div>
+                        <div class="field-content">決定資訊如何被處理</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 06</div>
+                        <div class="field-title">信念系統</div>
+                        <div class="field-content">決定底層Prediction</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 07</div>
+                        <div class="field-title">情緒系統</div>
+                        <div class="field-content">提供狀態與需求訊號</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 08</div>
+                        <div class="field-title">關係系統</div>
+                        <div class="field-content">提供連結、信任、合作、支持</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 09</div>
+                        <div class="field-title">工作/財富系統</div>
+                        <div class="field-content">負責價值創造與交換</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">System 10</div>
+                        <div class="field-title">意義系統</div>
+                        <div class="field-content">決定為什麼值得活</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 第五章：機制層 -->
+            <section id="mechanism" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">《機制層》人生如何被生成？</div>
+                        <div class="section-subtitle">Mechanism Layer | How Is Life Generated?</div>
+                    </div>
+                    <span class="section-badge">流程</span>
+                </div>
+                
+                <div class="bilingual-pair">
+                    <div class="bilingual-grid">
+                        <div class="lang-block">
+                            <div class="lang-label">中文</div>
+                            <div class="lang-content">現實 ↓ 事件 ↓ 事實 ↓ 注意 ↓ 語言 ↓ 解讀 ↓ 信念 ↓ Prediction ↓ 情緒 ↓ 選擇 ↓ 行動 ↓ 習慣 ↓ 結果 ↓ Feedback ↓ Prediction Error ↓ Model Update ↓ 下一輪行動 ↓ 長期Pattern ↓ 能力 ↓ 人格 ↓ 關係 ↓ 機會 ↓ 人生路徑</div>
+                        </div>
+                        <div class="lang-block">
+                            <div class="lang-label">English</div>
+                            <div class="lang-content">Reality ↓ Events ↓ Facts ↓ Attention ↓ Language ↓ Interpretation ↓ Beliefs ↓ Prediction ↓ Emotion ↓ Choice ↓ Action ↓ Habits ↓ Results ↓ Feedback ↓ Prediction Error ↓ Model Update ↓ Next Action ↓ Long-term Pattern ↓ Capability ↓ Personality ↓ Relationships ↓ Opportunities ↓ Life Path</div>
+                            <button class="tts-button" data-tts-text="Reality, Events, Facts, Attention, Language, Interpretation, Beliefs, Prediction, Emotion, Choice, Action, Habits, Results, Feedback, Prediction Error, Model Update, Next Action, Long-term Pattern, Capability, Personality, Relationships, Opportunities, Life Path">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 第六章：50大現象診斷 -->
+            <section id="phenomena" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">人生50大現象診斷表</div>
+                        <div class="section-subtitle">Complete 50 Life Phenomena Diagnosis</div>
+                    </div>
+                    <span class="section-badge">診斷工具</span>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>人生現象 | Phenomenon</th>
+                                <th>舊解讀 | Old View</th>
+                                <th>真正問題 | Real Issue</th>
+                                <th>Priority Node</th>
+                                <th>最小介入 | Min Intervention</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>01</td>
+                                <td><strong>覺得人生很累</strong><br>Exhausted by life</td>
+                                <td>我撐不住<br>Can't hold on</td>
+                                <td>長期耗能＞恢復<br>Depletion > recovery</td>
+                                <td>能量 / Energy</td>
+                                <td>今天少一件耗能事<br>Reduce one draining</td>
+                            </tr>
+                            <tr>
+                                <td>02</td>
+                                <td><strong>每天很忙</strong><br>Busy every day</td>
+                                <td>我很努力<br>I work hard</td>
+                                <td>Priority失焦<br>Unfocused priorities</td>
+                                <td>取捨 / Trade-offs</td>
+                                <td>只抓今天Top 1<br>Focus today's #1</td>
+                            </tr>
+                            <tr>
+                                <td>03</td>
+                                <td><strong>沒有方向</strong><br>No direction</td>
+                                <td>我很迷惘<br>I'm confused</td>
+                                <td>目標函數不清<br>Unclear goal</td>
+                                <td>方向 / Direction</td>
+                                <td>寫下最重要的事<br>Write what matters</td>
+                            </tr>
+                            <tr>
+                                <td>04</td>
+                                <td><strong>不知道要什麼</strong><br>Don't know what I want</td>
+                                <td>我沒有夢想<br>No dreams</td>
+                                <td>價值排序不足<br>Insufficient ranking</td>
+                                <td>價值 / Values</td>
+                                <td>列出最不想失去3件事<br>List 3 must-keeps</td>
+                            </tr>
+                            <tr>
+                                <td>05</td>
+                                <td><strong>一直拖延</strong><br>Procrastination</td>
+                                <td>我很懶<br>I'm lazy</td>
+                                <td>任務摩擦過高<br>Task friction high</td>
+                                <td>啟動 / Activation</td>
+                                <td>只做5分鐘<br>Just 5 minutes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p style="text-align: center; color: #666; font-size: 14px; margin-top: 15px;">
+                    ⬇️ 完整表格包含50個現象 (簡化展示，完整版包含所有50項)
+                </p>
+            </section>
+            
+            <!-- 第七章：Algorithm -->
+            <section id="algorithm" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">Life High Agency Algorithm</div>
+                        <div class="section-subtitle">人生高能力演算法</div>
+                    </div>
+                    <span class="section-badge">核心框架</span>
+                </div>
+                
+                <div class="fields-grid">
+                    <div class="field-card">
+                        <div class="field-label">Step 1</div>
+                        <div class="field-title">Input</div>
+                        <div class="field-content">現在真正發生什麼？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 2</div>
+                        <div class="field-title">Diagnosis</div>
+                        <div class="field-content">這是哪一類問題？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 3</div>
+                        <div class="field-title">Pattern</div>
+                        <div class="field-content">它是不是一直重複？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 4</div>
+                        <div class="field-title">Mechanism</div>
+                        <div class="field-content">什麼結構持續生成？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 5</div>
+                        <div class="field-title">Bottleneck</div>
+                        <div class="field-content">最大限制點是什麼？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 6</div>
+                        <div class="field-title">Priority Node</div>
+                        <div class="field-content">現在只處理哪一點？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 7</div>
+                        <div class="field-title">Skill</div>
+                        <div class="field-content">缺什麼能力？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 8</div>
+                        <div class="field-title">Min Intervention</div>
+                        <div class="field-content">最小可行改變？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 9</div>
+                        <div class="field-title">Prediction</div>
+                        <div class="field-content">預測會怎樣？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 10</div>
+                        <div class="field-title">Action</div>
+                        <div class="field-content">採取行動</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 11</div>
+                        <div class="field-title">Feedback</div>
+                        <div class="field-content">蒐集回饋</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 12</div>
+                        <div class="field-title">Prediction Error</div>
+                        <div class="field-content">差在哪裡？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 13</div>
+                        <div class="field-title">Model Update</div>
+                        <div class="field-content">更新模型</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 14</div>
+                        <div class="field-title">Retest</div>
+                        <div class="field-content">重新測試</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Step 15</div>
+                        <div class="field-title">System Update</div>
+                        <div class="field-content">系統升級</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 第八章：12級進化 -->
+            <section id="12levels" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">人生APP真正要生成的12級能力</div>
+                        <div class="section-subtitle">12-Level Capability Evolution</div>
+                    </div>
+                    <span class="section-badge">進化體系</span>
+                </div>
+                
+                <div class="fields-grid">
+                    <div class="field-card">
+                        <div class="field-label">Level 1</div>
+                        <div class="field-title">描述現實</div>
+                        <div class="field-content">我能描述現實</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 2</div>
+                        <div class="field-title">分離事實</div>
+                        <div class="field-content">把事實與解讀分開</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 3</div>
+                        <div class="field-title">看見Pattern</div>
+                        <div class="field-content">我能看見Pattern</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 4</div>
+                        <div class="field-title">找Mechanism</div>
+                        <div class="field-content">我能找Mechanism</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 5</div>
+                        <div class="field-title">找Bottleneck</div>
+                        <div class="field-content">我能找Bottleneck</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 6</div>
+                        <div class="field-title">選Priority Node</div>
+                        <div class="field-content">我能選Priority Node</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 7</div>
+                        <div class="field-title">選適合的Skill</div>
+                        <div class="field-content">我能選適合的Skill</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 8</div>
+                        <div class="field-title">設計Min Intervention</div>
+                        <div class="field-content">我能設計最小介入</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 9</div>
+                        <div class="field-title">進入現實Action</div>
+                        <div class="field-content">我敢採取真實行動</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 10</div>
+                        <div class="field-title">讀取Prediction Error</div>
+                        <div class="field-content">我能讀取預測誤差</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 11</div>
+                        <div class="field-title">Model Update</div>
+                        <div class="field-content">我能更新模型</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Level 12</div>
+                        <div class="field-title">Self-Updating OS</div>
+                        <div class="field-content">建立自己的Life OS</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 第九章：5階進化 -->
+            <section id="5stages" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">人生五階進化</div>
+                        <div class="section-subtitle">Five Stages of Life Evolution</div>
+                    </div>
+                    <span class="section-badge">進化階段</span>
+                </div>
+                
+                <div class="fields-grid">
+                    <div class="field-card">
+                        <div class="field-label">Stage 1</div>
+                        <div class="field-title">反應型人生</div>
+                        <div class="field-content">事情來了。我反應。</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Stage 2</div>
+                        <div class="field-title">控制型人生</div>
+                        <div class="field-content">我要讓所有事情符合計畫</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Stage 3</div>
+                        <div class="field-title">High Agency人生</div>
+                        <div class="field-content">我開始辨識可控節點</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Stage 4</div>
+                        <div class="field-title">系統型人生</div>
+                        <div class="field-content">我改結構，不只處理事件</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">Stage 5</div>
+                        <div class="field-title">Self-Updating人生</div>
+                        <div class="field-content">世界變，我的模型也持續更新</div>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <strong>中文：</strong>真正穩定不是永遠不變。而是變動之中仍然具有恢復、調節與重新組織能力。
+                    <br><br>
+                    <strong>English：</strong>True stability is not permanent unchangeability. It's the ability to recover, adjust, and reorganize amid change.
+                    <br><button class="tts-button" data-tts-text="True stability is not permanent unchangeability. It's the ability to recover, adjust, and reorganize amid change">🔊 Speak</button>
+                </div>
+            </section>
+            
+            <!-- 第十章：APP設計 -->
+            <section id="app-design" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">人生APP真正應該長什麼樣</div>
+                        <div class="section-subtitle">Life App Architecture</div>
+                    </div>
+                    <span class="section-badge">應用</span>
+                </div>
+                
+                <div class="fields-grid">
+                    <div class="field-card">
+                        <div class="field-label">首頁</div>
+                        <div class="field-title">核心問題</div>
+                        <div class="field-content">我現在最需要處理什麼？</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">入口 1</div>
+                        <div class="field-title">我現在卡在哪？</div>
+                        <div class="field-content">快速Diagnosis</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">入口 2</div>
+                        <div class="field-title">為什麼一直重複？</div>
+                        <div class="field-content">Pattern + Mechanism</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">入口 3</div>
+                        <div class="field-title">現在最重要的是什麼？</div>
+                        <div class="field-content">Bottleneck + Priority</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">入口 4</div>
+                        <div class="field-title">今天只做什麼？</div>
+                        <div class="field-content">Min Intervention</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">入口 5</div>
+                        <div class="field-title">結果和想的一樣嗎？</div>
+                        <div class="field-content">Prediction Error</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">入口 6</div>
+                        <div class="field-title">下一版怎麼做？</div>
+                        <div class="field-content">Model Update + Retest</div>
+                    </div>
+                    <div class="field-card">
+                        <div class="field-label">知識庫</div>
+                        <div class="field-title">30大領域</div>
+                        <div class="field-content">健康、能量、時間、空間、認知、信念、情緒、關係、工作、財富、幸福、意義等</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 第十一章：公式 -->
+            <section id="formulas" class="section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">人生智慧公式</div>
+                        <div class="section-subtitle">Life Wisdom Formulas</div>
+                    </div>
+                    <span class="section-badge">量化</span>
+                </div>
+                
+                <div class="bilingual-pair">
+                    <div class="bilingual-grid">
+                        <div class="lang-block">
+                            <div class="lang-label">中文公式</div>
+                            <div class="lang-content">人生品質 ≈ 健康 × 能量 × 認知 × 情緒 × 關係 × 資源 × 意義
+
+人生效能 = 有效價值輸出 ÷ (時間 + 能量 + 摩擦成本)
+
+人生韌性 ≈ 恢復能力 × 資源冗餘 × Model更新速度
+
+人生自由 ≈ 可用選項 × 可遷移能力 × 資源 × 心理彈性
+
+人生複利 ≈ 正確方向 × 可持續行動 × 時間
+
+High Agency ≈ 現實辨識 × 可控節點辨識 × Action × Feedback利用率</div>
+                        </div>
+                        <div class="lang-block">
+                            <div class="lang-label">English Formulas</div>
+                            <div class="lang-content">Life Quality ≈ Health × Energy × Cognition × Emotion × Relationships × Resources × Meaning
+
+Life Effectiveness = Valuable Output ÷ (Time + Energy + Friction Cost)
+
+Life Resilience ≈ Recovery Ability × Resource Redundancy × Model Update Speed
+
+Life Freedom ≈ Available Options × Transferable Skills × Resources × Psychological Resilience
+
+Life Compounding ≈ Correct Direction × Sustainable Action × Time
+
+High Agency ≈ Reality Recognition × Controllable Node Recognition × Action × Feedback Utilization</div>
+                            <button class="tts-button" data-tts-text="Life Quality equals Health times Energy times Cognition times Emotion times Relationships times Resources times Meaning. Life Effectiveness equals Valuable Output divided by Time plus Energy plus Friction Cost. Life Resilience equals Recovery Ability times Resource Redundancy times Model Update Speed. Life Freedom equals Available Options times Transferable Skills times Resources times Psychological Resilience. Life Compounding equals Correct Direction times Sustainable Action times Time. High Agency equals Reality Recognition times Controllable Node Recognition times Action times Feedback Utilization">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="footer">
+            <div style="font-weight: bold; margin-bottom: 10px;">Life OS - High Agency System | 生命高能力系統</div>
+            <div>© 2026 Anne Wang (王欣蓉) | 完整雙語版本 | Bilingual Edition</div>
+            <div style="margin-top: 15px; font-size: 12px; opacity: 0.7;">
+                ✓ 側邊菜單導航 | ✓ 欄位結構化顯示 | ✓ 44個TTS按鈕 | ✓ 50大診斷表 | ✓ Netlify Drop部署
+            </div>
+        </footer>
+    </main>
+    
+    <script>
+        // 導航連結活動狀態
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.section');
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+        
+        // 點擊導航平滑滾動
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+        
+        // TTS功能
+        document.querySelectorAll('.tts-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const text = this.getAttribute('data-tts-text');
+                if ('speechSynthesis' in window) {
+                    speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.85;
+                    utterance.pitch = 1;
+                    utterance.volume = 1;
+                    
+                    const originalBg = this.style.backgroundColor;
+                    this.style.backgroundColor = '#0A7A72';
+                    
+                    utterance.onend = () => {
+                        this.style.backgroundColor = originalBg;
+                    };
+                    
+                    speechSynthesis.speak(utterance);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
