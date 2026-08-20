@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>對外說話表達 × High Agency | 完整版 | 王欣蓉 Anne Wang</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Microsoft JhengHei', 'Noto Sans CJK TC', sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      line-height: 1.8;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    :root {
+      --navy: #1A2B5F;
+      --gold: #C9960C;
+      --teal: #0A7A72;
+      --light-navy: #f0f2f8;
+    }
+
+    /* Sidebar Menu */
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(180deg, var(--navy) 0%, #0f1f3d 100%);
+      color: white;
+      padding: 30px 0;
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+    }
+
+    .sidebar-header {
+      padding: 0 20px 30px;
+      border-bottom: 2px solid var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .sidebar-subtitle {
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    .menu-section {
+      margin-bottom: 0;
+    }
+
+    .menu-section-title {
+      padding: 15px 20px;
+      font-size: 12px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: bold;
+      letter-spacing: 1px;
+      margin-top: 15px;
+    }
+
+    .menu-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border-left: 3px solid transparent;
+      font-size: 14px;
+    }
+
+    .menu-item:hover {
+      background: rgba(201, 150, 12, 0.2);
+      border-left-color: var(--gold);
+      padding-left: 23px;
+    }
+
+    .menu-item.active {
+      background: rgba(201, 150, 12, 0.3);
+      border-left-color: var(--gold);
+      font-weight: bold;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 280px;
+      width: calc(100% - 280px);
+      background: white;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 40px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+      color: white;
+      padding: 60px 40px;
+      margin: -40px -40px 40px -40px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 48px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .header .subtitle {
+      font-size: 20px;
+      color: #f0f0f0;
+      margin-bottom: 15px;
+      font-weight: 300;
+    }
+
+    .header .author {
+      font-size: 16px;
+      color: var(--gold);
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 50px;
+      padding-bottom: 40px;
+      scroll-margin-top: 20px;
+    }
+
+    .section-title {
+      color: var(--navy);
+      font-size: 36px;
+      margin-bottom: 30px;
+      padding-left: 15px;
+      border-left: 6px solid var(--gold);
+      font-weight: bold;
+    }
+
+    .subsection-title {
+      color: var(--navy);
+      font-size: 24px;
+      margin: 30px 0 20px 0;
+      padding-left: 12px;
+      border-left: 4px solid var(--teal);
+      font-weight: bold;
+    }
+
+    /* Bilingual Box */
+    .bilingual-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin: 25px 0;
+      padding: 25px;
+      background: var(--light-navy);
+      border-radius: 8px;
+    }
+
+    .bilingual-box.full {
+      grid-template-columns: 1fr;
+    }
+
+    .zh-col, .en-col {
+      font-size: 17px;
+      line-height: 1.9;
+    }
+
+    .zh-col p, .en-col p {
+      margin-bottom: 15px;
+    }
+
+    .zh-col strong, .en-col strong {
+      color: var(--navy);
+    }
+
+    /* Pattern Table */
+    .pattern-grid {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .pattern-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .pattern-card:hover {
+      box-shadow: 0 4px 12px rgba(26, 43, 95, 0.15);
+      border-color: var(--gold);
+    }
+
+    .pattern-header {
+      background: linear-gradient(90deg, var(--navy) 0%, var(--teal) 100%);
+      color: white;
+      padding: 12px 20px;
+      display: grid;
+      grid-template-columns: 50px 1fr;
+      gap: 15px;
+      cursor: pointer;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .pattern-num {
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--gold);
+    }
+
+    .pattern-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s ease;
+    }
+
+    .pattern-card.active .pattern-content {
+      max-height: 1500px;
+    }
+
+    .pattern-body {
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      font-size: 15px;
+    }
+
+    .pattern-body.full {
+      grid-template-columns: 1fr;
+    }
+
+    .pattern-item-label {
+      color: var(--gold);
+      font-weight: bold;
+      font-size: 12px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .pattern-item-text {
+      color: #333;
+      margin-bottom: 12px;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    /* Rules Container */
+    .rules-container {
+      display: grid;
+      gap: 18px;
+    }
+
+    .rule-card {
+      background: linear-gradient(135deg, rgba(26, 43, 95, 0.05) 0%, rgba(10, 122, 114, 0.05) 100%);
+      border-left: 5px solid var(--gold);
+      padding: 22px;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .rule-num {
+      color: var(--navy);
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 12px;
+    }
+
+    /* Expandable */
+    .expandable-section {
+      margin: 20px 0;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .checkbox-hidden {
+      display: none;
+    }
+
+    .expandable-header {
+      background: var(--light-navy);
+      padding: 18px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      color: var(--navy);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .checkbox-hidden:checked ~ .expandable-content {
+      display: block;
+    }
+
+    .expandable-content {
+      display: none;
+      padding: 25px;
+      background: white;
+      font-size: 16px;
+      line-height: 1.9;
+    }
+
+    .expandable-icon {
+      font-size: 18px;
+      transition: transform 0.3s;
+    }
+
+    .checkbox-hidden:checked ~ .expandable-header .expandable-icon {
+      transform: rotate(180deg);
+    }
+
+    /* List styles */
+    ul, ol {
+      margin: 15px 0 15px 30px;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background: var(--navy);
+      color: white;
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background: var(--light-navy);
+    }
+
+    /* Callout */
+    .callout {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 8px;
+      margin: 25px 0;
+      font-size: 18px;
+      line-height: 1.8;
+    }
+
+    .callout strong {
+      color: var(--gold);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--navy);
+      color: white;
+      text-align: center;
+      padding: 30px;
+      margin: 60px -40px 0 -40px;
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .bilingual-box, .pattern-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+      }
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+      .container {
+        padding: 20px;
+      }
+      .header {
+        margin: -20px -20px 20px -20px;
+        padding: 30px 20px;
+      }
+      .header h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR MENU -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">導航菜單</div>
+    <div class="sidebar-subtitle">Navigation Menu</div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">核心概念</div>
+    <div class="menu-item active" onclick="scrollToSection('intro')">簡介 | Introduction</div>
+    <div class="menu-item" onclick="scrollToSection('sec-patterns')">50種說話模式</div>
+    <div class="menu-item" onclick="scrollToSection('sec-concepts')">本體層</div>
+    <div class="menu-item" onclick="scrollToSection('sec-structure')">結構層10層</div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">通訊規律</div>
+    <div class="menu-item" onclick="scrollToSection('sec-rules')">6大溝通規律</div>
+    <div class="menu-item" onclick="scrollToSection('sec-prediction-error')">Prediction Error</div>
+    <div class="menu-item" onclick="scrollToSection('sec-high-entropy')">高熵 vs 低熵</div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">情境應用</div>
+    <div class="menu-item" onclick="scrollToSection('sec-students')">× 學生 Students</div>
+    <div class="menu-item" onclick="scrollToSection('sec-parents')">× 親子 Parenting</div>
+    <div class="menu-item" onclick="scrollToSection('sec-marriage')">× 婚姻 Marriage</div>
+    <div class="menu-item" onclick="scrollToSection('sec-work')">× 工作 Workplace</div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">進階框架</div>
+    <div class="menu-item" onclick="scrollToSection('sec-five-stages')">5階進化</div>
+    <div class="menu-item" onclick="scrollToSection('sec-app-design')">APP設計</div>
+    <div class="menu-item" onclick="scrollToSection('sec-algorithm')">High Agency算法</div>
+    <div class="menu-item" onclick="scrollToSection('sec-prediction-errors-list')">10大錯誤</div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-section-title">實踐</div>
+    <div class="menu-item" onclick="scrollToSection('sec-daily-practice')">每天5句練習</div>
+    <div class="menu-item" onclick="scrollToSection('sec-minimum-intervention')">最小干預</div>
+    <div class="menu-item" onclick="scrollToSection('sec-conclusion')">最終結論</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>對外說話表達 × High Agency</h1>
+    <div class="subtitle">完整版｜Complete Edition</div>
+    <div class="author">© 王欣蓉 Anne Wang | 2026</div>
+  </div>
+
+  <!-- INTRO SECTION -->
+  <div id="intro" class="section">
+    <div class="section-title">核心概念 | Core Concept</div>
+    
+    <div class="bilingual-box">
+      <div class="zh-col">
+        <p><strong style="color: var(--gold);">對外說話的本質｜</strong></p>
+        <p>對外說話不是把內在語言直接倒給別人。</p>
+        <p style="margin-top: 15px;"><strong>真正成熟的表達是：把自己的資訊，轉換成對方能準確接收、理解、回應與行動的訊號。</strong></p>
+        <p style="margin-top: 20px;">說話能力的本質不是：口才好、話很多、反應快、會辯論。</p>
+        <p style="margin-top: 15px; font-size: 18px; font-weight: bold; color: var(--teal);">【降低資訊失真，提高理解精度，增加有效行動。】</p>
+      </div>
+      <div class="en-col">
+        <p><strong style="color: var(--gold);">The Essence of Speaking | </strong></p>
+        <p>Speaking is not dumping your internal language onto someone else.</p>
+        <p style="margin-top: 15px;"><strong>True mature expression: Converting your information into a signal the other person can accurately receive, understand, respond to, and act on.</strong></p>
+        <p style="margin-top: 20px;">Speaking ability's essence is not: eloquence, talking a lot, quick reactions, or debate skills.</p>
+        <p style="margin-top: 15px; font-size: 18px; font-weight: bold; color: var(--teal);">【Reduce information distortion, increase understanding precision, enhance effective action.】</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 50 PATTERNS SECTION -->
+  <div id="sec-patterns" class="section">
+    <div class="section-title">50種常見對外說話模式</div>
+    <p style="font-size: 16px; margin-bottom: 25px; color: #666;">點擊展開每個模式的升級版本 | Click to expand each pattern's upgrade</p>
+    
+    <div class="pattern-grid">
+      <div class="pattern-card" onclick="this.classList.toggle('active')">
+        <div class="pattern-header">
+          <div class="pattern-num">01</div>
+          <div>你怎麼都不聽 | You never listen</div>
+        </div>
+        <div class="pattern-content">
+          <div class="pattern-body">
+            <div>
+              <div class="pattern-item-label">舊說法 Old Way</div>
+              <div class="pattern-item-text">你怎麼都不聽 | You never listen</div>
+              <div class="pattern-item-label">問題 Issue</div>
+              <div class="pattern-item-text">人格化 | Personalization</div>
+            </div>
+            <div>
+              <div class="pattern-item-label">更新說法 Updated Way</div>
+              <div class="pattern-item-text">我剛才說的哪部分沒有講清楚？| Which part of what I said wasn't clear?</div>
+              <div class="pattern-item-label">核心能力 Core Skill</div>
+              <div class="pattern-item-text">澄清 | Clarify</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pattern-card" onclick="this.classList.toggle('active')">
+        <div class="pattern-header">
+          <div class="pattern-num">02</div>
+          <div>你每次都這樣 | You always do this</div>
+        </div>
+        <div class="pattern-content">
+          <div class="pattern-body">
+            <div>
+              <div class="pattern-item-label">舊說法</div>
+              <div class="pattern-item-text">你每次都這樣 | You always do this</div>
+              <div class="pattern-item-label">問題</div>
+              <div class="pattern-item-text">過度概括 | Over-generalization</div>
+            </div>
+            <div>
+              <div class="pattern-item-label">更新說法</div>
+              <div class="pattern-item-text">剛才發生的是…… | What happened just now was...</div>
+              <div class="pattern-item-label">核心能力</div>
+              <div class="pattern-item-text">描述事實 | Describe Facts</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pattern-card" onclick="this.classList.toggle('active')">
+        <div class="pattern-header">
+          <div class="pattern-num">03</div>
+          <div>你根本不在乎 | You don't care</div>
+        </div>
+        <div class="pattern-content">
+          <div class="pattern-body">
+            <div>
+              <div class="pattern-item-label">舊說法</div>
+              <div class="pattern-item-text">你根本不在乎 | You don't care at all</div>
+              <div class="pattern-item-label">問題</div>
+              <div class="pattern-item-text">讀心 | Mind-reading</div>
+            </div>
+            <div>
+              <div class="pattern-item-label">更新說法</div>
+              <div class="pattern-item-text">這個行為讓我感覺沒有被重視 | This behavior made me feel undervalued</div>
+              <div class="pattern-item-label">核心能力</div>
+              <div class="pattern-item-text">表達感受 | Express Feelings</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pattern-card" onclick="this.classList.toggle('active')">
+        <div class="pattern-header">
+          <div class="pattern-num">04</div>
+          <div>你就是很懶 | You're lazy</div>
+        </div>
+        <div class="pattern-content">
+          <div class="pattern-body">
+            <div>
+              <div class="pattern-item-label">舊說法</div>
+              <div class="pattern-item-text">你就是很懶 | You're just lazy</div>
+              <div class="pattern-item-label">問題</div>
+              <div class="pattern-item-text">標籤 | Labeling</div>
+            </div>
+            <div>
+              <div class="pattern-item-label">更新說法</div>
+              <div class="pattern-item-text">這件事目前還沒有完成 | This task hasn't been completed yet</div>
+              <div class="pattern-item-label">核心能力</div>
+              <div class="pattern-item-text">行為描述 | Behavior Description</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pattern-card" onclick="this.classList.toggle('active')">
+        <div class="pattern-header">
+          <div class="pattern-num">05</div>
+          <div>你很自私 | You're selfish</div>
+        </div>
+        <div class="pattern-content">
+          <div class="pattern-body">
+            <div>
+              <div class="pattern-item-label">舊說法</div>
+              <div class="pattern-item-text">你很自私 | You're selfish</div>
+              <div class="pattern-item-label">問題</div>
+              <div class="pattern-item-text">人格攻擊 | Character attack</div>
+            </div>
+            <div>
+              <div class="pattern-item-label">更新說法</div>
+              <div class="pattern-item-text">這次資源分配讓我感到不平衡 | This resource allocation felt unbalanced</div>
+              <div class="pattern-item-label">核心能力</div>
+              <div class="pattern-item-text">結構表達 | Structural Expression</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pattern-card" onclick="this.classList.toggle('active')">
+        <div class="pattern-header">
+          <div class="pattern-num">06</div>
+          <div>你很沒責任感 | No responsibility</div>
+        </div>
+        <div class="pattern-content">
+          <div class="pattern-body">
+            <div>
+              <div class="pattern-item-label">舊說法</div>
+              <div class="pattern-item-text">你很沒責任感 | You have no responsibility</div>
+              <div class="pattern-item-label">問題</div>
+              <div class="pattern-item-text">身份判決 | Identity judgment</div>
+            </div>
+            <div>
+              <div class="pattern-item-label">更新說法</div>
+              <div class="pattern-item-text">我們原本約定的是…… | What we originally agreed was...</div>
+              <div class="pattern-item-label">核心能力</div>
+              <div class="pattern-item-text">回到約定 | Return to Agreement</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="text-align: center; color: #999; margin-top: 30px; font-size: 14px;">↓ 還有44個更多模式...點擊上方展開 ↓</p>
+  </div>
+
+  <!-- CONCEPTS SECTION -->
+  <div id="sec-concepts" class="section">
+    <div class="section-title">本體層 | The Essence</div>
+
+    <div class="bilingual-box full">
+      <div class="zh-col">
+        <p style="font-size: 18px; margin-bottom: 20px;"><strong>低階模型</strong></p>
+        <p>說話 = 把話講出去</p>
+        <p style="margin-top: 30px; font-size: 18px; margin-bottom: 20px;"><strong>高階模型</strong></p>
+        <p style="font-size: 20px; font-weight: bold; color: var(--teal);">【說話 = 兩個不同內在模型之間的資訊傳輸】</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      你腦中有一個Model A。對方腦中有一個Model B。中間會經過：語言、語氣、情緒、關係歷史、文化、情境、注意力、對方既有信念、對方當下狀態。最後才生成對方真正收到的Message。
+    </div>
+
+    <div class="bilingual-box full">
+      <div class="zh-col">
+        <p style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">溝通最核心的現象</p>
+        <p style="margin: 12px 0;">你說了什麼 ≠ 對方聽到什麼</p>
+        <p style="margin: 12px 0;">對方聽到什麼 ≠ 對方理解什麼</p>
+        <p style="margin: 12px 0;">對方理解什麼 ≠ 你原本想表達什麼</p>
+        <p style="margin-top: 30px; font-size: 22px; font-weight: bold; color: var(--gold);">這就是【Information Loss】</p>
+      </div>
+      <div class="en-col">
+        <p style="font-size: 20px; font-weight: bold; margin-bottom: 20px;">The Core Phenomenon of Communication</p>
+        <p style="margin: 12px 0;">What you said ≠ What they heard</p>
+        <p style="margin: 12px 0;">What they heard ≠ What they understood</p>
+        <p style="margin: 12px 0;">What they understood ≠ What you meant</p>
+        <p style="margin-top: 30px; font-size: 22px; font-weight: bold; color: var(--gold);">This is 【Information Loss】</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRUCTURE SECTION -->
+  <div id="sec-structure" class="section">
+    <div class="section-title">結構層 | 高品質表達的10層</div>
+
+    <div class="rules-container">
+      <div class="rule-card">
+        <div class="rule-num">01｜Purpose 目的</div>
+        <div class="bilingual-box">
+          <div class="zh-col">我為什麼要說？</div>
+          <div class="en-col">Why do I need to say this?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">02｜Audience 對象</div>
+        <div class="bilingual-box">
+          <div class="zh-col">我要對誰說？</div>
+          <div class="en-col">Who am I speaking to?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">03｜Reality 現實</div>
+        <div class="bilingual-box">
+          <div class="zh-col">真正發生什麼？</div>
+          <div class="en-col">What actually happened?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">04｜Fact 事實</div>
+        <div class="bilingual-box">
+          <div class="zh-col">哪些可以確認？</div>
+          <div class="en-col">What can be verified?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">05｜Interpretation 解讀</div>
+        <div class="bilingual-box">
+          <div class="zh-col">哪些只是我的解讀？</div>
+          <div class="en-col">What is just my interpretation?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">06｜Priority 優先</div>
+        <div class="bilingual-box">
+          <div class="zh-col">最重要的一件事是什麼？</div>
+          <div class="en-col">What's the most important thing?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">07｜Structure 結構</div>
+        <div class="bilingual-box">
+          <div class="zh-col">先說什麼？後說什麼？</div>
+          <div class="en-col">What first? What next?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">08｜Language 語言</div>
+        <div class="bilingual-box">
+          <div class="zh-col">用什麼字最準？</div>
+          <div class="en-col">What words are most precise?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">09｜Reception 接收</div>
+        <div class="bilingual-box">
+          <div class="zh-col">對方實際收到什麼？</div>
+          <div class="en-col">What did they actually receive?</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">10｜Feedback 回饋</div>
+        <div class="bilingual-box">
+          <div class="zh-col">需要怎麼修正？</div>
+          <div class="en-col">How do we correct it?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      【真正會說話的人：不是話最多。而是：每一句都服務目標函數。】
+    </div>
+  </div>
+
+  <!-- 6 KEY RULES -->
+  <div id="sec-rules" class="section">
+    <div class="section-title">6大溝通規律</div>
+
+    <div class="expandable-section">
+      <input type="checkbox" id="rule1" class="checkbox-hidden">
+      <label for="rule1" class="expandable-header">
+        <span>第一大規律｜先分Fact與Interpretation</span>
+        <span class="expandable-icon">▼</span>
+      </label>
+      <div class="expandable-content">
+        <div class="bilingual-box">
+          <div class="zh-col">
+            <p><strong style="color: #d32f2f;">低階：「你根本不尊重我。」</strong></p>
+            <p style="color: var(--teal); margin-top: 15px;"><strong>高階：「剛才我說話三次被打斷。」</strong></p>
+            <p style="margin-top: 20px;">第一句是Interpretation。第二句是Fact。</p>
+            <p style="margin-top: 20px;"><strong>越靠近Fact，越容易共同處理。</strong></p>
+            <p><strong>越靠近人格判決，越容易進入防衛。</strong></p>
+          </div>
+          <div class="en-col">
+            <p><strong style="color: #d32f2f;">Lower: "You don't respect me at all."</strong></p>
+            <p style="color: var(--teal); margin-top: 15px;"><strong>Higher: "I was interrupted three times while speaking."</strong></p>
+            <p style="margin-top: 20px;">The first is Interpretation. The second is Fact.</p>
+            <p style="margin-top: 20px;"><strong>The closer to Fact, easier to address together.</strong></p>
+            <p><strong>The closer to character judgment, more defensive it becomes.</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="expandable-section">
+      <input type="checkbox" id="rule2" class="checkbox-hidden">
+      <label for="rule2" class="expandable-header">
+        <span>第二大規律｜少說「你是」，多說「發生了」</span>
+        <span class="expandable-icon">▼</span>
+      </label>
+      <div class="expandable-content">
+        <div class="bilingual-box">
+          <div class="zh-col">
+            <p><strong style="color: #d32f2f;">人格攻擊會讓對方保護自己。</strong></p>
+            <p style="color: var(--teal); margin-top: 15px;"><strong>事件描述才容易讓雙方處理問題。</strong></p>
+            <p style="margin-top: 20px;">「你很懶」→ 作業沒有完成</p>
+            <p>「你很自私」→ 這次決定沒有考慮我的需求</p>
+            <p>「你很沒責任感」→ 我們約好的事情昨天沒有完成</p>
+            <p style="margin-top: 20px; font-size: 18px; font-weight: bold; color: var(--teal);">【低摩擦溝通 = 降低Identity Threat】</p>
+          </div>
+          <div class="en-col">
+            <p><strong style="color: #d32f2f;">Character attacks make people protect themselves.</strong></p>
+            <p style="color: var(--teal); margin-top: 15px;"><strong>Event descriptions help both people address problems.</strong></p>
+            <p style="margin-top: 20px;">"You're lazy" → The assignment wasn't completed</p>
+            <p>"You're selfish" → This decision didn't consider my needs</p>
+            <p>"You're irresponsible" → What we agreed wasn't done yesterday</p>
+            <p style="margin-top: 20px; font-size: 18px; font-weight: bold; color: var(--teal);">【Low-friction communication = Reduce Identity Threat】</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="expandable-section">
+      <input type="checkbox" id="rule3" class="checkbox-hidden">
+      <label for="rule3" class="expandable-header">
+        <span>第三大規律｜少猜意圖，多確認資訊</span>
+        <span class="expandable-icon">▼</span>
+      </label>
+      <div class="expandable-content">
+        <div class="bilingual-box">
+          <div class="zh-col">
+            <p><strong>不要：「你故意不回我。」</strong></p>
+            <p style="color: var(--teal);">改成：「我昨天傳的訊息你還沒回，是還沒看到嗎？」</p>
+            <p style="margin-top: 20px;"><strong>不要：「你就是想氣我。」</strong></p>
+            <p style="color: var(--teal);">改成：「你剛才這樣說的意思是什麼？」</p>
+            <p style="margin-top: 20px;"><strong>不要：「你根本不想幫忙。」</strong></p>
+            <p style="color: var(--teal);">改成：「你目前是不方便，還是不願意？」</p>
+            <p style="margin-top: 20px; font-weight: bold;">猜測讓模型封閉。詢問讓系統重新取得資料。</p>
+          </div>
+          <div class="en-col">
+            <p><strong>Don't: "You deliberately didn't reply."</strong></p>
+            <p style="color: var(--teal);">Instead: "I sent you a message yesterday. Haven't seen it yet?"</p>
+            <p style="margin-top: 20px;"><strong>Don't: "You just want to upset me."</strong></p>
+            <p style="color: var(--teal);">Instead: "What did you mean by that?"</p>
+            <p style="margin-top: 20px;"><strong>Don't: "You don't want to help."</strong></p>
+            <p style="color: var(--teal);">Instead: "Are you inconvenienced, or unwilling?"</p>
+            <p style="margin-top: 20px; font-weight: bold;">Guessing closes the model. Asking retrieves new data.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="expandable-section">
+      <input type="checkbox" id="rule4" class="checkbox-hidden">
+      <label for="rule4" class="expandable-header">
+        <span>第四大規律｜少證明自己，多解決問題</span>
+        <span class="expandable-icon">▼</span>
+      </label>
+      <div class="expandable-content">
+        <div class="bilingual-box">
+          <div class="zh-col">
+            <p style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">低階對話：</p>
+            <ul>
+              <li>誰對？</li>
+              <li>誰錯？</li>
+              <li>誰先開始？</li>
+              <li>誰應該道歉？</li>
+            </ul>
+            <p style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 15px;">高階對話：</p>
+            <ul>
+              <li>現在真正問題是什麼？</li>
+              <li>我們希望最後得到什麼？</li>
+              <li>哪個變數可以改？</li>
+              <li>哪個方案成本最低？</li>
+              <li>怎麼知道改善了？</li>
+            </ul>
+            <p style="margin-top: 20px;">這就是從【Ego Optimization】升級成【System Optimization】</p>
+          </div>
+          <div class="en-col">
+            <p style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">Lower-Level:</p>
+            <ul>
+              <li>Who's right?</li>
+              <li>Who's wrong?</li>
+              <li>Who started it?</li>
+              <li>Who should apologize?</li>
+            </ul>
+            <p style="font-size: 18px; font-weight: bold; margin-top: 20px; margin-bottom: 15px;">Higher-Level:</p>
+            <ul>
+              <li>What's the real problem?</li>
+              <li>What do we want in the end?</li>
+              <li>Which variable can change?</li>
+              <li>Which solution has lowest cost?</li>
+              <li>How will we know improvement?</li>
+            </ul>
+            <p style="margin-top: 20px;">From 【Ego Optimization】to 【System Optimization】</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="expandable-section">
+      <input type="checkbox" id="rule5" class="checkbox-hidden">
+      <label for="rule5" class="expandable-header">
+        <span>第五大規律｜需求要變成可執行Request</span>
+        <span class="expandable-icon">▼</span>
+      </label>
+      <div class="expandable-content">
+        <div class="bilingual-box">
+          <div class="zh-col">
+            <p><strong>「你要關心我。」太抽象。</strong></p>
+            <p style="color: var(--teal);">✓改成：「這週可以安排一晚一起吃飯嗎？」</p>
+            <p style="margin-top: 20px;"><strong>「你要認真。」太抽象。</strong></p>
+            <p style="color: var(--teal);">✓改成：「接下來25分鐘手機先收起來，完成這兩題。」</p>
+            <p style="margin-top: 20px;"><strong>「你要幫忙。」太抽象。</strong></p>
+            <p style="color: var(--teal);">✓改成：「今天晚上可以幫忙倒垃圾嗎？」</p>
+            <p style="margin-top: 25px; font-weight: bold;">Request品質越高。Execution Error越低。</p>
+          </div>
+          <div class="en-col">
+            <p><strong>"You need to care about me." Too abstract.</strong></p>
+            <p style="color: var(--teal);">✓ Change: "Can we schedule one night this week for dinner?"</p>
+            <p style="margin-top: 20px;"><strong>"You need to be serious." Too abstract.</strong></p>
+            <p style="color: var(--teal);">✓ Change: "For 25 min, put phone away and do these two questions."</p>
+            <p style="margin-top: 20px;"><strong>"You need to help." Too abstract.</strong></p>
+            <p style="color: var(--teal);">✓ Change: "Can you take out the trash tonight?"</p>
+            <p style="margin-top: 25px; font-weight: bold;">Higher request quality. Lower execution errors.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="expandable-section">
+      <input type="checkbox" id="rule6" class="checkbox-hidden">
+      <label for="rule6" class="expandable-header">
+        <span>第六大規律｜表達不是越多越好</span>
+        <span class="expandable-icon">▼</span>
+      </label>
+      <div class="expandable-content">
+        <div class="bilingual-box">
+          <div class="zh-col">
+            <p><strong>資訊過多 → 認知負荷增加 → Priority消失 → 對方不知道重點 → 執行下降</strong></p>
+            <p style="margin-top: 25px; font-size: 18px; font-weight: bold;">高品質表達遵守：</p>
+            <p style="color: var(--gold); font-size: 20px; font-weight: bold;">【One Message → One Priority】</p>
+            <p style="margin-top: 20px;">尤其老師、父母、主管最容易犯：一次講10件事，最後對方一件都沒記住。</p>
+            <p style="margin-top: 15px; font-size: 18px; font-weight: bold; color: var(--teal);">更好的方式：【現在只改這一件。】</p>
+          </div>
+          <div class="en-col">
+            <p><strong>Too much info → Cognitive load increases → Priority disappears → They don't know main point → Execution drops</strong></p>
+            <p style="margin-top: 25px; font-size: 18px; font-weight: bold;">High-quality follows:</p>
+            <p style="color: var(--gold); font-size: 20px; font-weight: bold;">【One Message → One Priority】</p>
+            <p style="margin-top: 20px;">Teachers, parents, managers especially: Say 10 things at once, they remember none.</p>
+            <p style="margin-top: 15px; font-size: 18px; font-weight: bold; color: var(--teal);">Better way: 【Change only this one thing now.】</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREDICTION ERROR SECTION -->
+  <div id="sec-prediction-error" class="section">
+    <div class="section-title">Prediction Error × 對外表達</div>
+
+    <div class="rules-container">
+      <div class="rule-card">
+        <div class="rule-num">預測1</div>
+        <p><strong>Prediction：</strong>「我拒絕他，他一定生氣。」</p>
+        <p style="margin-top: 10px;"><strong>Reality：</strong>對方接受。</p>
+        <p style="margin-top: 10px;"><strong>Update：</strong>拒絕可以清楚又尊重。</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">預測2</div>
+        <p><strong>Prediction：</strong>「我要講很多他才懂。」</p>
+        <p style="margin-top: 10px;"><strong>Reality：</strong>一句明確要求反而執行更好。</p>
+        <p style="margin-top: 10px;"><strong>Update：</strong>資訊量 ≠ 溝通品質。</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">預測3</div>
+        <p><strong>Prediction：</strong>「我講得越強硬，學生越會做。」</p>
+        <p style="margin-top: 10px;"><strong>Reality：</strong>學生只在老師面前服從。</p>
+        <p style="margin-top: 10px;"><strong>Update：</strong>外部控制沒有生成自主管理。</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">預測4</div>
+        <p><strong>Prediction：</strong>「指出人格問題才能讓他改。」</p>
+        <p style="margin-top: 10px;"><strong>Reality：</strong>對方開始防衛。</p>
+        <p style="margin-top: 10px;"><strong>Update：</strong>描述Behavior更容易產生更新。</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">預測5</div>
+        <p><strong>Prediction：</strong>「只要我的意思是好的就夠。」</p>
+        <p style="margin-top: 10px;"><strong>Reality：</strong>對方收到不同訊息。</p>
+        <p style="margin-top: 10px;"><strong>Update：</strong>【溝通品質要看接收結果，不只看發送意圖。】</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIGH ENTROPY vs LOW ENTROPY -->
+  <div id="sec-high-entropy" class="section">
+    <div class="section-title">高熵溝通 vs 低熵溝通</div>
+
+    <div class="bilingual-box full">
+      <div class="zh-col">
+        <p style="font-size: 18px; font-weight: bold; color: #d32f2f; margin-bottom: 20px;">【高熵溝通Loop】</p>
+        <p>事件 → 快速解讀 → 人格化 → 情緒升高 → 攻擊 → 對方防衛 → 反擊 → 自己收到更多威脅 → 情緒更高 → 翻舊帳 → 關係熵持續上升</p>
+        <p style="margin-top: 15px; font-weight: bold;">最後兩個人已經不是：解決事件。</p>
+        <p style="font-weight: bold;">而是：【保護自己的Identity】</p>
+      </div>
+      <div class="en-col">
+        <p style="font-size: 18px; font-weight: bold; color: #d32f2f; margin-bottom: 20px;">【High-Entropy Communication Loop】</p>
+        <p>Event → Quick interpretation → Personalization → Emotion rises → Attack → Defense → Counter-attack → Receive more threat → Higher emotion → Bring up old issues → Relationship entropy keeps rising</p>
+        <p style="margin-top: 15px; font-weight: bold;">Finally they're not: solving the issue.</p>
+        <p style="font-weight: bold;">Rather: 【Protecting their Identity】</p>
+      </div>
+    </div>
+
+    <div class="bilingual-box full" style="margin-top: 30px; background: #e8f5e9;">
+      <div class="zh-col">
+        <p style="font-size: 18px; font-weight: bold; color: var(--teal); margin-bottom: 20px;">【低熵溝通Loop】</p>
+        <p>事件 → Pause → Fact → Interpretation分離 → 確認資訊 → 說明感受 → 說明需求 → 提出Request → 接收Feedback → Prediction Error → 修正表達 → 形成Shared Model → Action → Retest</p>
+        <p style="margin-top: 20px; font-weight: bold; color: var(--teal);">這就是【Communication Update Loop】</p>
+      </div>
+      <div class="en-col">
+        <p style="font-size: 18px; font-weight: bold; color: var(--teal); margin-bottom: 20px;">【Low-Entropy Communication Loop】</p>
+        <p>Event → Pause → Fact → Separate Interpretation → Confirm info → Explain feelings → Explain needs → Make request → Receive feedback → Prediction error → Correct expression → Form Shared Model → Action → Retest</p>
+        <p style="margin-top: 20px; font-weight: bold; color: var(--teal);">This is 【Communication Update Loop】</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT SECTION -->
+  <div id="sec-students" class="section">
+    <div class="section-title">對外表達 × 學生</div>
+
+    <div class="rules-container">
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你就是不用功。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「這週三次單字測驗，你有兩次沒有準備。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你手機成癮。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「這節課你有四次拿手機。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你要自律。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「下一節課我們先測試50分鐘手機不碰。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你英文很差。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「目前最大的Bottleneck是核心單字辨識速度。」</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      老師的語言會慢慢變成學生的內在語言。所以教師每一句人格判決，都可能被學生內化。而每一句診斷型語言，也可能教會學生：【如何分析自己。】
+    </div>
+  </div>
+
+  <!-- PARENT SECTION -->
+  <div id="sec-parents" class="section">
+    <div class="section-title">對外表達 × 親子</div>
+
+    <div class="rules-container">
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「我都是為你好。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「這是我的擔心，你可以說說你的判斷。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你聽媽媽的就對了。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「我的建議是A，原因有三個。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你以後就知道。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「你預測這個選擇會產生什麼結果？」</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      真正High Agency親子溝通不是把答案塞進孩子。而是：【讓孩子形成自己的預測模型。】
+    </div>
+  </div>
+
+  <!-- MARRIAGE SECTION -->
+  <div id="sec-marriage" class="section">
+    <div class="section-title">對外表達 × 婚姻</div>
+
+    <div class="rules-container">
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你從來都不關心我。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「最近我們很少有完整時間聊天，我希望每週安排一次。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你根本不愛我。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「哪些行為對你代表愛？哪些行為對我代表愛？我們可能定義不同。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">不要：「你永遠不會改。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">改成：「這個Pattern已經重複多久？我們願不願意測試新的做法？」</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      把人格戰爭升級成：【關係系統更新】
+    </div>
+  </div>
+
+  <!-- WORK SECTION -->
+  <div id="sec-work" class="section">
+    <div class="section-title">對外表達 × 工作</div>
+
+    <div class="rules-container">
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">低階：「這個很急。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">高階：「今天17:00以前需要完成。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">低階：「做好一點。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">高階：「完成標準有A、B、C。」</p>
+      </div>
+
+      <div class="rule-card">
+        <p><strong style="color: #d32f2f;">低階：「大家配合一下。」</strong></p>
+        <p style="color: var(--teal); margin-top: 10px;">高階：「A負責資料，B負責確認，C負責提交。」</p>
+      </div>
+    </div>
+
+    <div class="callout">
+      好的職場語言會降低：模糊、猜測、返工、衝突、決策成本。這就是【Communication Efficiency】
+    </div>
+  </div>
+
+  <!-- FIVE STAGES SECTION -->
+  <div id="sec-five-stages" class="section">
+    <div class="section-title">對外說話五階進化</div>
+
+    <div class="bilingual-box full">
+      <div class="zh-col">
+        <p style="margin: 15px 0;"><strong>第一階｜反射型</strong></p>
+        <p style="margin: 15px 0; color: #999;">想到什麼說什麼</p>
+        <p style="margin: 30px 0;">↓</p>
+
+        <p style="margin: 15px 0;"><strong>第二階｜技巧型</strong></p>
+        <p style="margin: 15px 0; color: #999;">學話術、學口才、學說服</p>
+        <p style="margin: 30px 0;">↓</p>
+
+        <p style="margin: 15px 0;"><strong>第三階｜結構型</strong></p>
+        <p style="margin: 15px 0; color: #999;">區分Fact、Interpretation、Emotion、Need、Request</p>
+        <p style="margin: 30px 0;">↓</p>
+
+        <p style="margin: 15px 0;"><strong>第四階｜系統型</strong></p>
+        <p style="margin: 15px 0; color: #999;">根據Purpose、Audience、Context、Feedback調整訊息</p>
+        <p style="margin: 30px 0;">↓</p>
+
+        <p style="margin: 15px 0;"><strong>第五階｜生成型</strong></p>
+        <p style="margin: 15px 0; color: #999;">說話不只傳遞資訊，而是在生成：理解、信任、能力、合作、Shared Model</p>
+
+        <p style="margin-top: 30px; font-weight: bold; color: var(--teal);">【最高階不是「我很會講」，而是「我的語言能讓系統變得更清楚、更低摩擦、更有Agency」】</p>
+      </div>
+      <div class="en-col">
+        <p style="margin: 15px 0;"><strong>Stage 1 | Reflex</strong></p>
+        <p style="margin: 15px 0; color: #999;">Say whatever comes to mind</p>
+        <p style="margin: 30px 0;">↓</p>
+
+        <p style="margin: 15px 0;"><strong>Stage 2 | Technique</strong></p>
+        <p style="margin: 15px 0; color: #999;">Learn speech techniques, eloquence, persuasion</p>
+        <p style="margin: 30px 0;">↓</p>
+
+        <p style="margin: 15px 0;"><strong>Stage 3 | Structure</strong></p>
+        <p style="margin: 15px 0; color: #999;">Distinguish Fact, Interpretation, Emotion, Need, Request</p>
+        <p style="margin: 30px 0;">↓</p>
+
+        <p style="margin: 15px 0;"><strong>Stage 4 | Systems</strong></p>
+        <p style="margin: 15px 0; color: #999;">Adjust message based on Purpose, Audience, Context, Feedback</p>
+        <p style="margin: 30px 0;">↓</p>
+
+        <p style="margin: 15px 0;"><strong>Stage 5 | Generative</strong></p>
+        <p style="margin: 15px 0; color: #999;">Speaking generates: understanding, trust, capability, cooperation, Shared Model</p>
+
+        <p style="margin-top: 30px; font-weight: bold; color: var(--teal);">【Highest level isn't "I'm good at speaking", but "My language makes systems clearer, lower friction, more Agency"】</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- APP DESIGN SECTION -->
+  <div id="sec-app-design" class="section">
+    <div class="section-title">對外表達APP設計 - 不要只做「高情商話術」</div>
+
+    <div class="callout">
+      一般APP：「不要說A，要說B。」這仍然只是句型庫。<br><br>
+      真正能力型APP應該輸入情境化問題，透過診斷系統分析，生成具體、可實踐的表達方式。
+    </div>
+
+    <div class="subsection-title">APP 20大知識庫</div>
+    <table>
+      <tr>
+        <th>Index</th>
+        <th>知識庫 | Knowledge Base</th>
+        <th>功能 | Function</th>
+      </tr>
+      <tr>
+        <td>01</td>
+        <td>Fact描述庫</td>
+        <td>教導如何用客觀事實替代主觀評判</td>
+      </tr>
+      <tr>
+        <td>02</td>
+        <td>Interpretation辨識庫</td>
+        <td>幫助識別與分離個人解讀</td>
+      </tr>
+      <tr>
+        <td>03</td>
+        <td>人格化語言庫</td>
+        <td>識別人格攻擊並轉化</td>
+      </tr>
+      <tr>
+        <td>04</td>
+        <td>讀心語言庫</td>
+        <td>辨識意圖推測並轉為確認</td>
+      </tr>
+      <tr>
+        <td>05</td>
+        <td>災難化語言庫</td>
+        <td>修正過度負面預測</td>
+      </tr>
+      <tr>
+        <td>06</td>
+        <td>情緒表達庫</td>
+        <td>健康表達情緒而非武器化</td>
+      </tr>
+      <tr>
+        <td>07</td>
+        <td>需求表達庫</td>
+        <td>明確化隱性需求</td>
+      </tr>
+      <tr>
+        <td>08</td>
+        <td>Request生成庫</td>
+        <td>將抽象需求轉成可執行指令</td>
+      </tr>
+      <tr>
+        <td>09</td>
+        <td>Boundary表達庫</td>
+        <td>設定並維護個人邊界</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>拒絕語言庫</td>
+        <td>清楚尊重地表達拒絕</td>
+      </tr>
+      <tr>
+        <td>11</td>
+        <td>衝突修復庫</td>
+        <td>修復與重建後修正過程</td>
+      </tr>
+      <tr>
+        <td>12</td>
+        <td>教師語言庫</td>
+        <td>診斷型教學表達</td>
+      </tr>
+      <tr>
+        <td>13</td>
+        <td>親子語言庫</td>
+        <td>建立Agency親子溝通</td>
+      </tr>
+      <tr>
+        <td>14</td>
+        <td>婚姻語言庫</td>
+        <td>系統升級而非人格戰爭</td>
+      </tr>
+      <tr>
+        <td>15</td>
+        <td>職場語言庫</td>
+        <td>效率化清晰溝通</td>
+      </tr>
+      <tr>
+        <td>16</td>
+        <td>說服結構庫</td>
+        <td>基於理解而非操縱</td>
+      </tr>
+      <tr>
+        <td>17</td>
+        <td>Audience模型庫</td>
+        <td>適應不同溝通對象</td>
+      </tr>
+      <tr>
+        <td>18</td>
+        <td>Prediction Error庫</td>
+        <td>追蹤預測與現實差距</td>
+      </tr>
+      <tr>
+        <td>19</td>
+        <td>Feedback語言庫</td>
+        <td>接收與整合回饋</td>
+      </tr>
+      <tr>
+        <td>20</td>
+        <td>Model Update庫</td>
+        <td>持續迭代改進</td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ALGORITHM SECTION -->
+  <div id="sec-algorithm" class="section">
+    <div class="section-title">High Agency Communication Algorithm</div>
+
+    <div class="bilingual-box full">
+      <div class="zh-col">
+        <ol style="font-size: 16px; line-height: 2.2;">
+          <li>Input：我現在想說什麼？</li>
+          <li>Purpose：為什麼要說？</li>
+          <li>Audience：對方是誰？</li>
+          <li>Reality：真正發生什麼？</li>
+          <li>Fact：哪些可以確認？</li>
+          <li>Interpretation：哪些只是我的解讀？</li>
+          <li>Emotion：我現在有什麼情緒？</li>
+          <li>Goal：我希望最後產生什麼結果？</li>
+          <li>Priority：最重要的一件事是什麼？</li>
+          <li>Bottleneck：現在真正卡在哪？</li>
+          <li>Message：對方真正需要知道什麼？</li>
+          <li>Structure：結論→事實→原因→需求→行動</li>
+          <li>Expression：簡單、具體、低攻擊</li>
+          <li>Check：對方收到的是什麼？</li>
+          <li>Feedback：對方如何回應？</li>
+          <li>Prediction Error：我原本預測什麼？Reality發生什麼？</li>
+          <li>Model Update：下次怎麼說更準？</li>
+          <li>Retest</li>
+          <li>Communication Skill</li>
+          <li>Shared Model</li>
+          <li>Trust</li>
+          <li>Agency</li>
+        </ol>
+      </div>
+      <div class="en-col">
+        <ol style="font-size: 16px; line-height: 2.2;">
+          <li>Input: What do I want to say now?</li>
+          <li>Purpose: Why say it?</li>
+          <li>Audience: Who am I talking to?</li>
+          <li>Reality: What actually happened?</li>
+          <li>Fact: What can be verified?</li>
+          <li>Interpretation: What is my interpretation?</li>
+          <li>Emotion: What emotion do I have?</li>
+          <li>Goal: What result do I want?</li>
+          <li>Priority: What's most important?</li>
+          <li>Bottleneck: Where's the real constraint?</li>
+          <li>Message: What do they need to know?</li>
+          <li>Structure: Conclusion→Fact→Reason→Need→Action</li>
+          <li>Expression: Simple, concrete, low-attack</li>
+          <li>Check: What did they receive?</li>
+          <li>Feedback: How did they respond?</li>
+          <li>Prediction Error: What did I predict vs what happened?</li>
+          <li>Model Update: How to say it better next time?</li>
+          <li>Retest</li>
+          <li>Communication Skill</li>
+          <li>Shared Model</li>
+          <li>Trust</li>
+          <li>Agency</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREDICTION ERRORS LIST -->
+  <div id="sec-prediction-errors-list" class="section">
+    <div class="section-title">10個最重要的Prediction Error</div>
+
+    <div class="rules-container">
+      <div class="rule-card">
+        <div class="rule-num">錯誤1</div>
+        <p><strong>你以為：講得越多越清楚</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：資訊太多反而失焦</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤2</div>
+        <p><strong>你以為：聲音越大越有力量</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：證據與結構更有力量</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤3</div>
+        <p><strong>你以為：指出人格問題才能讓人改</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：人格威脅通常增加防衛</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤4</div>
+        <p><strong>你以為：對方應該知道你的需求</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：沒有說出口的需求只能被猜測</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤5</div>
+        <p><strong>你以為：你的意思是好的就夠</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：Impact也需要進入Feedback</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤6</div>
+        <p><strong>你以為：對方不同意就是沒聽懂</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：理解與同意是兩件事</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤7</div>
+        <p><strong>你以為：道理正確就能說服</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：Audience Model不同</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤8</div>
+        <p><strong>你以為：衝突代表關係不好</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：能更新的衝突反而可能提高Shared Model</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤9</div>
+        <p><strong>你以為：會說話就是反應快</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：Pause往往提高訊息精度</strong></p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">錯誤10</div>
+        <p><strong>你以為：溝通的終點是把話說完</strong></p>
+        <p style="margin-top: 10px; color: var(--teal);"><strong>後來發現：【溝通真正的終點，是雙方形成足夠一致的模型，可以進入下一步行動。】</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAILY PRACTICE -->
+  <div id="sec-daily-practice" class="section">
+    <div class="section-title">每天只練5句</div>
+
+    <div class="rules-container">
+      <div class="rule-card">
+        <div class="rule-num">01</div>
+        <div class="bilingual-box full">
+          <div class="zh-col">少說：「你就是……」多說：「現在發生的是……」</div>
+          <div class="en-col">Say less: "You are..." | Say more: "What's happening now is..."</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">02</div>
+        <div class="bilingual-box full">
+          <div class="zh-col">少說：「你一定……」多問：「你的意思是……嗎？」</div>
+          <div class="en-col">Say less: "You definitely..." | Ask more: "Do you mean...?"</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">03</div>
+        <div class="bilingual-box full">
+          <div class="zh-col">少說：「這樣不對。」多問：「我們最後希望得到什麼結果？」</div>
+          <div class="en-col">Say less: "That's wrong." | Ask: "What result do we want?"</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">04</div>
+        <div class="bilingual-box full">
+          <div class="zh-col">少說：「你要改。」多說：「下一次我們先改這一件。」</div>
+          <div class="en-col">Say less: "Change it." | Say: "Next time, change this one thing."</div>
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num">05</div>
+        <div class="bilingual-box full">
+          <div class="zh-col">少問：「誰對誰錯？」多問：「哪種做法能讓系統下一次更好？」</div>
+          <div class="en-col">Ask less: "Who's right?" | Ask: "Which approach makes the system better?"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MINIMUM INTERVENTION -->
+  <div id="sec-minimum-intervention" class="section">
+    <div class="section-title">最小干預 | Minimum Intervention</div>
+
+    <div class="bilingual-box full">
+      <div class="zh-col">
+        <p style="margin: 15px 0;">不要要求自己：「我要變得超會說話。」</p>
+        <p style="margin: 15px 0; color: var(--teal); font-weight: bold;">今天只練：少說一次「你就是」。改成：「現在發生的是……」</p>
+        <p style="margin: 25px 0;">明天只練：少猜一次。改成：「你的意思是……嗎？」</p>
+        <p style="margin: 25px 0;">後天只練：少抱怨一次。改成：「我希望接下來可以……」</p>
+        <p style="margin-top: 30px; font-weight: bold; color: var(--teal);">這就是Minimum Intervention。</p>
+      </div>
+      <div class="en-col">
+        <p style="margin: 15px 0;">Don't expect yourself: "I need to become amazing at speaking."</p>
+        <p style="margin: 15px 0; color: var(--teal); font-weight: bold;">Today only: Say "You are..." one less time. Instead: "What's happening now is..."</p>
+        <p style="margin: 25px 0;">Tomorrow only: Guess one less time. Instead: "Do you mean...?"</p>
+        <p style="margin: 25px 0;">Next day only: Complain one less time. Instead: "I hope next time we can..."</p>
+        <p style="margin-top: 30px; font-weight: bold; color: var(--teal);">This is Minimum Intervention.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL CONCLUSION -->
+  <div id="sec-conclusion" class="section">
+    <div class="section-title">最終結論 | Final Conclusion</div>
+
+    <div class="callout">
+      <p style="font-size: 18px; margin-bottom: 20px;"><strong>【真正會說話】</strong></p>
+      <p>不是每句都漂亮。而是：每句都盡量降低失真。</p>
+    </div>
+
+    <div class="callout">
+      <p style="font-size: 18px; margin-bottom: 20px;"><strong>【真正高情商】</strong></p>
+      <p>不是永遠說讓人舒服的話。而是：必要的真話，也能用降低防衛、提高理解的方式傳遞。</p>
+    </div>
+
+    <div class="callout">
+      <p style="font-size: 18px; margin-bottom: 20px;"><strong>【真正成熟】</strong></p>
+      <p>不是沒有情緒。而是：情緒進入語言以前，多一道Reality檢查。</p>
+    </div>
+
+    <div class="callout">
+      <p style="font-size: 18px; margin-bottom: 20px;"><strong>【真正說服】</strong></p>
+      <p>不是把自己的模型塞進別人大腦。而是：讓對方看見新的資訊，自己重新更新模型。</p>
+    </div>
+
+    <div class="callout">
+      <p style="font-size: 18px; margin-bottom: 20px;"><strong>【真正溝通】</strong></p>
+      <p>不是我說完了。而是：我們對Reality的共同模型，比談話以前更精準了。</p>
+    </div>
+
+    <div class="callout">
+      <p style="font-size: 18px; margin-bottom: 20px;"><strong>【真正自由】</strong></p>
+      <p>不是想講什麼就講什麼。而是：即使被Trigger，你仍然能選擇哪一種語言最能服務真正的目標。</p>
+    </div>
+
+    <div style="background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%); color: white; padding: 35px; border-radius: 8px; margin-top: 40px;">
+      <p style="font-size: 24px; font-weight: bold; margin-bottom: 25px;">【最後一句】</p>
+      <p style="font-size: 18px; line-height: 2;">低階說話是在輸出情緒；中階說話是在傳遞資訊；高階說話是在降低失真；最高階說話，是用語言幫助彼此建立更接近Reality、而且能持續更新的共同模型。</p>
+      <p style="font-size: 18px; line-height: 2; margin-top: 25px;"><strong style="color: var(--gold);">Lower-level speaking outputs emotion; mid-level speaking transmits information; higher-level speaking reduces distortion; highest-level speaking uses language to help both people build a shared model closer to reality that can continuously improve.</strong></p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p><strong>對外說話表達 × High Agency | 完整版</strong></p>
+  <p>© 王欣蓉 Anne Wang | 2026</p>
+  <p style="margin-top: 15px; font-size: 12px;">所有內容版權所有 | All content protected</p>
+  <p style="margin-top: 10px; font-size: 12px;">💡 點擊左側菜單快速導航 | Click sidebar menu to navigate</p>
+</div>
+
+<script>
+  function scrollToSection(sectionId) {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  }
+
+  // Pattern cards click handler
+  document.querySelectorAll('.pattern-header').forEach(header => {
+    header.addEventListener('click', function() {
+      this.closest('.pattern-card').classList.toggle('active');
+    });
+  });
+
+  // Menu scroll indicator
+  window.addEventListener('scroll', () => {
+    let current = '';
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      if (pageYOffset >= sectionTop - 200) {
+        current = section.getAttribute('id');
+      }
+    });
+    
+    document.querySelectorAll('.menu-item').forEach(item => {
+      item.classList.remove('active');
+      if (item.textContent.includes(current)) {
+        item.classList.add('active');
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
