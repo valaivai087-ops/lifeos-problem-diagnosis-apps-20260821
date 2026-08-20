@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSAT英文診斷系統 - Problem Diagnosis × Bilingual Learning</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --navy: #1A2B5F;
+            --gold: #C9960C;
+            --teal: #0A7A72;
+            --light: #F8F8F8;
+            --text: #2C3E50;
+        }
+        body {
+            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            background: white;
+            color: var(--text);
+            line-height: 1.8;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .header h1 { font-size: 32px; margin-bottom: 10px; font-weight: bold; }
+        .header p { font-size: 18px; opacity: 0.95; }
+        .header .subtitle { font-size: 14px; opacity: 0.8; margin-top: 10px; }
+        
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .nav-tabs button {
+            padding: 12px 24px;
+            border: 2px solid var(--navy);
+            background: white;
+            color: var(--navy);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .nav-tabs button.active {
+            background: var(--navy);
+            color: white;
+        }
+        .nav-tabs button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        
+        /* Sections */
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        /* Diagnosis Table */
+        .diagnosis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .diagnosis-card {
+            background: white;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .diagnosis-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 6px 18px rgba(201, 150, 12, 0.15);
+            transform: translateY(-2px);
+        }
+        .diagnosis-card-header {
+            background: var(--navy);
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .diagnosis-id {
+            background: var(--gold);
+            color: var(--navy);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .diagnosis-title {
+            flex: 1;
+            margin-left: 12px;
+        }
+        .diagnosis-title-zh { font-size: 18px; font-weight: bold; margin-bottom: 4px; }
+        .diagnosis-title-en { font-size: 14px; opacity: 0.9; }
+        .diagnosis-content {
+            display: none;
+            padding: 16px;
+            background: white;
+            border-top: 2px solid var(--teal);
+        }
+        .diagnosis-content.open { display: block; }
+        .diagnosis-row {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #F0F0F0;
+        }
+        .diagnosis-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .diagnosis-label {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .diagnosis-value-zh { font-size: 14px; color: var(--navy); margin-bottom: 4px; }
+        .diagnosis-value-en { font-size: 13px; color: #666; font-style: italic; }
+        
+        /* Systems */
+        .systems-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .system-card {
+            background: linear-gradient(135deg, var(--navy) 0%, #0D1B3E 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .system-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(26, 43, 95, 0.2);
+        }
+        .system-card h3 { font-size: 20px; margin-bottom: 8px; }
+        .system-card .en-title { font-size: 14px; opacity: 0.8; margin-bottom: 12px; }
+        .system-card p { font-size: 14px; margin-bottom: 16px; line-height: 1.6; }
+        .system-components {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .system-components.open { display: block; }
+        .component {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .component span { color: var(--gold); font-weight: bold; }
+        
+        /* Prediction Errors */
+        .error-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .error-card {
+            background: white;
+            border-left: 4px solid var(--gold);
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        .error-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            transform: translateX(4px);
+        }
+        .error-title {
+            color: var(--gold);
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        .error-content-zh { font-size: 16px; color: var(--navy); font-weight: bold; margin-bottom: 12px; }
+        .error-content-en { font-size: 14px; color: #666; font-style: italic; margin-bottom: 16px; }
+        .error-update-label {
+            color: var(--teal);
+            font-weight: bold;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .error-update-zh { font-size: 14px; color: var(--text); margin-bottom: 8px; }
+        .error-update-en { font-size: 13px; color: #666; font-style: italic; }
+        
+        /* Algorithm */
+        .algorithm-flow {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+        .algorithm-step {
+            background: linear-gradient(135deg, var(--teal) 0%, #0A5F57 100%);
+            color: white;
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+            position: relative;
+        }
+        .algorithm-step::after {
+            content: "↓";
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            opacity: 0.5;
+            width: 100%;
+        }
+        .algorithm-step:last-child::after { display: none; }
+        .algorithm-label {
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .algorithm-content-zh { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+        .algorithm-content-en { font-size: 11px; opacity: 0.85; }
+        
+        /* TTS Button */
+        .tts-btn {
+            display: inline-block;
+            background: var(--gold);
+            color: var(--navy);
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 8px;
+            transition: all 0.2s;
+        }
+        .tts-btn:hover { transform: scale(1.05); box-shadow: 0 2px 8px rgba(201, 150, 12, 0.3); }
+        .tts-btn:active { transform: scale(0.98); }
+        
+        /* Search */
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 16px;
+            border: 2px solid var(--navy);
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201, 150, 12, 0.1);
+        }
+        
+        /* Formulas */
+        .formula-box {
+            background: linear-gradient(135deg, #f5f5f5 0%, #fafafa 100%);
+            border-left: 4px solid var(--gold);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        .formula-box .zh { color: var(--navy); font-weight: bold; }
+        .formula-box .en { color: #666; font-style: italic; }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 12px;
+            border-top: 1px solid #E0E0E0;
+            margin-top: 40px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 { font-size: 24px; }
+            .diagnosis-grid { grid-template-columns: 1fr; }
+            .systems-grid { grid-template-columns: 1fr; }
+            .error-cards { grid-template-columns: 1fr; }
+            .algorithm-flow { grid-template-columns: 1fr; }
+            .nav-tabs { gap: 8px; }
+            .nav-tabs button { padding: 10px 16px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎯 GSAT英文診斷系統</h1>
+            <p>Problem Diagnosis × Bilingual Learning System</p>
+            <p class="subtitle">從「背更多英文」升級成「建立陌生文本也能自主解題的英文能力系統」</p>
+            <p class="subtitle">From "Memorize More" to "Independent Problem-Solving Ability System"</p>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="diagnosis">50項診斷表</button>
+            <button class="tab-btn" data-tab="systems">7大能力系統</button>
+            <button class="tab-btn" data-tab="errors">10個Prediction Error</button>
+            <button class="tab-btn" data-tab="algorithm">High Agency演算法</button>
+            <button class="tab-btn" data-tab="formulas">能力公式</button>
+        </div>
+        
+        <!-- 50 Diagnosis Table -->
+        <div id="diagnosis" class="section active">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="搜尋問題... Search problems..." style="font-size: 14px; padding: 12px 16px;">
+            </div>
+            <div class="diagnosis-grid" id="diagnosis-grid"></div>
+        </div>
+        
+        <!-- 7 Systems -->
+        <div id="systems" class="section">
+            <div class="systems-grid" id="systems-grid"></div>
+        </div>
+        
+        <!-- 10 Errors -->
+        <div id="errors" class="section">
+            <div class="error-cards" id="errors-grid"></div>
+        </div>
+        
+        <!-- Algorithm -->
+        <div id="algorithm" class="section">
+            <h2 style="margin-bottom: 20px; color: var(--navy);">High Agency Algorithm | 高Agency演算法</h2>
+            <div class="algorithm-flow" id="algorithm-grid"></div>
+        </div>
+        
+        <!-- Formulas -->
+        <div id="formulas" class="section">
+            <h2 style="margin-bottom: 20px; color: var(--navy);">能力生成公式 × 核心公式</h2>
+            
+            <div class="formula-box">
+                <div class="zh">學測英文成績 ≠ 單字量</div>
+                <div class="en">GSAT English Score ≠ Vocabulary Quantity</div>
+                <div class="zh" style="margin-top: 10px;">更接近：成績 = Vocabulary × Sentence Parsing × Context × Reading × Writing × Translation × Exam Control</div>
+                <div class="en">Closer to: Score = Vocabulary × Sentence Parsing × Context × Reading × Writing × Translation × Exam Control</div>
+                <div class="zh" style="margin-top: 10px; color: var(--teal);">因為是乘法系統，最弱節點會限制整體輸出。</div>
+                <div class="en" style="color: var(--teal);">Because it's a multiplication system, the weakest component limits overall output.</div>
+            </div>
+            
+            <div class="formula-box">
+                <div class="zh">能力形成 = 高品質Input × 主動Retrieval × 適度難度 × 即時Feedback × Prediction Error × Model Update × Spaced Retest</div>
+                <div class="en">Ability Formation = High-Quality Input × Active Retrieval × Optimal Difficulty × Immediate Feedback × Prediction Error × Model Update × Spaced Retest</div>
+            </div>
+            
+            <div class="formula-box">
+                <div class="zh" style="color: var(--gold); font-size: 16px; margin-bottom: 12px;">低熵學習系統</div>
+                <div class="en" style="color: var(--gold); font-size: 14px; margin-bottom: 12px;">Low-Entropy Learning System</div>
+                <div class="zh">一個能力地圖 × 一個錯題資料庫 × 一個Pattern系統 × 一個Bottleneck × 一個Priority Node × 一個Minimum Intervention × 一個Feedback Loop × 一個Retest</div>
+                <div class="en">One Ability Map × One Error Database × One Pattern System × One Bottleneck × One Priority Node × One Minimum Intervention × One Feedback Loop × One Retest</div>
+                <div class="zh" style="margin-top: 10px; color: var(--teal);">資料可以很多。學生眼前的下一步必須很少。</div>
+                <div class="en" style="color: var(--teal);">Data can be abundant. The next step for students must be minimal.</div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>GSAT English Diagnosis System | 王欣蓉 Anne Wang</p>
+            <p>Built with Prediction Error Framework × High Agency Learning Model</p>
+        </div>
+    </div>
+    
+    <!-- Data -->
+    <script type="application/json" id="diagnosis-data">
+    [{"id": 1, "problem": "單字一直錯", "en": "Keep picking wrong words", "pattern": "熟字也會選錯", "pattern_en": "Mistake even with familiar words", "mechanism": "字義只有中文翻譯", "mechanism_en": "Only have Chinese definitions", "bottleneck": "語境辨義弱", "bottleneck_en": "Weak contextual disambiguation", "intervention": "每天辨析5組易混字", "intervention_en": "Analyze 5 confusing word pairs daily"}, {"id": 2, "problem": "背完很快忘", "en": "Forget quickly after memorizing", "pattern": "一次大量背", "pattern_en": "Memorize large amounts at once", "mechanism": "Retrieval不足", "mechanism_en": "Insufficient retrieval practice", "bottleneck": "提取頻率低", "bottleneck_en": "Low retrieval frequency", "intervention": "每天回想昨天10字", "intervention_en": "Recall 10 words from yesterday daily"}, {"id": 3, "problem": "單字看過卻認不出", "en": "Recognize words in isolation but not in text", "pattern": "只有被動閱讀", "pattern_en": "Only passive reading", "mechanism": "Recognition≠Recall", "mechanism_en": "Recognition ≠ Recall", "bottleneck": "主動提取不足", "bottleneck_en": "Insufficient active retrieval", "intervention": "遮住中文自己說意思", "intervention_en": "Cover Chinese, say meaning yourself"}, {"id": 4, "problem": "一字多義容易錯", "en": "Struggle with multiple word meanings", "pattern": "只背第一義", "pattern_en": "Only memorize first meaning", "mechanism": "語境模型過窄", "mechanism_en": "Too narrow context model", "bottleneck": "多義辨識弱", "bottleneck_en": "Weak polysemy discrimination", "intervention": "一字學3種常見語境", "intervention_en": "Learn 3 common contexts per word"}, {"id": 5, "problem": "易混字一直錯", "en": "Confusing words mistake", "pattern": "長得像就猜", "pattern_en": "Guess if looks similar", "mechanism": "字形干擾", "mechanism_en": "Orthographic interference", "bottleneck": "Distinction不足", "bottleneck_en": "Insufficient distinction", "intervention": "做A/B對比卡", "intervention_en": "Create A/B comparison cards"}, {"id": 6, "problem": "片語記不住", "en": "Can't remember phrases", "pattern": "單字拆開背", "pattern_en": "Memorize words separately", "mechanism": "Chunk不足", "mechanism_en": "Insufficient chunking", "bottleneck": "搭配詞弱", "bottleneck_en": "Weak collocations", "intervention": "整組學collocation", "intervention_en": "Learn collocations as units"}, {"id": 7, "problem": "長句看不懂", "en": "Can't understand long sentences", "pattern": "從第一字翻到最後", "pattern_en": "Translate word by word", "mechanism": "線性翻譯", "mechanism_en": "Linear translation", "bottleneck": "句構辨識弱", "bottleneck_en": "Weak sentence structure recognition", "intervention": "每天拆3個長句", "intervention_en": "Break down 3 long sentences daily"}, {"id": 8, "problem": "關係子句卡住", "en": "Stuck with relative clauses", "pattern": "不知道修飾誰", "pattern_en": "Don't know what's modified", "mechanism": "結構邊界不清", "mechanism_en": "Unclear structural boundaries", "bottleneck": "修飾關係弱", "bottleneck_en": "Weak modification relationships", "intervention": "圈先行詞＋關代", "intervention_en": "Circle antecedents + relative pronouns"}, {"id": 9, "problem": "分詞構句看不懂", "en": "Don't understand participial phrases", "pattern": "看到V-ing就亂猜", "pattern_en": "Guess randomly at V-ing", "mechanism": "壓縮結構不熟", "mechanism_en": "Unfamiliar compressed structures", "bottleneck": "邏輯還原弱", "bottleneck_en": "Weak logical restoration", "intervention": "還原完整子句", "intervention_en": "Restore to full clauses"}, {"id": 10, "problem": "文法懂卻不會用", "en": "Know grammar but can't use it", "pattern": "只會規則題", "pattern_en": "Only good at rule questions", "mechanism": "Knowledge≠Skill", "mechanism_en": "Knowledge ≠ Skill", "bottleneck": "遷移不足", "bottleneck_en": "Insufficient transfer", "intervention": "用文法自己造句", "intervention_en": "Create sentences using the grammar"}, {"id": 11, "problem": "克漏字靠感覺", "en": "Cloze relies on intuition", "pattern": "每格獨立作答", "pattern_en": "Answer each blank independently", "mechanism": "忽略上下文", "mechanism_en": "Ignore context", "bottleneck": "Context不足", "bottleneck_en": "Insufficient context use", "intervention": "先讀完整段再填", "intervention_en": "Read full passage before filling"}, {"id": 12, "problem": "克漏字兩個都像", "en": "Two cloze options seem similar", "pattern": "只看中文意思", "pattern_en": "Only check Chinese meaning", "mechanism": "搭配與語氣不足", "mechanism_en": "Insufficient collocation & tone", "bottleneck": "Collocation弱", "bottleneck_en": "Weak collocations", "intervention": "比較前後搭配", "intervention_en": "Compare surrounding collocations"}, {"id": 13, "problem": "轉折題常錯", "en": "Get transition questions wrong", "pattern": "沒看到邏輯訊號", "pattern_en": "Miss logic signals", "mechanism": "Discourse Marker弱", "mechanism_en": "Weak discourse markers", "bottleneck": "邏輯關係不足", "bottleneck_en": "Insufficient logical relationships", "intervention": "圈however／therefore等", "intervention_en": "Circle however/therefore etc"}, {"id": 14, "problem": "篇章結構題常錯", "en": "Get structure questions wrong", "pattern": "只看單句", "pattern_en": "Only look at single sentences", "mechanism": "沒建立段落模型", "mechanism_en": "No paragraph model", "bottleneck": "Coherence弱", "bottleneck_en": "Weak coherence", "intervention": "找代名詞與銜接詞", "intervention_en": "Find pronouns and connectives"}, {"id": 15, "problem": "句子插入題錯", "en": "Get sentence insertion wrong", "pattern": "只看意思像不像", "pattern_en": "Only check if meaning fits", "mechanism": "指涉鏈沒追蹤", "mechanism_en": "Don't track reference chains", "bottleneck": "Cohesion弱", "bottleneck_en": "Weak cohesion", "intervention": "找this／they／such指什麼", "intervention_en": "Find what this/they/such refers to"}, {"id": 16, "problem": "閱讀很慢", "en": "Reading is slow", "pattern": "每句翻中文", "pattern_en": "Translate each sentence", "mechanism": "Translation Cost高", "mechanism_en": "High translation cost", "bottleneck": "自動化不足", "bottleneck_en": "Insufficient automation", "intervention": "練意群閱讀", "intervention_en": "Practice chunked reading"}, {"id": 17, "problem": "長文看到就怕", "en": "Intimidated by long texts", "pattern": "字數＝困難", "pattern_en": "Word count = difficulty", "mechanism": "Threat Prediction過高", "mechanism_en": "Overestimate threat", "bottleneck": "啟動成本高", "bottleneck_en": "High activation cost", "intervention": "先看題目＋首尾段", "intervention_en": "Look at questions + first/last paragraphs first"}, {"id": 18, "problem": "每個字都想懂", "en": "Need to understand every word", "pattern": "局部未知就停止", "pattern_en": "Stop at unknowns", "mechanism": "完美理解模型", "mechanism_en": "Perfectionist comprehension model", "bottleneck": "容錯率低", "bottleneck_en": "Low error tolerance", "intervention": "練容許10%未知字", "intervention_en": "Practice tolerating 10% unknown words"}, {"id": 19, "problem": "生字一出現就卡", "en": "Stuck when unknown word appears", "pattern": "未知字＝無法理解", "pattern_en": "Unknown word = can't understand", "mechanism": "推論能力不足", "mechanism_en": "Insufficient inference", "bottleneck": "Context Guessing弱", "bottleneck_en": "Weak contextual guessing", "intervention": "用上下文猜詞義", "intervention_en": "Use context to guess meaning"}, {"id": 20, "problem": "主旨題常錯", "en": "Get main idea questions wrong", "pattern": "被細節吸走", "pattern_en": "Distracted by details", "mechanism": "Global Model不足", "mechanism_en": "Weak global model", "bottleneck": "主旨抽取弱", "bottleneck_en": "Weak main idea extraction", "intervention": "每段只寫5字重點", "intervention_en": "Write 5-word summary per paragraph"}, {"id": 21, "problem": "細節題常錯", "en": "Get detail questions wrong", "pattern": "靠記憶回答", "pattern_en": "Answer from memory", "mechanism": "Evidence Retrieval弱", "mechanism_en": "Weak evidence retrieval", "bottleneck": "定位能力不足", "bottleneck_en": "Insufficient location ability", "intervention": "題目關鍵詞回原文", "intervention_en": "Use question keywords to find text"}, {"id": 22, "problem": "推論題常錯", "en": "Get inference questions wrong", "pattern": "加入自己的想法", "pattern_en": "Add own thoughts", "mechanism": "Evidence Boundary模糊", "mechanism_en": "Blurry evidence boundary", "bottleneck": "過度推論", "bottleneck_en": "Over-inference", "intervention": "問「原文證據在哪？」", "intervention_en": "Ask 'Where's the text evidence?'"}, {"id": 23, "problem": "作者態度題錯", "en": "Get author attitude questions wrong", "pattern": "只看事件內容", "pattern_en": "Only check event content", "mechanism": "語氣辨識不足", "mechanism_en": "Weak tone recognition", "bottleneck": "Tone Model弱", "bottleneck_en": "Weak tone model", "intervention": "圈評價性字詞", "intervention_en": "Circle evaluative words"}, {"id": 24, "problem": "選項兩個都對", "en": "Two options seem correct", "pattern": "找合理答案", "pattern_en": "Look for reasonable answer", "mechanism": "沒找最佳證據", "mechanism_en": "Don't find best evidence", "bottleneck": "Discrimination弱", "bottleneck_en": "Weak discrimination", "intervention": "比較哪個證據最完整", "intervention_en": "Compare which evidence is most complete"}, {"id": 25, "problem": "常被誘答選項騙", "en": "Fooled by distractor options", "pattern": "看到原文字就選", "pattern_en": "Select if word appears in text", "mechanism": "Keyword Matching", "mechanism_en": "Keyword matching", "bottleneck": "語意驗證不足", "bottleneck_en": "Insufficient semantic verification", "intervention": "整句重新比對", "intervention_en": "Re-match entire sentences"}, {"id": 26, "problem": "閱讀做很多沒進步", "en": "Read lots but no progress", "pattern": "只有刷題", "pattern_en": "Only practice questions", "mechanism": "Feedback Loop斷掉", "mechanism_en": "Feedback loop broken", "bottleneck": "錯誤沒有分類", "bottleneck_en": "Errors not classified", "intervention": "每題標記錯因", "intervention_en": "Mark error type for each question"}, {"id": 27, "problem": "同類題一直錯", "en": "Same type questions keep wrong", "pattern": "訂正只有答案", "pattern_en": "Only check answers", "mechanism": "Pattern沒被提取", "mechanism_en": "Pattern not extracted", "bottleneck": "Model Update不足", "bottleneck_en": "Insufficient model updates", "intervention": "寫「我為何會選錯？」", "intervention_en": "Write 'Why did I choose wrong?'"}, {"id": 28, "problem": "模考忽高忽低", "en": "Scores fluctuate on practice tests", "pattern": "能力輸出不穩", "pattern_en": "Unstable output", "mechanism": "自動化不足", "mechanism_en": "Insufficient automation", "bottleneck": "穩定度低", "bottleneck_en": "Low stability", "intervention": "固定時間做小型模考", "intervention_en": "Do mini-tests at fixed times"}, {"id": 29, "problem": "考場突然看不懂", "en": "Can't understand during exam", "pattern": "壓力升高", "pattern_en": "Stress increases", "mechanism": "Working Memory被占用", "mechanism_en": "Working memory occupied", "bottleneck": "壓力調節弱", "bottleneck_en": "Weak stress regulation", "intervention": "練限時環境", "intervention_en": "Practice under timed pressure"}, {"id": 30, "problem": "時間永遠不夠", "en": "Never have enough time", "pattern": "每題平均用力", "pattern_en": "Equal effort per question", "mechanism": "資源配置錯誤", "mechanism_en": "Wrong resource allocation", "bottleneck": "Time Strategy弱", "bottleneck_en": "Weak time strategy", "intervention": "設各題型時間上限", "intervention_en": "Set time limits per question type"}, {"id": 31, "problem": "前面卡太久", "en": "Stuck too long on early questions", "pattern": "不願意跳題", "pattern_en": "Unwilling to skip", "mechanism": "沉沒成本", "mechanism_en": "Sunk cost", "bottleneck": "切換能力弱", "bottleneck_en": "Weak switching ability", "intervention": "90秒無進展就標記", "intervention_en": "Mark after 90s with no progress"}, {"id": 32, "problem": "作文不知道寫什麼", "en": "Don't know what to write", "pattern": "題目來才想內容", "pattern_en": "Think of content after seeing topic", "mechanism": "Idea Bank不足", "mechanism_en": "Insufficient idea bank", "bottleneck": "素材庫弱", "bottleneck_en": "Weak material library", "intervention": "建20個生活母題", "intervention_en": "Build 20 life themes"}, {"id": 33, "problem": "作文開頭卡住", "en": "Stuck on essay opening", "pattern": "想一次寫完美", "pattern_en": "Want to write perfectly first time", "mechanism": "啟動門檻過高", "mechanism_en": "Too high activation barrier", "bottleneck": "模板不足", "bottleneck_en": "Insufficient templates", "intervention": "準備3種開頭骨架", "intervention_en": "Prepare 3 opening structures"}, {"id": 34, "problem": "作文內容很空", "en": "Essay content is hollow", "pattern": "只有觀點", "pattern_en": "Only opinions", "mechanism": "缺少Evidence", "mechanism_en": "Lack evidence", "bottleneck": "展開能力弱", "bottleneck_en": "Weak elaboration", "intervention": "每段加入例子＋結果", "intervention_en": "Add examples + results per paragraph"}, {"id": 35, "problem": "作文句型很單調", "en": "Essay sentence patterns monotonous", "pattern": "只敢寫短句", "pattern_en": "Only write short sentences", "mechanism": "Sentence Bank不足", "mechanism_en": "Insufficient sentence bank", "bottleneck": "句型變化弱", "bottleneck_en": "Weak sentence variety", "intervention": "每天升級3句", "intervention_en": "Upgrade 3 sentences daily"}, {"id": 36, "problem": "作文很多中文式英文", "en": "Essay has Chinese English patterns", "pattern": "中文直接逐字轉譯", "pattern_en": "Direct word-by-word translation", "mechanism": "L1 Transfer", "mechanism_en": "L1 Transfer", "bottleneck": "英語語塊不足", "bottleneck_en": "Insufficient English chunks", "intervention": "累積英文常用chunks", "intervention_en": "Accumulate common English chunks"}, {"id": 37, "problem": "作文錯很多文法", "en": "Essay has many grammar errors", "pattern": "邊想內容邊監控文法", "pattern_en": "Monitor grammar while thinking content", "mechanism": "認知負荷過高", "mechanism_en": "Cognitive load too high", "bottleneck": "自動化不足", "bottleneck_en": "Insufficient automation", "intervention": "先求清楚，再二次修正", "intervention_en": "First draft for clarity, revise for grammar"}, {"id": 38, "problem": "作文用字很普通", "en": "Essay vocabulary is ordinary", "pattern": "只會good／bad", "pattern_en": "Only use good/bad", "mechanism": "可用詞彙不足", "mechanism_en": "Insufficient available vocabulary", "bottleneck": "Active Vocabulary弱", "bottleneck_en": "Weak active vocabulary", "intervention": "每主題建立10個可用詞", "intervention_en": "Build 10 usable words per theme"}, {"id": 39, "problem": "背高級字卻不會用", "en": "Know advanced words but can't use", "pattern": "Vocabulary只停在Recognition", "pattern_en": "Vocabulary only at recognition level", "mechanism": "Retrieval不足", "mechanism_en": "Insufficient retrieval", "bottleneck": "主動輸出弱", "bottleneck_en": "Weak active output", "intervention": "每個字自己造一句", "intervention_en": "Create a sentence with each word"}, {"id": 40, "problem": "作文沒有邏輯", "en": "Essay lacks logic", "pattern": "句子各自正確卻不連", "pattern_en": "Sentences correct but disconnected", "mechanism": "Discourse不足", "mechanism_en": "Insufficient discourse", "bottleneck": "段落架構弱", "bottleneck_en": "Weak paragraph structure", "intervention": "使用主張→理由→例子→結果", "intervention_en": "Use claim→reason→example→result"}, {"id": 41, "problem": "翻譯知道中文卻寫不出", "en": "Understand Chinese but can't translate", "pattern": "從中文逐字翻", "pattern_en": "Word-by-word translation", "mechanism": "Chunk不足", "mechanism_en": "Insufficient chunks", "bottleneck": "英語生成模型弱", "bottleneck_en": "Weak English generation", "intervention": "先抓主詞＋動詞", "intervention_en": "First find subject + verb"}, {"id": 42, "problem": "翻譯句型常錯", "en": "Translation sentence structure wrong", "pattern": "中文語序直接搬過去", "pattern_en": "Chinese word order carried over", "mechanism": "Syntax Transfer", "mechanism_en": "Syntax Transfer", "bottleneck": "英語語序弱", "bottleneck_en": "Weak English word order", "intervention": "先建立英文骨架", "intervention_en": "First establish English skeleton"}, {"id": 43, "problem": "翻譯漏資訊", "en": "Translation misses information", "pattern": "一次處理整句", "pattern_en": "Process entire sentence at once", "mechanism": "Working Memory超載", "mechanism_en": "Working memory overload", "bottleneck": "切塊不足", "bottleneck_en": "Insufficient chunking", "intervention": "中文先切意群", "intervention_en": "Chunk Chinese first"}, {"id": 44, "problem": "寫完找不到錯誤", "en": "Can't find errors after writing", "pattern": "看自己的句子太熟", "pattern_en": "Too familiar with own writing", "mechanism": "Error Detection弱", "mechanism_en": "Weak error detection", "bottleneck": "校對流程不足", "bottleneck_en": "Insufficient editing process", "intervention": "分3輪檢查：動詞／名詞／連接", "intervention_en": "3-round check: verbs/nouns/connectives"}, {"id": 45, "problem": "很努力卻沒進步", "en": "Work hard but no progress", "pattern": "時間平均分配", "pattern_en": "Time distributed evenly", "mechanism": "沒找Bottleneck", "mechanism_en": "Haven't found bottleneck", "bottleneck": "Priority錯誤", "bottleneck_en": "Wrong priority", "intervention": "找最高頻錯誤類型", "intervention_en": "Find most frequent error type"}, {"id": 46, "problem": "每天讀很多英文", "en": "Read lots of English daily", "pattern": "Input很多", "pattern_en": "High input", "mechanism": "沒有Retrieval", "mechanism_en": "No retrieval", "bottleneck": "Output不足", "bottleneck_en": "Insufficient output", "intervention": "每讀完閉書說重點", "intervention_en": "Summarize after each reading"}, {"id": 47, "problem": "補習很多仍不會", "en": "Tutoring lots but still don't understand", "pattern": "老師一直輸入", "pattern_en": "Teacher keeps inputting", "mechanism": "學生沒有自主解題", "mechanism_en": "Student doesn't solve independently", "bottleneck": "Agency不足", "bottleneck_en": "Insufficient agency", "intervention": "每題先自己提出假設", "intervention_en": "Make hypothesis before teacher helps"}, {"id": 48, "problem": "太依賴AI", "en": "Overly dependent on AI", "pattern": "AI直接給答案", "pattern_en": "AI gives direct answer", "mechanism": "Prediction Error被消滅", "mechanism_en": "Prediction error eliminated", "bottleneck": "Model Update消失", "bottleneck_en": "Model update lost", "intervention": "AI只能提示，不先給答案", "intervention_en": "AI gives hints only, not answers"}, {"id": 49, "problem": "錯題很多很挫折", "en": "Many errors feel discouraging", "pattern": "Error＝能力差", "pattern_en": "Error = weak ability", "mechanism": "錯誤人格化", "mechanism_en": "Errors personalized", "bottleneck": "學習模型錯誤", "bottleneck_en": "Wrong learning model", "intervention": "Error改標成資料", "intervention_en": "Reframe errors as data"}, {"id": 50, "problem": "不知道如何真正進步", "en": "Don't know how to really improve", "pattern": "學習＝多讀多背", "pattern_en": "Learning = read/memorize more", "mechanism": "缺少能力模型", "mechanism_en": "Missing ability model", "bottleneck": "Learning OS不足", "bottleneck_en": "Insufficient learning OS", "intervention": "建立個人能力地圖", "intervention_en": "Build personal ability map"}]
+    </script>
+    <script type="application/json" id="systems-data">
+    [{"id": 1, "name": "Vocabulary System | 單字系統", "en_name": "Vocabulary System", "description": "看到字，能不能快速知道它在這句話真正是什麼意思？", "description_en": "When you see a word, can you quickly know what it really means in this sentence?", "components": ["字義 | Word meaning", "多義 | Polysemy", "字根 | Word roots", "字首 | Prefixes", "字尾 | Suffixes", "搭配 | Collocation", "語境 | Context", "近義 | Synonyms", "反義 | Antonyms", "易混 | Confusables"]}, {"id": 2, "name": "Sentence System | 句子系統", "en_name": "Sentence System", "description": "句子再長，你能不能找到誰做什麼？", "description_en": "No matter how long the sentence, can you find who does what?", "components": ["主詞 | Subject", "動詞 | Verb", "受詞 | Object", "修飾 | Modification", "子句 | Clauses", "連接 | Connection", "省略 | Ellipsis", "分詞 | Participles"]}, {"id": 3, "name": "Context System | 上下文系統", "en_name": "Context System", "description": "不知道一個字，也能不能靠前後文推回去？", "description_en": "Even without knowing a word, can you infer it from context?", "components": ["前因 | Preceding cause", "後果 | Consequence", "轉折 | Transition", "舉例 | Examples", "對比 | Contrast", "指涉 | Reference"]}, {"id": 4, "name": "Reading System | 閱讀系統", "en_name": "Reading System", "description": "一篇陌生文章，你能不能快速抓住作者到底在講什麼？", "description_en": "For an unfamiliar text, can you quickly grasp what the author is saying?", "components": ["主旨 | Main idea", "細節 | Details", "推論 | Inference", "目的 | Purpose", "態度 | Attitude", "結構 | Structure", "證據 | Evidence"]}, {"id": 5, "name": "Writing System | 作文系統", "en_name": "Writing System", "description": "腦中的想法，能不能變成清楚、有邏輯的英文？", "description_en": "Can your thoughts become clear, logical English?", "components": ["想法 | Ideas", "架構 | Structure", "句型 | Sentence patterns", "詞彙 | Vocabulary", "例子 | Examples", "連接 | Connection", "修正 | Revision"]}, {"id": 6, "name": "Translation System | 翻譯系統", "en_name": "Translation System", "description": "看到中文意思，能不能重新用英文的方式組裝？", "description_en": "Can you reassemble Chinese meaning in English?", "components": ["意思 | Meaning", "切塊 | Chunking", "英文骨架 | English skeleton", "語塊 | Chunks", "組句 | Assembly", "檢查 | Checking"]}, {"id": 7, "name": "Exam Control System | 考場控制系統", "en_name": "Exam Control System", "description": "有限時間內，能不能把真正能力穩定輸出？", "description_en": "Can you output your true ability within time limits?", "components": ["時間 | Time", "順序 | Order", "跳題 | Skipping", "壓力 | Pressure", "注意力 | Focus", "檢查 | Review", "決策 | Decision"]}]
+    </script>
+    <script type="application/json" id="errors-data">
+    [{"id": 1, "error": "Prediction Error 01 | 錯誤預測 01", "content": "「單字背越多，英文一定越好。」", "content_en": "'The more words you memorize, the better your English will be.'", "update": "更新：單字量重要，但還需要語境、句構、篇章與輸出能力。", "update_en": "Update: Word quantity matters, but you also need context, sentence structure, discourse, and output ability."}, {"id": 2, "error": "Prediction Error 02 | 錯誤預測 02", "content": "「文法全部學完就看得懂文章。」", "content_en": "'Once you learn all grammar, you'll understand texts.'", "update": "更新：知道規則不等於即時解析能力。", "update_en": "Update: Knowing rules ≠ instant parsing ability."}, {"id": 3, "error": "Prediction Error 03 | 錯誤預測 03", "content": "「閱讀就是每個字都看懂。」", "content_en": "'Reading means understanding every word.'", "update": "更新：成熟閱讀需要容忍部分未知資訊。", "update_en": "Update: Mature reading requires tolerating some unknowns."}, {"id": 4, "error": "Prediction Error 04 | 錯誤預測 04", "content": "「刷題越多進步越快。」", "content_en": "'More practice questions = faster progress.'", "update": "更新：如果錯誤機制沒有更新，1000題可能只是把同一錯法練1000次。", "update_en": "Update: Without updating your error mechanism, 1000 questions is just practicing the same mistake 1000 times."}, {"id": 5, "error": "Prediction Error 05 | 錯誤預測 05", "content": "「訂正＝把正確答案抄下來。」", "content_en": "'Correction = copying the right answer.'", "update": "更新：真正訂正要找到：【我當時為什麼會選錯？】", "update_en": "Update: Real correction asks: 'Why did I choose wrong?'"}, {"id": 6, "error": "Prediction Error 06 | 錯誤預測 06", "content": "「作文就是背範文。」", "content_en": "'Essay writing = memorizing model essays.'", "update": "更新：題目一變，沒有生成能力就容易失效。", "update_en": "Update: Without generation ability, model essays fail when the topic changes."}, {"id": 7, "error": "Prediction Error 07 | 錯誤預測 07", "content": "「高級單字越多，作文分數越高。」", "content_en": "'More advanced words = higher essay score.'", "update": "更新：清楚、正確、連貫、切題通常比硬塞難字重要。", "update_en": "Update: Clarity, correctness, coherence, and relevance usually matter more than difficult words."}, {"id": 8, "error": "Prediction Error 08 | 錯誤預測 08", "content": "「AI給我答案就是AI學習。」", "content_en": "'AI giving answers = AI learning.'", "update": "更新：AI直接消除錯誤，也可能同時消除學生最重要的學習訊號。", "update_en": "Update: When AI eliminates errors, it also eliminates the most important learning signal."}, {"id": 9, "error": "Prediction Error 09 | 錯誤預測 09", "content": "「錯很多代表我英文很差。」", "content_en": "'Many errors = my English is bad.'", "update": "更新：錯題其實是在暴露尚未穩定的能力節點。", "update_en": "Update: Errors expose unstable ability nodes."}, {"id": 10, "error": "Prediction Error 10 | 錯誤預測 10", "content": "「學測考的是我有沒有讀過。」", "content_en": "'GSAT tests what you've read before.'", "update": "更新：學測很重要的一部分其實是在測：【沒讀過的內容，你還能不能處理。】", "update_en": "Update: A key part of GSAT tests: 'Can you handle content you've never seen?'"}]
+    </script>
+    <script type="application/json" id="algorithm-data">
+    {"title": "High Agency Algorithm | 高Agency演算法", "steps": [["Input | 輸入", "今天做題 | Do questions today"], ["Diagnosis | 診斷", "錯在哪個題型？| Which question type?"], ["Pattern | 規律", "是不是一直重複？| Is it repeating?"], ["Mechanism | 機制", "我為什麼會這樣選？| Why did I choose this?"], ["Bottleneck | 瓶頸", "真正缺哪個能力？| Which ability is missing?"], ["Priority Node | 優先節點", "現在只補哪一個？| Focus on which one now?"], ["Skill | 技能", "單字？拆句？語境？篇章？證據？作文？翻譯？時間？| Vocabulary? Parsing? Context? Discourse? Evidence? Writing? Translation? Time?"], ["Minimum Intervention | 最小介入", "今天最少練什麼？| What's the minimum?"], ["Action | 行動", "開始練習 | Start practice"], ["Feedback | 回饋", "正確率、速度、信心有沒有改變？| Did accuracy/speed/confidence change?"], ["Prediction Error | 預測誤差", "我原本以為自己哪裡有問題？實際資料顯示什麼？| What did I think was wrong? What does data show?"], ["Model Update | 模型更新", "更新理解 | Update understanding"], ["Retest | 再測試", "驗證進步 | Verify progress"]]}
+    </script>
+    
+    <script>
+        const diagnosisData = JSON.parse(document.getElementById('diagnosis-data').textContent);
+        const systemsData = JSON.parse(document.getElementById('systems-data').textContent);
+        const errorsData = JSON.parse(document.getElementById('errors-data').textContent);
+        const algorithmData = JSON.parse(document.getElementById('algorithm-data').textContent);
+        
+        // Render diagnosis cards
+        function renderDiagnosis(data = diagnosisData) {
+            const grid = document.getElementById('diagnosis-grid');
+            grid.innerHTML = data.map(d => `
+                <div class="diagnosis-card">
+                    <div class="diagnosis-card-header" onclick="toggleDiagnosis(this)">
+                        <div class="diagnosis-id">${d.id}</div>
+                        <div class="diagnosis-title">
+                            <div class="diagnosis-title-zh">${d.problem}</div>
+                            <div class="diagnosis-title-en">${d.en}</div>
+                        </div>
+                    </div>
+                    <div class="diagnosis-content">
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-label">Pattern | 規律</div>
+                            <div class="diagnosis-value-zh">${d.pattern}</div>
+                            <div class="diagnosis-value-en">${d.pattern_en}</div>
+                        </div>
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-label">Mechanism | 生成機制</div>
+                            <div class="diagnosis-value-zh">${d.mechanism}</div>
+                            <div class="diagnosis-value-en">${d.mechanism_en}</div>
+                        </div>
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-label">Bottleneck | 瓶頸</div>
+                            <div class="diagnosis-value-zh">${d.bottleneck}</div>
+                            <div class="diagnosis-value-en">${d.bottleneck_en}</div>
+                        </div>
+                        <div class="diagnosis-row">
+                            <div class="diagnosis-label">Minimum Intervention | 最小介入</div>
+                            <div class="diagnosis-value-zh">${d.intervention}</div>
+                            <div class="diagnosis-value-en">${d.intervention_en}</div>
+                            <button class="tts-btn" data-text="${d.intervention_en}" onclick="speakEnglish(this)">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Render systems
+        function renderSystems() {
+            const grid = document.getElementById('systems-grid');
+            grid.innerHTML = systemsData.map((s, i) => `
+                <div class="system-card" onclick="toggleSystem(this)">
+                    <h3>System ${s.id}</h3>
+                    <div class="en-title">${s.en_name}</div>
+                    <div style="color: var(--gold); font-weight: bold; margin-bottom: 8px;">${s.name.split(' | ')[0]}</div>
+                    <p>${s.description}</p>
+                    <p style="font-size: 13px; opacity: 0.8; font-style: italic;">"${s.description_en}"</p>
+                    <div class="system-components">
+                        ${s.components.map(c => `<div class="component"><span>●</span> ${c}</div>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Render errors
+        function renderErrors() {
+            const grid = document.getElementById('errors-grid');
+            grid.innerHTML = errorsData.map(e => `
+                <div class="error-card">
+                    <div class="error-title">${e.error}</div>
+                    <div class="error-content-zh">${e.content}</div>
+                    <div class="error-content-en">${e.content_en}</div>
+                    <div class="error-update-label">✓ Update</div>
+                    <div class="error-update-zh">${e.update}</div>
+                    <div class="error-update-en">${e.update_en}</div>
+                    <button class="tts-btn" data-text="${e.update_en}" onclick="speakEnglish(this)" style="margin-top: 12px;">🔊 Speak</button>
+                </div>
+            `).join('');
+        }
+        
+        // Render algorithm
+        function renderAlgorithm() {
+            const grid = document.getElementById('algorithm-grid');
+            grid.innerHTML = algorithmData.steps.map(([label, content]) => {
+                const [zh, en] = label.split(' | ');
+                const [czh, cen] = content.split(' | ');
+                return `
+                    <div class="algorithm-step">
+                        <div class="algorithm-label">${zh} | ${en}</div>
+                        <div class="algorithm-content-zh">${czh}</div>
+                        <div class="algorithm-content-en">${cen}</div>
+                        <button class="tts-btn" data-text="${cen}" onclick="speakEnglish(this)" style="display: block; margin: 8px auto 0;">🔊</button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Toggle diagnosis details
+        function toggleDiagnosis(header) {
+            const card = header.parentElement;
+            const content = card.querySelector('.diagnosis-content');
+            content.classList.toggle('open');
+        }
+        
+        // Toggle system components
+        function toggleSystem(card) {
+            const components = card.querySelector('.system-components');
+            components.classList.toggle('open');
+        }
+        
+        // TTS English
+        function speakEnglish(btn) {
+            const text = btn.getAttribute('data-text');
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                speechSynthesis.speak(utterance);
+                btn.style.background = '#a67d06';
+                setTimeout(() => { btn.style.background = 'var(--gold)'; }, 200);
+            }
+        }
+        
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.getAttribute('data-tab')).classList.add('active');
+            });
+        });
+        
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            if (!query) {
+                renderDiagnosis();
+                return;
+            }
+            const filtered = diagnosisData.filter(d =>
+                d.problem.toLowerCase().includes(query) ||
+                d.en.toLowerCase().includes(query) ||
+                d.pattern.toLowerCase().includes(query) ||
+                d.mechanism.toLowerCase().includes(query)
+            );
+            renderDiagnosis(filtered);
+        });
+        
+        // Initialize
+        renderDiagnosis();
+        renderSystems();
+        renderErrors();
+        renderAlgorithm();
+    </script>
+</body>
+</html>
