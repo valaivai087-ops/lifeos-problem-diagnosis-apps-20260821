@@ -1,0 +1,74 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Resource Intelligence｜資源智慧 OS</title><style>
+:root{--i:#14261f;--p:#f2efe6;--l:#d9ff67;--o:#ff7048;--b:#c8c9bd}*{box-sizing:border-box}body{margin:0;background:var(--p);color:var(--i);font-family:Arial,"Noto Sans TC",sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}header{background:var(--i);color:#fff;padding:0 6vw 70px}nav{height:84px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fff3}.logo{display:flex;gap:12px;align-items:center;font-weight:900;letter-spacing:.08em}.logo b,footer>b{display:grid;place-items:center;background:var(--l);color:var(--i);width:40px;height:40px;border-radius:50%;font-size:22px}.logo small{display:block;color:#abc0b5}.listen,.tabs button{background:transparent;color:#fff;border:1px solid #fff4;border-radius:22px;padding:9px 13px}.hero{max-width:1160px;margin:auto;padding-top:75px}.hero label,.title label{color:var(--o);font-size:11px;font-weight:900;letter-spacing:.2em}.hero h1{font-size:clamp(45px,7vw,88px);line-height:1;letter-spacing:-.06em;margin:20px 0}.hero h1 em{color:var(--l);font-style:normal}.hero p{color:#b9cbc1;font-size:19px;max-width:720px;line-height:1.6}.tabs{display:flex;gap:8px;margin-top:30px;flex-wrap:wrap}.tabs button.on{background:var(--l);color:var(--i);border-color:var(--l)}main{max-width:1160px;margin:auto;padding:60px 22px}.title{margin-bottom:30px}.title h2{font-size:clamp(32px,4vw,50px);letter-spacing:-.04em;margin:10px 0}.title p{color:#68776f}.diag{background:#fff;padding:26px;border:1px solid var(--b);display:grid;gap:10px}.diag textarea{min-height:90px;padding:14px;border:1px solid var(--b)}.primary{justify-self:start;border:0;background:var(--l);padding:14px 18px;font-weight:900}.result{margin-top:14px;background:var(--i);color:#fff;padding:24px}.result h3{font-size:28px;margin:6px 0}.result p{color:#bfd0c7}.result button,.card button,.resource button{background:transparent;border:1px solid #fff5;color:inherit;border-radius:20px;padding:7px}.tools{display:grid;gap:10px;margin-bottom:20px}.tools input{padding:14px;border:1px solid var(--b)}.chips{display:flex;gap:6px;flex-wrap:wrap}.chips button{border:1px solid var(--b);background:transparent;border-radius:18px;padding:6px 11px}.chips button.on{background:var(--i);color:#fff}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card,.resource{background:#fff;border:1px solid var(--b);padding:20px}.card label,.resource label{color:var(--o);font-size:11px;font-weight:900;display:flex;justify-content:space-between}.card h3,.resource h3{font-size:25px;margin:12px 0}.card h3 small,.resource h3 small{display:block;color:#728078;font-size:13px}.model{background:#f0eee5;padding:12px}.model b,.model i{display:block}.model i,.resource i{font-style:normal;color:#708078;font-size:13px}.action{margin-top:8px;background:var(--i);color:#fff;padding:12px}.resourceGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.resource{border-top:5px solid var(--l)}.resource button{color:var(--i);border-color:var(--b);margin-top:12px}.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--i);padding:25px}.flow div{background:#20352c;color:#fff;padding:14px}.flow b{color:var(--l);margin-right:10px}footer{background:var(--o);padding:35px 6vw;display:flex;align-items:center;gap:18px;font-weight:800}footer span{display:block;font-size:13px;font-weight:400}@media(max-width:760px){.listen{display:none}.hero{padding-top:50px}.hero h1{font-size:48px}.grid,.resourceGrid{grid-template-columns:1fr}.flow{grid-template-columns:1fr 1fr}main{padding:40px 14px}}
+</style></head><body><header><nav><div class="logo"><b>R</b><span>RESOURCE INTELLIGENCE<small>資源智慧 OS</small></span></div><button class="listen" onclick="say('Resource Intelligence. Turn what you already have into future options.')">🔊 English</button></nav><div class="hero"><label>RESOURCE × PROBLEM DIAGNOSIS</label><h1>不是擁有更多。<br><em>是重新配置已有的一切。</em></h1><p>Not about owning more. Identify, allocate, convert, compound, and regenerate what you already have.</p><div class="tabs"><button class="on" data-tab="diagnose">診斷 Diagnosis</button><button data-tab="cases">50 案例 Cases</button><button data-tab="resources">20 資源 Resources</button><button data-tab="algorithm">演算法 Algorithm</button></div></div></header><main id="app"></main><footer><b>R</b><p>資源自由，是資源有限時，仍知道最值得投入的節點。<span>Resource freedom is knowing where to invest—even when resources are limited.</span></p></footer><script>
+const raw=`沒時間|No time|時間配置失焦|Time allocation has lost focus|刪一件低價值事|Remove one low-value task|時間
+沒錢|No money|金錢只是資源之一|Money is only one kind of resource|列出10種已有資源|List ten resources you already have|財務
+沒體力|No energy|能量是底層限制|Energy is the foundational constraint|今天增加恢復|Add recovery today|健康
+沒人幫|No one helps|協作網絡不足|The collaboration network is weak|找一個可合作的人|Find one collaborator|關係
+不會做|I don't know how|這是技能缺口|This is a skill gap|今天學一個微技能|Learn one micro-skill today|學習
+沒機會|No opportunities|能見度、能力或網絡不足|Visibility, capability, or network may be insufficient|主動提出一次價值|Proactively offer value once|品牌
+資訊太多|Too much information|資訊熵過高|Information entropy is too high|只留目標相關資訊|Keep only goal-relevant information|注意力
+APP很多|Too many apps|工具不等於能力|Tools are not capability|固定一個核心工具|Choose one core tool|工具
+課程很多|Too many courses|知識尚未轉成行動|Knowledge has not become action|每學一點就應用一次|Apply every small lesson once|學習
+人脈很多|Many contacts|弱連結不等於可用信任|Weak ties are not usable trust|深化一段高品質關係|Deepen one quality relationship|關係
+很忙沒成果|Busy without results|資源投錯節點|Resources target the wrong node|找最大限制點|Find the largest constraint|系統
+產品太多|Too many products|注意力被稀釋|Attention is diluted|找最高價值產品|Identify the highest-value product|產品
+收藏很多資料|Saved lots of data|沒有索引就是低可用資源|No index means low usability|今天分類一批|Classify one batch today|資料
+很多經驗|Lots of experience|經驗可以產品化|Experience can be productized|寫成一個SOP|Turn it into one SOP|知識
+遇到問題|Problems appear|問題暴露系統缺口|Problems expose system gaps|記錄一次模式|Record one pattern|系統
+犯錯|Made a mistake|錯誤能產生預測誤差資料|Errors generate prediction-error data|寫下錯誤假設|Write the faulty assumption|學習
+被拒絕|Rejected|你得到市場回饋|You received market feedback|詢問拒絕原因|Ask why you were rejected|市場
+客戶抱怨|Customer complaints|這是免費產品研究資料|This is free product research|找出重複抱怨|Find repeated complaints|產品
+學生考錯|Student errors|錯題是能力缺口資料|Wrong answers reveal capability gaps|分類錯誤|Classify the errors|教育
+工作壓力|Work stress|壓力暴露系統瓶頸|Stress exposes system bottlenecks|找重複耗能點|Find a recurring energy drain|健康
+年紀增加|Getting older|體力下降但經驗上升|Energy may decline while experience rises|用智慧替代蠻力|Replace brute force with wisdom|人生
+AI出現|AI arrives|認知槓桿增加|Cognitive leverage has increased|外包一個重複任務|Delegate one repetitive task to AI|AI
+手機干擾|Phone distraction|它同時是工具與刺激入口|It is both a tool and stimulus gateway|關掉非必要通知|Disable nonessential notifications|注意力
+社群媒體|Social media|也能累積信任與品牌資產|It can build trust and brand assets|分享有價值觀點|Share one valuable insight|品牌
+粉絲不多|Few followers|信任密度比人數重要|Trust density matters more than count|解決一個真問題|Solve one real problem|品牌
+沒有產品|No product|技能可以被封裝|Skills can be packaged|做一個最小產品|Build one minimum product|產品
+沒有團隊|No team|可能缺流程而非缺人|You may lack process, not people|先標準化一項工作|Standardize one task first|系統
+有團隊很累|Team feels exhausting|協作介面可能有問題|The collaboration interface may be broken|明確一個責任|Clarify one responsibility|關係
+空間很亂|Messy space|空間增加行動摩擦|The environment increases action friction|清出一個工作區|Clear one work area|空間
+睡眠不足|Not enough sleep|今天正在借用明天的資源|Today is borrowing tomorrow's resources|固定今晚停止時間|Set tonight's stop time|健康
+健康不好|Poor health|健康是其他資源的乘數|Health multiplies every other resource|先處理健康節點|Address health first|健康
+情緒內耗|Emotional drain|注意力與能量持續被消耗|Attention and energy are continuously drained|找最大耗能事件|Identify the biggest drain|健康
+關係衝突|Relationship conflict|信任資本正在流失|Trust capital is being lost|處理一個誤解|Resolve one misunderstanding|關係
+不敢拒絕|Cannot say no|資源被他人目標占用|Others' goals consume your resources|拒絕低價值要求|Decline one low-value request|時間
+什麼都自己做|Do everything myself|沒有建立可擴張結構|You have not built a scalable structure|交出低風險任務|Delegate one low-risk task|系統
+重複回答問題|Repeated answers|知識尚未資產化|Knowledge has not become an asset|寫成模板|Turn it into a template|知識
+重複教相同內容|Repeat the same teaching|教學可以模組化|Teaching can be modularized|做可重用教材|Create one reusable lesson|教育
+每次重寫文案|Rewrite copy every time|缺少母體資料庫|You lack a source-of-truth library|保存高效提示詞|Save one effective prompt|內容
+資料散落|Scattered data|搜尋成本過高|Search cost is too high|建立分類與標籤|Create categories and tags|資料
+決策很累|Decision fatigue|沒有固定判準|You lack fixed criteria|固定三個決策條件|Set three decision criteria|注意力
+事情一直來|Tasks keep arriving|缺少入口管理|You lack intake management|建立單一待辦入口|Create one task inbox|系統
+每件事都重要|Everything is important|忽略機會成本|Opportunity cost is ignored|問：我決定不做什麼？|Ask: what will I not do?|時間
+想學很多|Want to learn everything|學習資源過度分散|Learning resources are over-dispersed|一次只攻一個能力|Focus on one capability at a time|學習
+很多點子|Many ideas|點子未進入執行管線|Ideas have not entered an execution pipeline|只選一個測試|Choose one experiment|產品
+作品沒人看|Work gets no attention|傳播與分發不足|Distribution is insufficient|換一個入口|Try one new channel|市場
+有流量沒收入|Traffic but no revenue|價值到交易介面不足|The value-to-transaction interface is weak|做一個清楚方案|Create one clear offer|財務
+有收入沒自由|Income without freedom|收入高度依賴本人|Income depends too much on you|找一項可自動化工作|Find one task to automate|財務
+成功但很累|Successful but exhausted|系統靠高耗能維持|The system depends on high energy consumption|刪掉低報酬流程|Remove a low-ROI process|系統
+已經很多資源|Many resources already|沒有配置就不產生價值|Resources create no value without allocation|重新配置一次|Reallocate one resource|系統
+資源有限|Limited resources|限制迫使高槓桿設計|Constraints can force high-leverage design|找最小可行方案|Find the minimum viable solution|系統`;
+const cases=raw.split('\n').map((x,i)=>{let[zh,en,mz,me,az,ae,cat]=x.split('|');return{i:i+1,zh,en,mz,me,az,ae,cat}});const res=`時間|Time|最不可逆資源|The most irreversible resource
+注意力|Attention|時間真正的控制器|The controller of time
+健康|Health|所有資源的底層乘數|The multiplier of all resources
+能量|Energy|決定每日可用輸出|Determines daily output
+知識|Knowledge|降低未知|Reduces uncertainty
+技能|Skill|把知識轉成結果|Turns knowledge into results
+經驗|Experience|降低試錯成本|Reduces experimentation cost
+資料|Data|提高預測準確度|Improves prediction accuracy
+AI|AI|放大認知與轉換|Amplifies cognition and conversion
+工具|Tools|降低行動摩擦|Reduce action friction
+金錢|Money|提高交換與選擇|Increases exchange and options
+資產|Assets|持續產生未來價值|Create future value
+關係|Relationships|增加合作與資訊流|Increase collaboration and information flow
+信任|Trust|降低交易成本|Reduces transaction cost
+品牌|Brand|縮短信任建立時間|Shortens trust-building time
+內容|Content|可重複傳播的知識資產|Reusable knowledge assets
+系統|Systems|讓結果不必每次重做|Prevent repeated rebuilding
+SOP|SOP|降低重複工作的認知成本|Reduces cognitive cost
+平台|Platform|放大傳播|Amplifies distribution
+意義|Meaning|決定資源流向|Determines where resources flow`.split('\n').map(x=>x.split('|'));const flow=['Goal 目標','Inventory 盤點','Diagnosis 診斷','Pattern 模式','Mechanism 機制','Bottleneck 瓶頸','Priority Node 優先節點','Skill 技能','Minimum Intervention 最小介入','Action 行動','Output 輸出','Feedback 回饋','Prediction Error 預測誤差','Model Update 模型更新','Reallocation 重新配置','Asset Formation 資產化','Compounding 複利','Regeneration 再生'];let tab='diagnose',cat='全部',query='';function say(t){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.9;speechSynthesis.speak(u)}function title(n,z,e){return `<div class="title"><label>${n}</label><h2>${z}</h2><p>${e}</p></div>`}function render(){let a=document.querySelector('#app');if(tab==='diagnose')a.innerHTML=title('01 / DIAGNOSE','今天，哪個資源正在限制整個系統？','Which resource is constraining your whole system today?')+`<div class="diag"><b>寫下你的目標或卡點</b><small>Describe your goal or bottleneck</small><textarea id="goal" placeholder="例如：我想完成 APP，但一直增加功能…"></textarea><button class="primary" onclick="diagnose()">產生優先節點 →</button></div><div id="out"></div>`;if(tab==='cases'){let cats=['全部',...new Set(cases.map(x=>x.cat))];let f=cases.filter(x=>(cat==='全部'||x.cat===cat)&&Object.values(x).join(' ').toLowerCase().includes(query.toLowerCase()));a.innerHTML=title('02 / CASE LIBRARY','50 個日常資源誤判','Turn scarcity stories into action models.')+`<div class="tools"><input oninput="query=this.value;render()" value="${query}" placeholder="搜尋 Search…"><div class="chips">${cats.map(x=>`<button class="${x===cat?'on':''}" onclick="cat='${x}';render()">${x}</button>`).join('')}</div></div><div class="grid">${f.map(x=>`<article class="card"><label>#${String(x.i).padStart(2,'0')} · ${x.cat}<button onclick="say('${x.en}. ${x.me}. ${x.ae}')">🔊 EN</button></label><h3>${x.zh}<small>${x.en}</small></h3><div class="model"><b>${x.mz}</b><i>${x.me}</i></div><div class="action"><b>${x.az}</b><i>${x.ae}</i></div></article>`).join('')}</div>`}if(tab==='resources')a.innerHTML=title('03 / RESOURCE MAP','資源不只是錢：20 類未來選項','Mobilize resources to reduce constraints and create value.')+`<div class="resourceGrid">${res.map((x,i)=>`<article class="resource"><label>${String(i+1).padStart(2,'0')}</label><h3>${x[0]}<small>${x[1]}</small></h3><p>${x[2]}</p><i>${x[3]}</i><button onclick="say('${x[1]}. ${x[3]}')">🔊 Play</button></article>`).join('')}</div>`;if(tab==='algorithm')a.innerHTML=title('04 / HIGH AGENCY ALGORITHM','從問題到複利的完整路徑','From scarcity to assets and regeneration.')+`<div class="flow">${flow.map((x,i)=>`<div><b>${String(i+1).padStart(2,'0')}</b>${x}</div>`).join('')}</div>`}function diagnose(){let v=document.querySelector('#goal').value;let x=cases.find(c=>v.includes(c.zh)||v.includes(c.cat))||cases[v.length*7%50];document.querySelector('#out').innerHTML=`<div class="result"><small>DIAGNOSIS #${x.i}</small><h3>${x.mz}</h3><p>${x.me}</p><h3>${x.az}</h3><p>${x.ae}</p><button onclick="say('${x.en}. ${x.me}. ${x.ae}')">🔊 Play English</button></div>`}document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('on'));b.classList.add('on');render()});render();
+</script></body></html>
