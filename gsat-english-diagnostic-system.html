@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大學英文學測 × Problem Diagnosis | 王欣蓉 Anne Wang</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #FFFFFF;
+            color: #333;
+            font-family: 'Microsoft JhengHei', 'Segoe UI', Arial, sans-serif;
+            line-height: 1.8;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        header {
+            background: linear-gradient(135deg, #1A2B5F 0%, #0A7A72 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        header p {
+            font-size: 16px;
+            opacity: 0.95;
+            margin-bottom: 5px;
+        }
+        .author {
+            font-size: 14px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #C9960C;
+            padding-bottom: 20px;
+        }
+        .nav-tab {
+            padding: 12px 24px;
+            background-color: #f5f5f5;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .nav-tab:hover {
+            background-color: #e8e8e8;
+            border-color: #C9960C;
+        }
+        .nav-tab.active {
+            background-color: #C9960C;
+            color: white;
+            border-color: #C9960C;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .problem-card {
+            background-color: #f9f9f9;
+            border-left: 4px solid #0A7A72;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .problem-card:hover {
+            background-color: #f0f0f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .problem-card.expanded {
+            background-color: #f0f8f7;
+            border-left-color: #C9960C;
+        }
+        .problem-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .problem-id {
+            background-color: #1A2B5F;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-right: 15px;
+            min-width: 40px;
+            text-align: center;
+        }
+        .problem-title {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+        }
+        .problem-title-zh {
+            color: #1A2B5F;
+            font-weight: bold;
+        }
+        .problem-title-en {
+            color: #0A7A72;
+            font-style: italic;
+        }
+        .toggle-icon {
+            color: #C9960C;
+            font-size: 20px;
+            transition: transform 0.3s ease;
+        }
+        .problem-card.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
+        .problem-content {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .problem-card.expanded .problem-content {
+            display: block;
+        }
+        .bilingual-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 15px;
+        }
+        .bilingual-item {
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+        }
+        .bilingual-item.zh {
+            border-right: 2px solid #f0f0f0;
+        }
+        .item-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .item-label.zh {
+            color: #1A2B5F;
+        }
+        .item-label.en {
+            color: #0A7A72;
+        }
+        .item-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+        .tts-btn {
+            background-color: #C9960C;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 8px;
+            transition: background-color 0.3s ease;
+        }
+        .tts-btn:hover {
+            background-color: #a67c09;
+        }
+        .tts-btn.playing {
+            background-color: #0A7A72;
+        }
+        .system-card {
+            background-color: white;
+            border: 2px solid #0A7A72;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .system-card:hover {
+            box-shadow: 0 4px 12px rgba(10, 122, 114, 0.15);
+        }
+        .system-card.expanded {
+            background-color: #f0f8f7;
+        }
+        .system-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .system-title {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex: 1;
+        }
+        .system-title-zh {
+            color: #1A2B5F;
+        }
+        .system-title-en {
+            color: #0A7A72;
+            font-style: italic;
+        }
+        .system-content {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #0A7A72;
+        }
+        .system-card.expanded .system-content {
+            display: block;
+        }
+        .system-desc {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #C9960C;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .elements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .element-tag {
+            background-color: #1A2B5F;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .prediction-card {
+            background-color: white;
+            border-left: 4px solid #C9960C;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .prediction-card:hover {
+            background-color: #faf8f3;
+        }
+        .prediction-card.expanded {
+            background-color: #fffbf5;
+        }
+        .prediction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .prediction-error {
+            flex: 1;
+            font-weight: bold;
+            color: #C9960C;
+        }
+        .prediction-content {
+            display: none;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        .prediction-card.expanded .prediction-content {
+            display: block;
+        }
+        .update-label {
+            color: #0A7A72;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+        .formula-box {
+            background: linear-gradient(135deg, #1A2B5F 0%, #0A7A72 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 2;
+            font-weight: bold;
+        }
+        .formula-box-content {
+            font-family: 'Courier New', monospace;
+        }
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #C9960C, transparent);
+            margin: 40px 0;
+        }
+        @media (max-width: 768px) {
+            .bilingual-row {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .bilingual-item.zh {
+                border-right: none;
+            }
+            .problem-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .elements-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 大學英文學測 × Problem Diagnosis</h1>
+            <p>從「背更多英文」升級成「建立陌生文本也能自主解題的英文能力系統」</p>
+            <p style="font-size: 18px; margin-top: 10px; font-style: italic;">From "memorizing more" to "solving unfamiliar texts independently"</p>
+            <div class="author">👤 王欣蓉 Anne Wang</div>
+        </header>
+
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('problems')">50 Problems</div>
+            <div class="nav-tab" onclick="switchTab('systems')">7 Systems</div>
+            <div class="nav-tab" onclick="switchTab('errors')">10 Errors</div>
+            <div class="nav-tab" onclick="switchTab('algorithm')">Algorithm</div>
+            <div class="nav-tab" onclick="switchTab('formulas')">Formulas</div>
+            <div class="nav-tab" onclick="switchTab('evolution')">5 Stages</div>
+        </div>
+
+        <!-- PROBLEMS SECTION -->
+        <div id="problems" class="section active">
+            <h2 style="color: #1A2B5F; margin-bottom: 30px; font-size: 28px;">50 Problem Phenomena & Diagnosis</h2>
+            <div id="problems-container"></div>
+        </div>
+
+        <!-- SYSTEMS SECTION -->
+        <div id="systems" class="section">
+            <h2 style="color: #1A2B5F; margin-bottom: 30px; font-size: 28px;">7 Ability Systems</h2>
+            <div id="systems-container"></div>
+        </div>
+
+        <!-- ERRORS SECTION -->
+        <div id="errors" class="section">
+            <h2 style="color: #1A2B5F; margin-bottom: 30px; font-size: 28px;">10 Prediction Errors</h2>
+            <div id="errors-container"></div>
+        </div>
+
+        <!-- ALGORITHM SECTION -->
+        <div id="algorithm" class="section">
+            <h2 style="color: #1A2B5F; margin-bottom: 30px; font-size: 28px;">High Agency Algorithm</h2>
+            <div style="background-color: #f9f9f9; padding: 30px; border-radius: 8px; border-left: 4px solid #0A7A72;">
+                <div class="bilingual-row">
+                    <div class="bilingual-item zh">
+                        <strong>Input：</strong> 今天做題。
+                        <br><strong>Diagnosis：</strong> 錯在哪個題型？
+                        <br><strong>Pattern：</strong> 是不是一直重複？
+                        <br><strong>Mechanism：</strong> 我為什麼會這樣選？
+                        <br><strong>Bottleneck：</strong> 真正缺哪個能力？
+                        <br><strong>Priority Node：</strong> 現在只補哪一個？
+                        <br><strong>Skill：</strong> 單字？拆句？語境？篇章？證據？作文？翻譯？時間？
+                        <br><strong>Minimum Intervention：</strong> 今天最少練什麼？
+                        <br><strong>Action。</strong>
+                        <br><strong>Feedback：</strong> 正確率、速度、信心有沒有改變？
+                        <br><strong>Prediction Error：</strong> 我原本以為自己哪裡有問題？實際資料顯示什麼？
+                        <br><strong>Model Update。</strong>
+                        <br><strong>Retest。</strong>
+                    </div>
+                    <div class="bilingual-item en">
+                        <strong>Input:</strong> Do a problem set today.
+                        <br><strong>Diagnosis:</strong> What question type did you get wrong?
+                        <br><strong>Pattern:</strong> Is this a repeat mistake?
+                        <br><strong>Mechanism:</strong> Why did you choose that answer?
+                        <br><strong>Bottleneck:</strong> What ability is truly lacking?
+                        <br><strong>Priority Node:</strong> What's the one thing to fix now?
+                        <br><strong>Skill:</strong> Vocabulary? Parsing? Context? Reading? Evidence? Writing? Translation? Speed?
+                        <br><strong>Minimum Intervention:</strong> What's the least to practice today?
+                        <br><strong>Action.</strong>
+                        <br><strong>Feedback:</strong> Did accuracy, speed, or confidence change?
+                        <br><strong>Prediction Error:</strong> What did you think was wrong? What does the data show?
+                        <br><strong>Model Update.</strong>
+                        <br><strong>Retest.</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMULAS SECTION -->
+        <div id="formulas" class="section">
+            <h2 style="color: #1A2B5F; margin-bottom: 30px; font-size: 28px;">Core Formulas</h2>
+            
+            <h3 style="color: #0A7A72; margin-top: 30px; margin-bottom: 15px;">GSAT Score Formula</h3>
+            <div class="formula-box">
+                <div class="formula-box-content">
+                Score = Vocabulary<br>
+                × Sentence Parsing<br>
+                × Context<br>
+                × Reading<br>
+                × Writing<br>
+                × Translation<br>
+                × Exam Control
+                </div>
+            </div>
+            <p style="background-color: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <strong>因為是乘法系統，最弱節點會限制整體輸出。</strong><br>
+                <span style="color: #0A7A72;"><strong>Since it's a multiplication system, the weakest node limits overall output.</strong></span>
+            </p>
+
+            <h3 style="color: #0A7A72; margin-top: 30px; margin-bottom: 15px;">Ability Formation Formula</h3>
+            <div class="formula-box">
+                <div class="formula-box-content">
+                Ability = High Quality Input<br>
+                × Active Retrieval<br>
+                × Appropriate Difficulty<br>
+                × Immediate Feedback<br>
+                × Prediction Error<br>
+                × Model Update<br>
+                × Spaced Retest
+                </div>
+            </div>
+            <p style="background-color: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                <strong>少掉 Feedback → 不知道自己錯</strong><br>
+                <strong>少掉 Prediction Error → 不知道模型哪裡不準</strong><br>
+                <strong>少掉 Retest → 不知道到底有沒有真正學會</strong>
+            </p>
+        </div>
+
+        <!-- EVOLUTION SECTION -->
+        <div id="evolution" class="section">
+            <h2 style="color: #1A2B5F; margin-bottom: 30px; font-size: 28px;">5-Stage Evolution</h2>
+            
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: #1A2B5F; font-size: 20px; margin-bottom: 15px;">第一階｜答案型</h3>
+                <div class="system-desc">
+                    <strong>中文：</strong> 這題答案是什麼？<br>
+                    <strong>English:</strong> What's the answer to this question?
+                </div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: #1A2B5F; font-size: 20px; margin-bottom: 15px;">第二階｜知識型</h3>
+                <div class="system-desc">
+                    <strong>中文：</strong> 這個單字、文法是什麼？<br>
+                    <strong>English:</strong> What does this vocabulary or grammar mean?
+                </div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: #1A2B5F; font-size: 20px; margin-bottom: 15px;">第三階｜能力型</h3>
+                <div class="system-desc">
+                    <strong>中文：</strong> 我能不能處理陌生題？<br>
+                    <strong>English:</strong> Can I handle unfamiliar questions?
+                </div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: #1A2B5F; font-size: 20px; margin-bottom: 15px;">第四階｜診斷型</h3>
+                <div class="system-desc">
+                    <strong>中文：</strong> 我知道自己為什麼錯。<br>
+                    <strong>English:</strong> I know why I got it wrong.
+                </div>
+            </div>
+
+            <div style="margin-bottom: 40px;">
+                <h3 style="color: #1A2B5F; font-size: 20px; margin-bottom: 15px;">第五階｜High Agency型</h3>
+                <div class="system-desc">
+                    <strong>中文：</strong> 我能：<br>
+                    • 診斷自己<br>
+                    • 找到瓶頸<br>
+                    • 選 Skill<br>
+                    • 設計練習<br>
+                    • 取得 Feedback<br>
+                    • 修改模型<br>
+                    • 再次測試
+                    <br><br>
+                    <strong>English:</strong> I can:<br>
+                    • Diagnose myself<br>
+                    • Find my bottleneck<br>
+                    • Select the skill to work on<br>
+                    • Design practice<br>
+                    • Get feedback<br>
+                    • Update my model<br>
+                    • Retest myself
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <h3 style="color: #1A2B5F; font-size: 20px; margin-bottom: 20px; margin-top: 40px;">Teacher's Role Evolution</h3>
+            <div style="background-color: #f9f9f9; padding: 20px; border-radius: 6px;">
+                <p style="margin-bottom: 10px;"><strong>低階：</strong> 老師 = 答案提供者</p>
+                <p style="margin-bottom: 10px;"><strong>中階：</strong> 老師 = 知識教學者</p>
+                <p style="margin-bottom: 10px;"><strong>高階：</strong> 老師 = 能力教練</p>
+                <p style="margin-bottom: 10px;"><strong>更高階：</strong> 老師 = 學習系統設計者</p>
+                <p style="font-weight: bold; color: #0A7A72;"><strong>最高階：</strong> 老師逐漸把學習控制權交還學生。</p>
+            </div>
+        </div>
+
+        <div class="divider" style="margin-top: 60px;"></div>
+
+        <footer style="text-align: center; color: #666; font-size: 14px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd;">
+            <p>王欣蓉 Anne Wang | GSAT English Diagnostic System</p>
+            <p style="margin-top: 10px; color: #999;">高中英文教師 | 線上教學社群運營者 | 教育內容創作者</p>
+        </footer>
+    </div>
+
+    <script>
+        const appData = {
+            "problems": [
+                {"id": 1, "zh": "單字一直錯", "pattern": "熟字也會選錯", "mechanism": "字義只有中文翻譯", "bottleneck": "語境辨義弱", "intervention": "每天辨析5組易混字", "pattern_en": "Even familiar words get chosen wrong", "mechanism_en": "Word meanings only in Chinese translation", "bottleneck_en": "Weak contextual discrimination", "intervention_en": "Analyze 5 pairs of confusing words daily"},
+                {"id": 2, "zh": "背完很快忘", "pattern": "一次大量背", "mechanism": "Retrieval不足", "bottleneck": "提取頻率低", "intervention": "每天回想昨天10字", "pattern_en": "Memorized but quickly forgotten", "mechanism_en": "Insufficient retrieval practice", "bottleneck_en": "Low retrieval frequency", "intervention_en": "Recall 10 words from yesterday daily"},
+                {"id": 3, "zh": "單字看過卻認不出", "pattern": "只有被動閱讀", "mechanism": "Recognition≠Recall", "bottleneck": "主動提取不足", "intervention": "遮住中文自己說意思", "pattern_en": "Seen words but can't recognize them", "mechanism_en": "Recognition ≠ Recall ability", "bottleneck_en": "Insufficient active retrieval", "intervention_en": "Cover Chinese, speak meanings yourself"},
+                {"id": 4, "zh": "一字多義容易錯", "pattern": "只背第一義", "mechanism": "語境模型過窄", "bottleneck": "多義辨識弱", "intervention": "一字學3種常見語境", "pattern_en": "Multiple meanings confuse you", "mechanism_en": "Context model too narrow", "bottleneck_en": "Weak polysemy discrimination", "intervention_en": "Learn 3 common contexts per word"},
+                {"id": 5, "zh": "易混字一直錯", "pattern": "長得像就猜", "mechanism": "字形干擾", "bottleneck": "Distinction不足", "intervention": "做A/B對比卡", "pattern_en": "Similar-looking words always confuse", "mechanism_en": "Word form interference", "bottleneck_en": "Insufficient distinction ability", "intervention_en": "Make A/B comparison cards"},
+                {"id": 6, "zh": "片語記不住", "pattern": "單字拆開背", "mechanism": "Chunk不足", "bottleneck": "搭配詞弱", "intervention": "整組學collocation", "pattern_en": "Phrasal verbs don't stick", "mechanism_en": "Insufficient chunking", "bottleneck_en": "Weak collocation knowledge", "intervention_en": "Learn collocations as chunks"},
+                {"id": 7, "zh": "長句看不懂", "pattern": "從第一字翻到最後", "mechanism": "線性翻譯", "bottleneck": "句構辨識弱", "intervention": "每天拆3個長句", "pattern_en": "Can't understand long sentences", "mechanism_en": "Linear word-by-word translation", "bottleneck_en": "Weak sentence structure recognition", "intervention_en": "Parse 3 long sentences daily"},
+                {"id": 8, "zh": "關係子句卡住", "pattern": "不知道修飾誰", "mechanism": "結構邊界不清", "bottleneck": "修飾關係弱", "intervention": "圈先行詞＋關代", "pattern_en": "Relative clauses confuse you", "mechanism_en": "Unclear structural boundaries", "bottleneck_en": "Weak modification relationships", "intervention_en": "Circle antecedents and relative pronouns"},
+                {"id": 9, "zh": "分詞構句看不懂", "pattern": "看到V-ing就亂猜", "mechanism": "壓縮結構不熟", "bottleneck": "邏輯還原弱", "intervention": "還原完整子句", "pattern_en": "Participle phrases confuse you", "mechanism_en": "Unfamiliar compressed structures", "bottleneck_en": "Weak logical reduction", "intervention_en": "Restore complete clauses"},
+                {"id": 10, "zh": "文法懂卻不會用", "pattern": "只會規則題", "mechanism": "Knowledge≠Skill", "bottleneck": "遷移不足", "intervention": "用文法自己造句", "pattern_en": "Know grammar but can't apply it", "mechanism_en": "Knowledge ≠ Skill", "bottleneck_en": "Insufficient transfer ability", "intervention_en": "Create sentences using grammar"},
+                {"id": 11, "zh": "克漏字靠感覺", "pattern": "每格獨立作答", "mechanism": "忽略上下文", "bottleneck": "Context不足", "intervention": "先讀完整段再填", "pattern_en": "Cloze relies on guessing", "mechanism_en": "Answer each blank independently", "bottleneck_en": "Insufficient context use", "intervention_en": "Read full paragraph before filling"},
+                {"id": 12, "zh": "克漏字兩個都像", "pattern": "只看中文意思", "mechanism": "搭配與語氣不足", "bottleneck": "Collocation弱", "intervention": "比較前後搭配", "pattern_en": "Two options seem equally right", "mechanism_en": "Only check Chinese meaning", "bottleneck_en": "Weak collocation knowledge", "intervention_en": "Compare surrounding collocations"},
+                {"id": 13, "zh": "轉折題常錯", "pattern": "沒看到邏輯訊號", "mechanism": "Discourse Marker弱", "bottleneck": "邏輯關係不足", "intervention": "圈however／therefore等", "pattern_en": "Transition questions often wrong", "mechanism_en": "Miss logical signals", "bottleneck_en": "Weak discourse markers", "intervention_en": "Circle however/therefore/etc."},
+                {"id": 14, "zh": "篇章結構題常錯", "pattern": "只看單句", "mechanism": "沒建立段落模型", "bottleneck": "Coherence弱", "intervention": "找代名詞與銜接詞", "pattern_en": "Structure questions often wrong", "mechanism_en": "Only look at single sentences", "bottleneck_en": "Weak coherence", "intervention_en": "Find pronouns and connectors"},
+                {"id": 15, "zh": "句子插入題錯", "pattern": "只看意思像不像", "mechanism": "指涉鏈沒追蹤", "bottleneck": "Cohesion弱", "intervention": "找this／they／such指什麼", "pattern_en": "Sentence insertion questions wrong", "mechanism_en": "Don't track reference chains", "bottleneck_en": "Weak cohesion", "intervention_en": "Find what 'this/they/such' refer to"},
+                {"id": 16, "zh": "閱讀很慢", "pattern": "每句翻中文", "mechanism": "Translation Cost高", "bottleneck": "自動化不足", "intervention": "練意群閱讀", "pattern_en": "Reading is very slow", "mechanism_en": "Translate every sentence to Chinese", "bottleneck_en": "Insufficient automaticity", "intervention_en": "Practice phrase-chunk reading"},
+                {"id": 17, "zh": "長文看到就怕", "pattern": "字數＝困難", "mechanism": "Threat Prediction過高", "bottleneck": "啟動成本高", "intervention": "先看題目＋首尾段", "pattern_en": "Fear long passages", "mechanism_en": "More words = more difficulty", "bottleneck_en": "High activation cost", "intervention_en": "Look at questions + opening/closing first"},
+                {"id": 18, "zh": "每個字都想懂", "pattern": "局部未知就停止", "mechanism": "完美理解模型", "bottleneck": "容錯率低", "intervention": "練容許10%未知字", "pattern_en": "Need to understand every word", "mechanism_en": "Stop when encountering unknowns", "bottleneck_en": "Low error tolerance", "intervention_en": "Practice tolerating 10% unknown words"},
+                {"id": 19, "zh": "生字一出現就卡", "pattern": "未知字＝無法理解", "mechanism": "推論能力不足", "bottleneck": "Context Guessing弱", "intervention": "用上下文猜詞義", "pattern_en": "New words cause complete blockage", "mechanism_en": "Unknown word = can't understand", "bottleneck_en": "Weak contextual guessing", "intervention_en": "Guess word meaning from context"},
+                {"id": 20, "zh": "主旨題常錯", "pattern": "被細節吸走", "mechanism": "Global Model不足", "bottleneck": "主旨抽取弱", "intervention": "每段只寫5字重點", "pattern_en": "Main idea questions often wrong", "mechanism_en": "Distracted by details", "bottleneck_en": "Weak main idea extraction", "intervention_en": "Write 5-word summary per paragraph"},
+                {"id": 21, "zh": "細節題常錯", "pattern": "靠記憶回答", "mechanism": "Evidence Retrieval弱", "bottleneck": "定位能力不足", "intervention": "題目關鍵詞回原文", "pattern_en": "Detail questions often wrong", "mechanism_en": "Rely on memory", "bottleneck_en": "Weak evidence retrieval", "intervention_en": "Trace question keywords back to text"},
+                {"id": 22, "zh": "推論題常錯", "pattern": "加入自己的想法", "mechanism": "Evidence Boundary模糊", "bottleneck": "過度推論", "intervention": "問「原文證據在哪？」", "pattern_en": "Inference questions often wrong", "mechanism_en": "Add your own ideas", "bottleneck_en": "Over-inference", "intervention_en": "Ask 'Where's the evidence in text?'"},
+                {"id": 23, "zh": "作者態度題錯", "pattern": "只看事件內容", "mechanism": "語氣辨識不足", "bottleneck": "Tone Model弱", "intervention": "圈評價性字詞", "pattern_en": "Author's attitude questions wrong", "mechanism_en": "Only look at event content", "bottleneck_en": "Weak tone recognition", "intervention_en": "Circle evaluative words"},
+                {"id": 24, "zh": "選項兩個都對", "pattern": "找合理答案", "mechanism": "沒找最佳證據", "bottleneck": "Discrimination弱", "intervention": "比較哪個證據最完整", "pattern_en": "Two options seem both correct", "mechanism_en": "Find reasonable answers", "bottleneck_en": "Weak discrimination", "intervention_en": "Compare which evidence is most complete"},
+                {"id": 25, "zh": "常被誘答選項騙", "pattern": "看到原文字就選", "mechanism": "Keyword Matching", "bottleneck": "語意驗證不足", "intervention": "整句重新比對", "pattern_en": "Often tricked by distractors", "mechanism_en": "Choose when you see text keywords", "bottleneck_en": "Insufficient semantic verification", "intervention_en": "Re-compare entire sentences"},
+                {"id": 26, "zh": "閱讀做很多沒進步", "pattern": "只有刷題", "mechanism": "Feedback Loop斷掉", "bottleneck": "錯誤沒有分類", "intervention": "每題標記錯因", "pattern_en": "Read much but no progress", "mechanism_en": "Only practice, no review", "bottleneck_en": "Broken feedback loop", "intervention_en": "Mark error reason for each question"},
+                {"id": 27, "zh": "同類題一直錯", "pattern": "訂正只有答案", "mechanism": "Pattern沒被提取", "bottleneck": "Model Update不足", "intervention": "寫「我為何會選錯？」", "pattern_en": "Same type questions always wrong", "mechanism_en": "Corrections only show answers", "bottleneck_en": "Insufficient pattern extraction", "intervention_en": "Write 'Why did I choose wrong?'"},
+                {"id": 28, "zh": "模考忽高忽低", "pattern": "能力輸出不穩", "mechanism": "自動化不足", "bottleneck": "穩定度低", "intervention": "固定時間做小型模考", "pattern_en": "Practice tests fluctuate wildly", "mechanism_en": "Unstable performance output", "bottleneck_en": "Low consistency", "intervention_en": "Do mini-tests at fixed times"},
+                {"id": 29, "zh": "考場突然看不懂", "pattern": "壓力升高", "mechanism": "Working Memory被占用", "bottleneck": "壓力調節弱", "intervention": "練限時環境", "pattern_en": "Suddenly can't understand in exam", "mechanism_en": "Stress increases", "bottleneck_en": "Weak stress regulation", "intervention_en": "Practice in time-pressured settings"},
+                {"id": 30, "zh": "時間永遠不夠", "pattern": "每題平均用力", "mechanism": "資源配置錯誤", "bottleneck": "Time Strategy弱", "intervention": "設各題型時間上限", "pattern_en": "Never enough time", "mechanism_en": "Spend equal time per question", "bottleneck_en": "Weak time strategy", "intervention_en": "Set time limits per question type"},
+                {"id": 31, "zh": "前面卡太久", "pattern": "不願意跳題", "mechanism": "沉沒成本", "bottleneck": "切換能力弱", "intervention": "90秒無進展就標記", "pattern_en": "Stuck on early questions", "mechanism_en": "Unwilling to skip", "bottleneck_en": "Weak switching ability", "intervention_en": "Mark and skip after 90 seconds"},
+                {"id": 32, "zh": "作文不知道寫什麼", "pattern": "題目來才想內容", "mechanism": "Idea Bank不足", "bottleneck": "素材庫弱", "intervention": "建20個生活母題", "pattern_en": "Don't know what to write", "mechanism_en": "Think of ideas when prompt appears", "bottleneck_en": "Weak idea bank", "intervention_en": "Build 20 life topic ideas"},
+                {"id": 33, "zh": "作文開頭卡住", "pattern": "想一次寫完美", "mechanism": "啟動門檻過高", "bottleneck": "模板不足", "intervention": "準備3種開頭骨架", "pattern_en": "Stuck on essay opening", "mechanism_en": "Want to write perfectly at once", "bottleneck_en": "Insufficient templates", "intervention_en": "Prepare 3 opening frameworks"},
+                {"id": 34, "zh": "作文內容很空", "pattern": "只有觀點", "mechanism": "缺少Evidence", "bottleneck": "展開能力弱", "intervention": "每段加入例子＋結果", "pattern_en": "Essay content is thin", "mechanism_en": "Only have opinions", "bottleneck_en": "Weak elaboration ability", "intervention_en": "Add examples + results per paragraph"},
+                {"id": 35, "zh": "作文句型很單調", "pattern": "只敢寫短句", "mechanism": "Sentence Bank不足", "bottleneck": "句型變化弱", "intervention": "每天升級3句", "pattern_en": "Essay sentences are repetitive", "mechanism_en": "Only dare to write short sentences", "bottleneck_en": "Weak sentence variety", "intervention_en": "Upgrade 3 sentences daily"},
+                {"id": 36, "zh": "作文很多中文式英文", "pattern": "中文直接逐字轉譯", "mechanism": "L1 Transfer", "bottleneck": "英語語塊不足", "intervention": "累積英文常用chunks", "pattern_en": "Essay is Chinglish", "mechanism_en": "Direct word-by-word translation", "bottleneck_en": "Insufficient English chunks", "intervention_en": "Accumulate common English phrases"},
+                {"id": 37, "zh": "作文錯很多文法", "pattern": "邊想內容邊監控文法", "mechanism": "認知負荷過高", "bottleneck": "自動化不足", "intervention": "先求清楚，再二次修正", "pattern_en": "Essay has many grammar errors", "mechanism_en": "Think of content while monitoring grammar", "bottleneck_en": "Insufficient automaticity", "intervention_en": "Draft first, edit grammar later"},
+                {"id": 38, "zh": "作文用字很普通", "pattern": "只會good／bad", "mechanism": "可用詞彙不足", "bottleneck": "Active Vocabulary弱", "intervention": "每主題建立10個可用詞", "pattern_en": "Essay vocabulary is plain", "mechanism_en": "Only use 'good/bad'", "bottleneck_en": "Weak active vocabulary", "intervention_en": "Build 10 usable words per topic"},
+                {"id": 39, "zh": "背高級字卻不會用", "pattern": "Vocabulary只停在Recognition", "mechanism": "Retrieval不足", "bottleneck": "主動輸出弱", "intervention": "每個字自己造一句", "pattern_en": "Memorize advanced words but can't use", "mechanism_en": "Vocabulary stops at recognition", "bottleneck_en": "Weak active output", "intervention_en": "Create one sentence per word"},
+                {"id": 40, "zh": "作文沒有邏輯", "pattern": "句子各自正確卻不連", "mechanism": "Discourse不足", "bottleneck": "段落架構弱", "intervention": "使用主張→理由→例子→結果", "pattern_en": "Essay lacks logic", "mechanism_en": "Sentences are correct but disconnected", "bottleneck_en": "Weak paragraph structure", "intervention_en": "Use claim→reason→example→result"},
+                {"id": 41, "zh": "翻譯知道中文卻寫不出", "pattern": "從中文逐字翻", "mechanism": "Chunk不足", "bottleneck": "英語生成模型弱", "intervention": "先抓主詞＋動詞", "pattern_en": "Know Chinese meaning but can't write English", "mechanism_en": "Translate word-by-word", "bottleneck_en": "Weak English generation", "intervention_en": "First find subject + verb"},
+                {"id": 42, "zh": "翻譯句型常錯", "pattern": "中文語序直接搬過去", "mechanism": "Syntax Transfer", "bottleneck": "英語語序弱", "intervention": "先建立英文骨架", "pattern_en": "Translation sentence structure often wrong", "mechanism_en": "Apply Chinese word order to English", "bottleneck_en": "Weak English syntax", "intervention_en": "First establish English structure"},
+                {"id": 43, "zh": "翻譯漏資訊", "pattern": "一次處理整句", "mechanism": "Working Memory超載", "bottleneck": "切塊不足", "intervention": "中文先切意群", "pattern_en": "Translation omits information", "mechanism_en": "Process whole sentence at once", "bottleneck_en": "Insufficient chunking", "intervention_en": "Chunk Chinese first"},
+                {"id": 44, "zh": "寫完找不到錯誤", "pattern": "看自己的句子太熟", "mechanism": "Error Detection弱", "bottleneck": "校對流程不足", "intervention": "分3輪檢查：動詞／名詞／連接", "pattern_en": "Can't find your own errors", "mechanism_en": "Overfamiliar with own sentences", "bottleneck_en": "Weak error detection", "intervention_en": "3-pass check: verbs/nouns/connections"},
+                {"id": 45, "zh": "很努力卻沒進步", "pattern": "時間平均分配", "mechanism": "沒找Bottleneck", "bottleneck": "Priority錯誤", "intervention": "找最高頻錯誤類型", "pattern_en": "Work hard but no improvement", "mechanism_en": "Effort spread evenly", "bottleneck_en": "Wrong priorities", "intervention_en": "Find highest frequency error type"},
+                {"id": 46, "zh": "每天讀很多英文", "pattern": "Input很多", "mechanism": "沒有Retrieval", "bottleneck": "Output不足", "intervention": "每讀完閉書說重點", "pattern_en": "Read lots of English daily", "mechanism_en": "High input", "bottleneck_en": "Insufficient output", "intervention_en": "Summarize aloud after reading"},
+                {"id": 47, "zh": "補習很多仍不會", "pattern": "老師一直輸入", "mechanism": "學生沒有自主解題", "bottleneck": "Agency不足", "intervention": "每題先自己提出假設", "pattern_en": "Lots of tutoring but still can't", "mechanism_en": "Teacher keeps inputting", "bottleneck_en": "Insufficient student agency", "intervention_en": "Form hypothesis before being shown"},
+                {"id": 48, "zh": "太依賴AI", "pattern": "AI直接給答案", "mechanism": "Prediction Error被消滅", "bottleneck": "Model Update消失", "intervention": "AI只能提示，不先給答案", "pattern_en": "Too reliant on AI", "mechanism_en": "AI directly gives answers", "bottleneck_en": "Prediction errors eliminated", "intervention_en": "AI only hints, no direct answers"},
+                {"id": 49, "zh": "錯題很多很挫折", "pattern": "Error＝能力差", "mechanism": "錯誤人格化", "bottleneck": "學習模型錯誤", "intervention": "Error改標成資料", "pattern_en": "Many errors feel discouraging", "mechanism_en": "Errors = low ability", "bottleneck_en": "Wrong learning model", "intervention_en": "Reframe errors as data"},
+                {"id": 50, "zh": "不知道如何真正進步", "pattern": "學習＝多讀多背", "mechanism": "缺少能力模型", "bottleneck": "Learning OS不足", "intervention": "建立個人能力地圖", "pattern_en": "Don't know how to truly improve", "mechanism_en": "Learning = more reading/memorizing", "bottleneck_en": "Insufficient learning system", "intervention_en": "Build your ability map"}
+            ],
+            "systems": [
+                {
+                    "id": 1,
+                    "zh_name": "①Vocabulary System｜單字系統",
+                    "en_name": "①Vocabulary System",
+                    "zh_desc": "看到字，能不能快速知道它在這句話真正是什麼意思？",
+                    "en_desc": "When you see a word, can you quickly know what it truly means in this sentence?",
+                    "elements": ["字義 Word meaning", "多義 Polysemy", "字根 Word roots", "字首 Prefixes", "字尾 Suffixes", "搭配 Collocation", "語境 Context", "近義 Synonyms", "反義 Antonyms", "易混 Confusions"]
+                },
+                {
+                    "id": 2,
+                    "zh_name": "②Sentence System｜句子系統",
+                    "en_name": "②Sentence System",
+                    "zh_desc": "句子再長，你能不能找到誰做什麼？",
+                    "en_desc": "No matter how long the sentence, can you find who does what?",
+                    "elements": ["主詞 Subject", "動詞 Verb", "受詞 Object", "修飾 Modification", "子句 Clauses", "連接 Connections", "省略 Ellipsis", "分詞 Participles"]
+                },
+                {
+                    "id": 3,
+                    "zh_name": "③Context System｜上下文系統",
+                    "en_name": "③Context System",
+                    "zh_desc": "不知道一個字，也能不能靠前後文推回去？",
+                    "en_desc": "Without knowing a word, can you infer its meaning from surrounding context?",
+                    "elements": ["前因 Cause", "後果 Effect", "轉折 Transition", "舉例 Examples", "對比 Contrast", "指涉 Reference"]
+                },
+                {
+                    "id": 4,
+                    "zh_name": "④Reading System｜閱讀系統",
+                    "en_name": "④Reading System",
+                    "zh_desc": "一篇陌生文章，你能不能快速抓住作者到底在講什麼？",
+                    "en_desc": "Can you quickly grasp the main idea of an unfamiliar article?",
+                    "elements": ["主旨 Main idea", "細節 Details", "推論 Inference", "目的 Purpose", "態度 Attitude", "結構 Structure", "證據 Evidence"]
+                },
+                {
+                    "id": 5,
+                    "zh_name": "⑤Writing System｜作文系統",
+                    "en_name": "⑤Writing System",
+                    "zh_desc": "腦中的想法，能不能變成清楚、有邏輯的英文？",
+                    "en_desc": "Can your thoughts become clear, logical English?",
+                    "elements": ["想法 Ideas", "架構 Structure", "句型 Sentence patterns", "詞彙 Vocabulary", "例子 Examples", "連接 Connections", "修正 Revision"]
+                },
+                {
+                    "id": 6,
+                    "zh_name": "⑥Translation System｜翻譯系統",
+                    "en_name": "⑥Translation System",
+                    "zh_desc": "看到中文意思，能不能重新用英文的方式組裝？",
+                    "en_desc": "Can you reassemble Chinese meaning in English structure?",
+                    "elements": ["切塊 Chunking", "英文骨架 English structure", "語塊 Phrases", "組句 Sentence building", "檢查 Proofreading"]
+                },
+                {
+                    "id": 7,
+                    "zh_name": "⑦Exam Control System｜考場控制系統",
+                    "en_name": "⑦Exam Control System",
+                    "zh_desc": "有限時間內，能不能把真正能力穩定輸出？",
+                    "en_desc": "Can you consistently perform under time constraints?",
+                    "elements": ["時間 Time", "順序 Order", "跳題 Skipping", "壓力 Stress", "注意力 Attention", "檢查 Review", "決策 Decision-making"]
+                }
+            ],
+            "prediction_errors": [
+                {"id": 1, "zh_error": "「單字背越多，英文一定越好。」", "en_error": "\"The more vocabulary you memorize, the better your English.\"", "zh_update": "單字量重要，但還需要語境、句構、篇章與輸出能力。", "en_update": "Vocabulary is important, but context, sentence structure, and output ability matter too."},
+                {"id": 2, "zh_error": "「文法全部學完就看得懂文章。」", "en_error": "\"Learning all grammar rules means you can understand any article.\"", "zh_update": "知道規則不等於即時解析能力。", "en_update": "Knowing rules ≠ real-time parsing ability."},
+                {"id": 3, "zh_error": "「閱讀就是每個字都看懂。」", "en_error": "\"Reading means understanding every single word.\"", "zh_update": "成熟閱讀需要容忍部分未知資訊。", "en_update": "Mature reading tolerates partial unknown information."},
+                {"id": 4, "zh_error": "「刷題越多進步越快。」", "en_error": "\"The more practice problems you do, the faster you improve.\"", "zh_update": "如果錯誤機制沒有更新，1000題可能只是把同一錯法練1000次。", "en_update": "Without updating your error patterns, 1000 problems might just repeat the same mistake 1000 times."},
+                {"id": 5, "zh_error": "「訂正＝把正確答案抄下來。」", "en_error": "\"Correction = copying down the right answer.\"", "zh_update": "真正訂正要找到：【我當時為什麼會選錯？】", "en_update": "True correction requires finding: Why did I choose wrong then?"},
+                {"id": 6, "zh_error": "「作文就是背範文。」", "en_error": "\"Essays are just memorized samples.\"", "zh_update": "題目一變，沒有生成能力就容易失效。", "en_update": "Without generative ability, memorized essays fail when topics change."},
+                {"id": 7, "zh_error": "「高級單字越多，作文分數越高。」", "en_error": "\"More advanced vocabulary = higher essay scores.\"", "zh_update": "清楚、正確、連貫、切題通常比硬塞難字重要。", "en_update": "Clarity, correctness, coherence, and relevance usually matter more than forcing difficult words."},
+                {"id": 8, "zh_error": "「AI給我答案就是AI學習。」", "en_error": "\"Having AI give you answers is learning with AI.\"", "zh_update": "AI直接消除錯誤，也可能同時消除學生最重要的學習訊號。", "en_update": "AI eliminating errors might also eliminate your most important learning signals."},
+                {"id": 9, "zh_error": "「錯很多代表我英文很差。」", "en_error": "\"Making many mistakes means my English is poor.\"", "zh_update": "錯題其實是在暴露尚未穩定的能力節點。", "en_update": "Wrong answers expose unstable ability nodes that need development."},
+                {"id": 10, "zh_error": "「學測考的是我有沒有讀過。」", "en_error": "\"GSAT tests whether you've read the material.\"", "zh_update": "學測很重要的一部分其實是在測：【沒讀過的內容，你還能不能處理。】", "en_update": "A crucial part of GSAT tests: Can you handle content you've never seen before?"}
+            ]
+        };
+
+        function switchTab(tabName) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(s => s.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function renderProblems() {
+            const container = document.getElementById('problems-container');
+            appData.problems.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'problem-card';
+                card.innerHTML = `
+                    <div class="problem-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div style="display: flex; align-items: center; flex: 1;">
+                            <div class="problem-id">#${p.id}</div>
+                            <div class="problem-title">
+                                <div class="problem-title-zh">${p.zh}</div>
+                                <div class="problem-title-en" style="display: none;"></div>
+                            </div>
+                        </div>
+                        <div class="toggle-icon">▼</div>
+                    </div>
+                    <div class="problem-content">
+                        <div class="bilingual-row">
+                            <div class="bilingual-item zh">
+                                <span class="item-label zh">Pattern 規律</span>
+                                <div class="item-content">${p.pattern}</div>
+                                <span class="item-label zh" style="margin-top: 15px;">Mechanism 生成機制</span>
+                                <div class="item-content">${p.mechanism}</div>
+                                <span class="item-label zh" style="margin-top: 15px;">Bottleneck 瓶頸</span>
+                                <div class="item-content">${p.bottleneck}</div>
+                                <span class="item-label zh" style="margin-top: 15px;">Minimum Intervention 最小介入</span>
+                                <div class="item-content">${p.intervention}</div>
+                            </div>
+                            <div class="bilingual-item en">
+                                <span class="item-label en">Pattern</span>
+                                <div class="item-content">${p.pattern_en}</div>
+                                <span class="item-label en" style="margin-top: 15px;">Mechanism</span>
+                                <div class="item-content">${p.mechanism_en}</div>
+                                <span class="item-label en" style="margin-top: 15px;">Bottleneck</span>
+                                <div class="item-content">${p.bottleneck_en}</div>
+                                <span class="item-label en" style="margin-top: 15px;">Minimum Intervention</span>
+                                <div class="item-content">${p.intervention_en}</div>
+                                <button class="tts-btn" onclick="speakText('${(p.pattern_en + ' ' + p.mechanism_en + ' ' + p.bottleneck_en + ' ' + p.intervention_en).replace(/'/g, "\\'")}', event)">🔊 Speak</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderSystems() {
+            const container = document.getElementById('systems-container');
+            appData.systems.forEach(s => {
+                const card = document.createElement('div');
+                card.className = 'system-card';
+                const elementsHtml = s.elements.map(e => `<div class="element-tag">${e}</div>`).join('');
+                card.innerHTML = `
+                    <div class="system-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="system-title">
+                            <div class="system-title-zh">${s.zh_name}</div>
+                            <div class="system-title-en">${s.en_name}</div>
+                        </div>
+                        <div class="toggle-icon">▼</div>
+                    </div>
+                    <div class="system-content">
+                        <div class="bilingual-row">
+                            <div class="bilingual-item zh">
+                                <span class="item-label zh">定義 Definition</span>
+                                <div class="item-content">${s.zh_desc}</div>
+                            </div>
+                            <div class="bilingual-item en">
+                                <span class="item-label en">Definition</span>
+                                <div class="item-content">${s.en_desc}</div>
+                                <button class="tts-btn" onclick="speakText('${s.en_desc.replace(/'/g, "\\'")}', event)">🔊 Speak</button>
+                            </div>
+                        </div>
+                        <h4 style="color: #1A2B5F; margin-top: 20px; margin-bottom: 15px;">核心要素 Core Elements</h4>
+                        <div class="elements-grid">${elementsHtml}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderErrors() {
+            const container = document.getElementById('errors-container');
+            appData.prediction_errors.forEach(e => {
+                const card = document.createElement('div');
+                card.className = 'prediction-card';
+                card.innerHTML = `
+                    <div class="prediction-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="prediction-error">Error #${e.id}</div>
+                        <div class="toggle-icon">▼</div>
+                    </div>
+                    <div class="prediction-content">
+                        <div class="bilingual-row">
+                            <div class="bilingual-item zh">
+                                <span class="item-label zh">常見迷思 Common Misconception</span>
+                                <div class="item-content">${e.zh_error}</div>
+                                <span class="item-label zh" style="margin-top: 15px;">更新 Update</span>
+                                <div class="item-content">${e.zh_update}</div>
+                            </div>
+                            <div class="bilingual-item en">
+                                <span class="item-label en">Common Misconception</span>
+                                <div class="item-content">${e.en_error}</div>
+                                <span class="item-label en" style="margin-top: 15px;">Update</span>
+                                <div class="item-content">${e.en_update}</div>
+                                <button class="tts-btn" onclick="speakText('${(e.en_error + ' ' + e.en_update).replace(/'/g, "\\'")}', event)">🔊 Speak</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function speakText(text, event) {
+            const btn = event.target;
+            if (btn.classList.contains('playing')) {
+                window.speechSynthesis.cancel();
+                btn.classList.remove('playing');
+                btn.textContent = '🔊 Speak';
+                return;
+            }
+            
+            const cleanText = text.replace(/<[^>]*>/g, '');
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85;
+            
+            btn.classList.add('playing');
+            btn.textContent = '⏸️ Stop';
+            
+            utterance.onend = () => {
+                btn.classList.remove('playing');
+                btn.textContent = '🔊 Speak';
+            };
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProblems();
+            renderSystems();
+            renderErrors();
+        });
+    </script>
+</body>
+</html>
