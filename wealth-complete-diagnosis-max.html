@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>財富系統完全診斷 APP | Complete Wealth System Diagnosis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --navy: #1A2B5F;
+            --gold: #C9960C;
+            --teal: #0A7A72;
+            --light-bg: #F8F9FA;
+            --text-dark: #2C3E50;
+            --border-light: #E0E6ED;
+        }
+        
+        body {
+            font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--light-bg) 0%, #FFFFFF 100%);
+            color: var(--text-dark);
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, #0D1B3E 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(26, 43, 95, 0.3);
+            margin-bottom: 2rem;
+            border-bottom: 3px solid var(--gold);
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            letter-spacing: 0.5px;
+        }
+        
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 1.2rem;
+            border: 2px solid var(--gold);
+            background: white;
+            color: var(--navy);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        .nav-btn:hover {
+            background: var(--gold);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(201, 150, 12, 0.3);
+        }
+        
+        .nav-btn.active {
+            background: var(--gold);
+            color: white;
+            box-shadow: 0 8px 20px rgba(201, 150, 12, 0.3);
+        }
+        
+        .content-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            color: var(--navy);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 4px solid var(--gold);
+            font-weight: 700;
+        }
+        
+        .problem-card {
+            background: white;
+            border-left: 5px solid var(--teal);
+            padding: 0;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+        
+        .problem-card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #F0F4F8 0%, #E8EEF5 100%);
+            padding: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: all 0.3s ease;
+            gap: 1rem;
+        }
+        
+        .card-header:hover {
+            background: linear-gradient(135deg, #E8EEF5 0%, #E0E6ED 100%);
+        }
+        
+        .card-header.active {
+            background: linear-gradient(135deg, var(--gold) 0%, #B8860B 100%);
+            color: white;
+        }
+        
+        .card-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--teal);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 0.95rem;
+        }
+        
+        .card-title {
+            flex: 1;
+            font-weight: 600;
+        }
+        
+        .card-toggle {
+            color: currentColor;
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .card-header.active .card-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .card-content {
+            display: none;
+            padding: 1.8rem;
+            background: white;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .card-header.active + .card-content {
+            display: block;
+        }
+        
+        .bilingual-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            align-items: start;
+        }
+        
+        .bilingual-full {
+            grid-template-columns: 1fr;
+        }
+        
+        .zh-label {
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .zh-text {
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #333;
+        }
+        
+        .en-text {
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #555;
+            font-style: italic;
+        }
+        
+        .tts-btn {
+            display: inline-block;
+            background: var(--teal);
+            color: white;
+            padding: 0.35rem 0.9rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+            transition: all 0.2s ease;
+            font-weight: 600;
+        }
+        
+        .tts-btn:hover {
+            background: #086963;
+            transform: scale(1.08);
+        }
+        
+        .tts-btn.playing {
+            background: var(--gold);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 0.9rem;
+        }
+        
+        th {
+            background: linear-gradient(135deg, var(--navy) 0%, #0D1B3E 100%);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+        }
+        
+        td {
+            padding: 0.9rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+        
+        tr:hover {
+            background: #F8F9FA;
+        }
+        
+        .framework-box {
+            background: linear-gradient(135deg, #F0F4F8 0%, #E8EEF5 100%);
+            border-left: 4px solid var(--gold);
+            padding: 1.8rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 2;
+        }
+        
+        .framework-title {
+            color: var(--navy);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .formula-box {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--teal);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 2;
+            color: var(--navy);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .flow-box {
+            background: linear-gradient(135deg, #F0F9F8 0%, #E8F5F3 100%);
+            border-left: 4px solid var(--teal);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 2.2;
+        }
+        
+        .error-item {
+            background: white;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            border-left: 4px solid var(--gold);
+        }
+        
+        .error-label {
+            color: var(--navy);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 3rem;
+            font-size: 0.9rem;
+        }
+        
+        .footer-author {
+            color: var(--gold);
+            font-weight: 700;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border-light);
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover {
+            color: var(--navy);
+        }
+        
+        .tab-btn.active {
+            color: var(--gold);
+            border-bottom-color: var(--gold);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .bilingual-row {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.4rem;
+            }
+            
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>財富系統完全診斷 APP</h1>
+        <p>Complete Wealth System Diagnosis | Maximum Detail & Full Integration</p>
+    </div>
+    
+    <div class="container">
+        <div class="nav-grid">
+            <button class="nav-btn active" onclick="switchSection('problems')">50個財富問題</button>
+            <button class="nav-btn" onclick="switchSection('table')">完整診斷表</button>
+            <button class="nav-btn" onclick="switchSection('six-systems')">六大系統詳解</button>
+            <button class="nav-btn" onclick="switchSection('prediction-errors')">12個預測誤差</button>
+            <button class="nav-btn" onclick="switchSection('brand-wealth')">個人品牌財富機制</button>
+            <button class="nav-btn" onclick="switchSection('knowledge-conversion')">知識工作者轉換</button>
+            <button class="nav-btn" onclick="switchSection('ai-wealth')">AI時代財富轉換</button>
+            <button class="nav-btn" onclick="switchSection('entropy')">低熵財富系統</button>
+            <button class="nav-btn" onclick="switchSection('formulas')">所有公式與演算法</button>
+            <button class="nav-btn" onclick="switchSection('evolution')">五階進化與決策</button>
+        </div>
+        
+        <!-- Section 1: 50 Problems -->
+        <div id="problems" class="content-section active">
+            <h2 class="section-title">50個財富問題完整診斷</h2>
+            <p style="margin-bottom: 2rem; color: #666; font-size: 1.05rem;">每個問題對應完整的診斷模型：Problem → Pattern → Mechanism → Bottleneck → Intervention</p>
+            <div id="problems-container"></div>
+        </div>
+        
+        <!-- Section 2: Complete Table -->
+        <div id="table" class="content-section">
+            <h2 class="section-title">50個財富問題完整診斷表</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">#</th>
+                            <th style="width: 15%;">Problem (問題現象)</th>
+                            <th style="width: 15%;">Pattern (規律)</th>
+                            <th style="width: 15%;">Mechanism (生成機制)</th>
+                            <th style="width: 15%;">Bottleneck (瓶頸)</th>
+                            <th style="width: 20%;">Minimum Intervention (最小介入)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Section 3: Six Systems -->
+        <div id="six-systems" class="content-section">
+            <h2 class="section-title">財富的結構層：六大系統詳解</h2>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">①</span>
+                    <span class="card-title">收入系統 | Income System</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row bilingual-full">
+                        <div>
+                            <div class="zh-label">組成部分：</div>
+                            <div class="zh-text">薪資 | 專業服務 | 副業 | 產品 | 事業 | 資產收入</div>
+                            <div class="en-text" style="margin-top: 0.8rem;">Salary | Professional Services | Side Gigs | Products | Businesses | Asset Income</div>
+                        </div>
+                    </div>
+                    <div class="framework-box" style="margin-top: 1rem;">
+                        <div class="framework-title">收入系統的演進：</div>
+                        第一階：依靠工資 → 第二階：時間換收入 → 第三階：能力生成高價值收入 → 第四階：產品與資產自動化收入 → 第五階：系統性複利收入
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">②</span>
+                    <span class="card-title">支出系統 | Expense System</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row bilingual-full">
+                        <div>
+                            <div class="zh-label">組成部分：</div>
+                            <div class="zh-text">固定成本 | 變動成本 | 低價值耗損 | 生活品質支出</div>
+                            <div class="en-text" style="margin-top: 0.8rem;">Fixed Costs | Variable Costs | Low-Value Waste | Quality of Life Spending</div>
+                        </div>
+                    </div>
+                    <div class="framework-box" style="margin-top: 1rem;">
+                        <div class="framework-title">支出系統的優化：</div>
+                        識別低價值耗損 → 降低固定成本 → 保護生活品質投資 → 建立支出的可見性 → 形成支出的自動控制
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">③</span>
+                    <span class="card-title">安全系統 | Safety System</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row bilingual-full">
+                        <div>
+                            <div class="zh-label">組成部分：</div>
+                            <div class="zh-text">現金 | 預備金 | 保險 | 負債管理 | 風險管理</div>
+                            <div class="en-text" style="margin-top: 0.8rem;">Cash | Reserves | Insurance | Debt Management | Risk Management</div>
+                        </div>
+                    </div>
+                    <div class="framework-box" style="margin-top: 1rem;">
+                        <div class="framework-title">安全系統的構建：</div>
+                        建立現金預備 (3-6個月) → 清理高利負債 → 建立保險保護 → 建立風險緩衝 → 建立靈活應對能力
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">④</span>
+                    <span class="card-title">資產系統 | Asset System</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row bilingual-full">
+                        <div>
+                            <div class="zh-label">組成部分：</div>
+                            <div class="zh-text">金融資產 | 事業資產 | 知識產權 | 品牌 | 資料庫 | APP | 內容</div>
+                            <div class="en-text" style="margin-top: 0.8rem;">Financial Assets | Business Assets | Intellectual Property | Brand | Database | Apps | Content</div>
+                        </div>
+                    </div>
+                    <div class="framework-box" style="margin-top: 1rem;">
+                        <div class="framework-title">資產系統的積累：</div>
+                        能力 → 解決問題 → 產品化 → 標準化 → 數位化 → 自動化 → 可複製 → 規模化 → 持續複利
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">⑤</span>
+                    <span class="card-title">複利系統 | Compound System</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row bilingual-full">
+                        <div>
+                            <div class="zh-label">組成部分：</div>
+                            <div class="zh-text">能力複利 | 知識複利 | 品牌複利 | 關係複利 | 資本複利</div>
+                            <div class="en-text" style="margin-top: 0.8rem;">Ability Compound | Knowledge Compound | Brand Compound | Relationship Compound | Capital Compound</div>
+                        </div>
+                    </div>
+                    <div class="framework-box" style="margin-top: 1rem;">
+                        <div class="framework-title">複利系統的啟動：</div>
+                        持續投入 → 結果反饋 → 模型更新 → 決策優化 → 效率提升 → 更多資源投入 → 進入正向迴圈
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">⑥</span>
+                    <span class="card-title">更新系統 | Update System</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row bilingual-full">
+                        <div>
+                            <div class="zh-label">監測指標：</div>
+                            <div class="zh-text">收入 | 支出 | 轉換率 | 客戶回購 | 時間投入 | 投資結果 | Prediction Error | Model Update</div>
+                            <div class="en-text" style="margin-top: 0.8rem;">Income | Expenses | Conversion Rate | Customer Repeat | Time Investment | Investment Results | Prediction Error | Model Update</div>
+                        </div>
+                    </div>
+                    <div class="framework-box" style="margin-top: 1rem;">
+                        <div class="framework-title">更新系統的運作：</div>
+                        定期回顧 → 數據分析 → 發現偏差 → 檢視假設 → 調整模型 → 重新測試 → 循環迭代
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 4: Prediction Errors -->
+        <div id="prediction-errors" class="content-section">
+            <h2 class="section-title">財富最重要的12個Prediction Error</h2>
+            <p style="margin-bottom: 2rem; color: #666;">這些是最容易犯的信念偏差，改正它們能徹底改變財富軌跡</p>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 01：「努力 = 有錢」</div>
+                <div class="zh-text">修正：努力只有在對的價值節點上才可能產生高回報。</div>
+                <div class="en-text">Correction: Effort only generates high returns at the right value nodes.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 02：「收入高 = 有錢」</div>
+                <div class="zh-text">修正：收入、支出、負債、資產與風險要一起看。</div>
+                <div class="en-text">Correction: Must view income, expenses, debt, assets, and risk together.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 03：「省錢就會有錢」</div>
+                <div class="zh-text">修正：降低浪費重要，但收入與資產生成能力也有上限效應。</div>
+                <div class="en-text">Correction: Cutting waste matters, but income and asset generation have ceiling effects.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 04：「投資報酬越高越好」</div>
+                <div class="zh-text">修正：報酬不能脫離風險、流動性、成本與時間尺度。</div>
+                <div class="en-text">Correction: Returns can't be separated from risk, liquidity, costs, and time horizon.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 05：「有錢人才需要投資」</div>
+                <div class="zh-text">修正：資產配置是財務系統的一部分，但必須符合個人風險與目標。</div>
+                <div class="en-text">Correction: Asset allocation is core to financial systems, tailored to personal risk and goals.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 06：「產品好自然有人買」</div>
+                <div class="zh-text">修正：產品價值 + 信任 + 曝光 + 需求 + 轉換缺一不可。</div>
+                <div class="en-text">Correction: Product value + Trust + Exposure + Demand + Conversion all essential.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 07：「粉絲越多越賺錢」</div>
+                <div class="zh-text">修正：注意力不等於信任，信任也不自動等於交易。</div>
+                <div class="en-text">Correction: Attention ≠ Trust, and trust doesn't automatically = Transactions.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 08：「做更多產品收入就增加」</div>
+                <div class="zh-text">修正：產品過多也可能增加選擇熵與營運成本。</div>
+                <div class="en-text">Correction: Too many products increase choice entropy and operating costs.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 09：「AI會自動幫我賺錢」</div>
+                <div class="zh-text">修正：AI降低生產成本，但不自動產生市場價值。</div>
+                <div class="en-text">Correction: AI lowers production costs but doesn't automatically create market value.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 10：「被動收入 = 完全不用工作」</div>
+                <div class="zh-text">修正：多數可持續收入系統仍需要前期建設、維護與更新。</div>
+                <div class="en-text">Correction: Most sustainable income systems need upfront building, maintenance, and updates.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 11：「錢越多越自由」</div>
+                <div class="zh-text">修正：如果生活成本與欲望同步膨脹，選擇權未必增加。</div>
+                <div class="en-text">Correction: If costs and desires expand together, choices may not actually increase.</div>
+            </div>
+            
+            <div class="error-item">
+                <div class="error-label">❌ Error 12：「財富自由 = 不用工作」</div>
+                <div class="zh-text">修正：真正自由是【工作可以成為選擇，而不是生存強迫】</div>
+                <div class="en-text">Correction: True freedom is 【Work becomes choice, not survival necessity】</div>
+            </div>
+        </div>
+        
+        <!-- Section 5: Brand & Wealth -->
+        <div id="brand-wealth" class="content-section">
+            <h2 class="section-title">個人品牌的財富機制</h2>
+            
+            <div class="flow-box">
+                <div class="framework-title">個人品牌財富轉換的完整流程：</div>
+                知識 <br>↓<br>
+                內容（被看見） <br>↓<br>
+                持續提供價值 → 信任 <br>↓<br>
+                信任 → 社群 <br>↓<br>
+                社群 → 需求資料 <br>↓<br>
+                需求資料 → 產品 <br>↓<br>
+                產品 → 使用結果 <br>↓<br>
+                結果 → 口碑 <br>↓<br>
+                口碑 → 更多信任 <br>↓<br>
+                【形成正向Feedback Loop】
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">★</span>
+                    <span class="card-title">真正值錢的不是爆文，而是信任網絡</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row bilingual-full">
+                        <div>
+                            <div class="zh-label">常見誤解：</div>
+                            <div class="zh-text">• 某一篇爆文能改變人生<br>• 粉絲數等於賺錢能力<br>• 流量就是收入<br>• 內容越多越好</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row bilingual-full">
+                        <div>
+                            <div class="zh-label">真正的財富機制：</div>
+                            <div class="zh-text">• 長期累積的信任網絡<br>• 反覆驗證的品質承諾<br>• 社群內部的推薦與複述<br>• 持續的價值提供與回饋<br>• 客戶結果的持續改善</div>
+                        </div>
+                    </div>
+                    <div class="framework-box" style="margin-top: 1.5rem;">
+                        <div class="framework-title">品牌到財富的翻轉點：</div>
+                        第一年：建立可見性<br>
+                        第二年：積累信任資本<br>
+                        第三年：轉換成產品<br>
+                        第四年：形成複利<br>
+                        第五年以上：系統自動化與被動收入
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 6: Knowledge Conversion -->
+        <div id="knowledge-conversion" class="content-section">
+            <h2 class="section-title">知識工作者的財富轉換階梯</h2>
+            
+            <div class="flow-box">
+                <div class="framework-title">一次教學 → 重複財富：</div>
+                一次教學<br>↓<br>
+                教材<br>↓<br>
+                模板<br>↓<br>
+                知識庫<br>↓<br>
+                APP<br>↓<br>
+                學習系統<br>↓<br>
+                會員服務<br>↓<br>
+                會員使用 → Feedback<br>↓<br>
+                Feedback → 資料<br>↓<br>
+                資料 → 產品更新<br>↓<br>
+                產品更新 → 更好的結果<br>↓<br>
+                結果 → 信任增加<br>↓<br>
+                【做過的工作變成可重複工作的資產】
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">★</span>
+                    <span class="card-title">知識資產化的五個關鍵步驟</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label">第一步：教學內容可見化</div>
+                        <div class="zh-text">把口頭教學轉成可重複使用的教材<br>把課堂內容變成課程大綱與講義<br>把隱性知識變成顯性文件</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label">第二步：教材模板化</div>
+                        <div class="zh-text">把單次教材變成可重複套用的模板<br>建立標準化的教學流程<br>創造可複製的內容框架</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label">第三步：知識系統化</div>
+                        <div class="zh-text">把散落的知識點組織成知識庫<br>建立主題間的連接與層級<br>形成完整的知識框架</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label">第四步：產品數位化</div>
+                        <div class="zh-text">把知識庫轉化成線上課程<br>開發學習系統或APP<br>建立自動化的學習流程</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label">第五步：價值持續化</div>
+                        <div class="zh-text">收集學習者反饋<br>持續改進產品內容<br>構建可持續的收入模式</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 7: AI Wealth -->
+        <div id="ai-wealth" class="content-section">
+            <h2 class="section-title">AI時代最大的財富轉換</h2>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">①</span>
+                    <span class="card-title">過去 vs 現在 vs 未來的價值定義</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label">過去 (Pre-AI)：</div>
+                        <div class="zh-text">價值 ≈ 我知道多少<br>競爭基礎：知識擁有<br>稀缺性：知識本身</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label">現在 (AI時代)：</div>
+                        <div class="zh-text">AI讓「知道答案」快速商品化<br>曾經值錢的「知識」變成了「工具」<br>競爭轉移到應用層面</div>
+                    </div>
+                    
+                    <div>
+                        <div class="zh-label">未來更稀缺的是：</div>
+                        <div class="zh-text">✓ 選題能力（問對問題）<br>✓ 問題定義（深刻理解）<br>✓ 資料結構（組織信息）<br>✓ 判斷（做出決策）<br>✓ 篩選（找到信號）<br>✓ 整合（連接觀點）<br>✓ 情境化（適應環境）<br>✓ 信任（建立連接）<br>✓ 實際結果（證明價值）<br>✓ 更新能力（持續進化）</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">②</span>
+                    <span class="card-title">AI時代的真正財富槓桿</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label" style="color: #C9960C;">❌ 不是：</div>
+                        <div class="zh-text">「AI幫我寫更多文章」<br>「AI幫我生成更多內容」<br>「AI幫我快速複製與擴展」</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label" style="color: #0A7A72;">✓ 而是：</div>
+                        <div class="zh-text">「AI把我的智慧結構放大，讓同一份能力可以服務更多人」<br><br>我的選題能力 → AI快速生成內容<br>我的判斷能力 → AI快速執行<br>我的價值觀 → AI放大我的影響<br>我的系統 → AI自動化流程<br>我的能力 → AI複製到規模</div>
+                    </div>
+                    
+                    <div class="framework-box" style="margin-top: 1.5rem;">
+                        <div class="framework-title">AI時代的財富公式：</div>
+                        我的獨特智慧 × AI的執行速度 × 系統的規模化 = 可持續的複利財富
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 8: Low Entropy -->
+        <div id="entropy" class="content-section">
+            <h2 class="section-title">財富的低熵系統 vs 高熵系統</h2>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">高熵</span>
+                    <span class="card-title">高熵財富系統（混亂、耗能、不可持續）</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="zh-text" style="line-height: 2;">
+                        ❌ 收入來源混亂<br>
+                        ❌ 產品很多<br>
+                        ❌ 資料找不到<br>
+                        ❌ 每天臨時工作<br>
+                        ❌ 一直追新機會<br>
+                        ❌ 支出不知道去哪<br>
+                        ❌ 投資跟著情緒<br>
+                        ❌ 沒有預備金<br>
+                        ❌ 本人停下來全部停止<br>
+                        ❌ 沒有反饋機制<br>
+                        ❌ 無法持續學習
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">低熵</span>
+                    <span class="card-title">低熵財富系統（清晰、高效、可持續）</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="zh-text" style="line-height: 2;">
+                        ✓ 收入結構清楚<br>
+                        ✓ 成本清楚<br>
+                        ✓ 核心產品清楚<br>
+                        ✓ 資料庫集中<br>
+                        ✓ 流程SOP化<br>
+                        ✓ 資產持續累積<br>
+                        ✓ 風險有Buffer<br>
+                        ✓ 重要工作可以重複<br>
+                        ✓ 每月有Feedback<br>
+                        ✓ 錯誤可以更新<br>
+                        ✓ 系統逐漸自動化
+                    </div>
+                </div>
+            </div>
+            
+            <div class="framework-box" style="margin-top: 2rem;">
+                <div class="framework-title">真正財富的本質：</div>
+                不是【擁有最多】<br><br>
+                而是【系統的摩擦越來越低，選擇權越來越高】<br><br>
+                低熵系統 = 用最少的努力維持最多的價值創造
+            </div>
+        </div>
+        
+        <!-- Section 9: All Formulas -->
+        <div id="formulas" class="content-section">
+            <h2 class="section-title">所有公式與演算法集合</h2>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">①</span>
+                    <span class="card-title">現金流與財富累積公式</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="formula-box">
+現金流 = 收入 - 支出
+
+可投資盈餘 = 收入 - 必要支出 - 必要安全配置
+
+財富累積 ≈ 持續盈餘 × 時間 × 合理複利 - 重大風險損失
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">②</span>
+                    <span class="card-title">財富生成力公式（核心）</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="formula-box">
+財富生成力 = 能力 × 解決問題價值 × 信任 × Distribution × 轉換 × 可複製性
+
+說明：
+只要其中一項接近0，整體輸出就會被壓低。
+這是找Bottleneck的最佳框架。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">③</span>
+                    <span class="card-title">真正財富的五階進化公式</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="formula-box">
+時間 → 能力 → 解決問題 → 價值 → 收入 → 盈餘 → 安全Buffer + 資產 → 複利
+
+知識 → 資料庫 → 產品 → 系統 → 可複製 → 降低個人工時依賴 → 時間自主↑ → 選擇權↑
+
+最終實現：
+【即使我不把全部生命拿去換錢，我的能力、知識、品牌、系統與資產仍然可以持續創造價值】
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">④</span>
+                    <span class="card-title">High Agency Algorithm（高能動財富決策演算法）</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="formula-box">
+Input: 我現在真正的財務狀況？
+↓ Diagnosis: 收入？支出？負債？資產？時間？能力？
+↓ Pattern: 什麼一直重複？
+↓ Mechanism: 什麼機制生成這個結果？
+↓ Bottleneck: 哪個節點卡住整體？
+↓ Priority Node: 現在只處理哪一件事？
+↓ Skill: 需要提升什麼能力？
+↓ Minimum Intervention: 今天最小可以做什麼？
+↓ Action → Feedback → Prediction Error → Model Update → Retest
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">⑤</span>
+                    <span class="card-title">最高階的財富優化函數</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="formula-box">
+不是只最大化：「錢」
+
+而是同時最優化：
+金錢 ↑
+時間自主 ↑
+健康 ✓ 不能下降
+關係 ✓ 不能持續下降
+風險 ✓ 不能失控上升
+生命意義 ✓ 不能歸零
+
+最高階的財富 ≠ 最多的錢
+最高階的財富 = 【錢是生命的工具，能力是價值的來源，系統是能力的放大器，選擇權是最終自由】
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section 10: Five Stages -->
+        <div id="evolution" class="content-section">
+            <h2 class="section-title">五階進化與決策導航</h2>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">①</span>
+                    <span class="card-title">第一階：生存型 | Survival Stage</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">定義：</div>
+                            <div class="zh-text">錢 → 活下去</div>
+                        </div>
+                        <div>
+                            <div class="en-text">Money → Survive</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">特徵：</div>
+                            <div class="zh-text">• 生活在貧困或不安全中<br>• 每天為溫飽奮力<br>• 沒有安全感<br>• 選擇權最少</div>
+                        </div>
+                        <div>
+                            <div class="en-text">• Living in poverty/unsecurity<br>• Daily struggle for basics<br>• No sense of safety<br>• Minimum choices</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">Priority Node：</div>
+                            <div class="zh-text">建立基本收入系統<br>確保每日最低支出<br>建立安全感</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">②</span>
+                    <span class="card-title">第二階：勞動型 | Labor Stage</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">定義：</div>
+                            <div class="zh-text">時間 → 收入</div>
+                        </div>
+                        <div>
+                            <div class="en-text">Time → Income</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">特徵：</div>
+                            <div class="zh-text">• 有穩定工作<br>• 收入與時間綁定<br>• 開始積累盈餘<br>• 可以計畫短期目標</div>
+                        </div>
+                        <div>
+                            <div class="en-text">• Have stable work<br>• Income tied to hours<br>• Start accumulating surplus<br>• Plan short-term goals</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">Priority Node：</div>
+                            <div class="zh-text">建立現金流管理<br>開始正確儲蓄<br>建立安全預備金</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">③</span>
+                    <span class="card-title">第三階：能力型 | Capability Stage</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">定義：</div>
+                            <div class="zh-text">Skill → 高價值收入</div>
+                        </div>
+                        <div>
+                            <div class="en-text">Skill → High-Value Income</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">特徵：</div>
+                            <div class="zh-text">• 發展專業能力<br>• 收入與能力掛鉤<br>• 收入開始增長<br>• 有時間投資未來</div>
+                        </div>
+                        <div>
+                            <div class="en-text">• Develop expertise<br>• Income tied to skill<br>• Income starts growing<br>• Time to invest future</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">Priority Node：</div>
+                            <div class="zh-text">提升核心能力<br>建立市場認可<br>探索產品化機會</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">④</span>
+                    <span class="card-title">第四階：資產型 | Asset Stage</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">定義：</div>
+                            <div class="zh-text">能力 → 產品 → 系統 → 資產 → 複利</div>
+                        </div>
+                        <div>
+                            <div class="en-text">Ability → Product → System → Asset → Compound</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">特徵：</div>
+                            <div class="zh-text">• 建立可複製產品<br>• 收入開始自動化<br>• 資產持續累積<br>• 開始複利生長</div>
+                        </div>
+                        <div>
+                            <div class="en-text">• Build replicable products<br>• Income starts automating<br>• Assets accumulating<br>• Compound growth starts</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">Priority Node：</div>
+                            <div class="zh-text">產品化與標準化<br>建立系統與流程<br>建立可重複收入</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card">
+                <div class="card-header" onclick="toggleCard(this)">
+                    <span class="card-num">⑤</span>
+                    <span class="card-title">第五階：自由型 | Freedom Stage</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">定義：</div>
+                            <div class="zh-text">財富 → 選擇權 → 時間 → 創造 → 利他 → 再生成更多價值</div>
+                        </div>
+                        <div>
+                            <div class="en-text">Wealth → Choice → Time → Creation → Altruism → Generate More Value</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">特徵：</div>
+                            <div class="zh-text">• 工作成為選擇<br>• 時間完全自主<br>• 能力持續複利<br>• 回饋社會與他人</div>
+                        </div>
+                        <div>
+                            <div class="en-text">• Work becomes choice<br>• Time completely autonomous<br>• Abilities compound<br>• Give back to society</div>
+                        </div>
+                    </div>
+                    <div class="bilingual-row">
+                        <div>
+                            <div class="zh-label">Priority Node：</div>
+                            <div class="zh-text">擴大系統規模<br>建立多元影響<br>尋找更深價值</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="problem-card" style="border-left-color: var(--gold); margin-top: 2rem;">
+                <div class="card-header" onclick="toggleCard(this)" style="background: linear-gradient(135deg, #FFF5E6 0%, #FFECDB 100%);">
+                    <span class="card-num" style="background: var(--gold); color: white;">★</span>
+                    <span class="card-title" style="color: var(--navy);">財富APP首頁真正應該顯示的內容</span>
+                    <span class="card-toggle">▼</span>
+                </div>
+                <div class="card-content">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="zh-label">不是100個數字，而是三個問題的答案：</div>
+                    </div>
+                    
+                    <div style="background: #F0F9F8; padding: 1.5rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                        <div class="zh-label" style="color: var(--teal);">第一眼只回答：</div>
+                        <div class="zh-text" style="margin-top: 0.8rem;">
+                            ❓ 我現在在哪裡？ (Current State)<br>
+                            ❓ 最大財富瓶頸是什麼？ (Biggest Bottleneck)<br>
+                            ❓ 現在只做哪一件事？ (Priority Node)
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #F5F0F8 0%, #EFE8F5 100%); padding: 1.5rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                        <div class="zh-label">例如：Person A</div>
+                        <div class="zh-text" style="margin-top: 0.8rem;">
+                            現在狀態：收入穩定，但可投資盈餘偏低<br>
+                            最大瓶頸：非必要固定支出過高<br>
+                            本週只做：盤點並取消3項低價值固定成本
+                        </div>
+                    </div>
+                    
+                    <div style="background: linear-gradient(135deg, #F5F0F8 0%, #EFE8F5 100%); padding: 1.5rem; border-radius: 6px;">
+                        <div class="zh-label">例如：Person B</div>
+                        <div class="zh-text" style="margin-top: 0.8rem;">
+                            現在狀態：現金流穩定，資產開始累積<br>
+                            最大瓶頸：收入完全依賴本人時間<br>
+                            本週只做：把一項重複服務整理成SOP與流程
+                        </div>
+                    </div>
+                    
+                    <div class="framework-box" style="margin-top: 1.5rem;">
+                        <div class="framework-title">這才不是：財務記帳APP</div>
+                        這是：【財富決策導航器】<br><br>
+                        不只追蹤過去發生了什麼<br>而是指引未來應該做什麼
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p style="margin-bottom: 1rem;">© 2024 Complete Wealth System Diagnosis | 財富系統完全診斷</p>
+        <p>Author <span class="footer-author">王欣蓉 Anne Wang</span></p>
+        <p style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.9;">This comprehensive app contains all frameworks, prediction errors, wealth formulas, conversion flows, and decision algorithms for complete financial transformation.</p>
+    </div>
+    
+    <script>
+        const problemsData = [
+            { num: "01", zh: "每月錢不夠", en: "Not Enough Money Each Month", pattern_zh: "月底固定不足", pattern_en: "Consistently insufficient at month-end", mechanism_zh: "現金流失衡", mechanism_en: "Cash flow imbalance", bottleneck_zh: "收支差額", bottleneck_en: "Income-expense gap", intervention_zh: "先記30天收支", intervention_en: "Track 30 days of income and expenses first" },
+            { num: "02", zh: "不知道錢去哪", en: "Don't Know Where Money Goes", pattern_zh: "小額很多", pattern_en: "Many small expenses", mechanism_zh: "支出不可見", mechanism_en: "Invisible expenses", bottleneck_zh: "缺少資料", bottleneck_en: "Lack of data", intervention_zh: "每天只記總支出", intervention_en: "Track only daily total spending" },
+            { num: "03", zh: "薪水不低卻沒錢", en: "Good Income But No Savings", pattern_zh: "收入增加支出也增加", pattern_en: "When income rises, expenses rise too", mechanism_zh: "Lifestyle Inflation", mechanism_en: "Lifestyle Inflation", bottleneck_zh: "儲蓄沒有優先", bottleneck_en: "Savings not prioritized", intervention_zh: "收入先固定留一部分", intervention_en: "Fix a portion of income first" },
+            { num: "04", zh: "一直存不到錢", en: "Can't Accumulate Savings", pattern_zh: "有剩才存", pattern_en: "Save only what's left", mechanism_zh: "儲蓄排在最後", mechanism_en: "Savings comes last", bottleneck_zh: "自動化不足", bottleneck_en: "Lack of automation", intervention_zh: "發薪日先存", intervention_en: "Save on payday first" },
+            { num: "05", zh: "收入太單一", en: "Income Too Concentrated", pattern_zh: "只靠薪水", pattern_en: "Depend only on salary", mechanism_zh: "單點收入風險", mechanism_en: "Single-source income risk", bottleneck_zh: "第二收入源不足", bottleneck_en: "Lack of secondary income", intervention_zh: "盤點一項可變現Skill", intervention_en: "Identify one monetizable skill" },
+            { num: "06", zh: "想兼職又沒時間", en: "Want Side Gigs But No Time", pattern_zh: "時間已滿載", pattern_en: "Time already maxed out", mechanism_zh: "用時間換錢到上限", mechanism_en: "Hit limit of trading time for money", bottleneck_zh: "可擴張性不足", bottleneck_en: "Lack of scalability", intervention_zh: "找可重複出售的成果", intervention_en: "Find repeatable deliverables" },
+            { num: "07", zh: "工作很多收入沒增加", en: "Lots of Work, No Income Growth", pattern_zh: "工時與收入線性綁定", pattern_en: "Hours and income linearly tied", mechanism_zh: "時間槓桿低", mechanism_en: "Low time leverage", bottleneck_zh: "沒有資產化", bottleneck_en: "No assetization", intervention_zh: "把一次工作做成模板", intervention_en: "Turn one project into a template" },
+            { num: "08", zh: "很有能力卻難變現", en: "Capable But Hard to Monetize", pattern_zh: "能力只有自己知道", pattern_en: "Only I know my ability", mechanism_zh: "價值不可見", mechanism_en: "Value invisible", bottleneck_zh: "缺少市場接口", bottleneck_en: "Lack market interface", intervention_zh: "公開一個有用成果", intervention_en: "Publicly share one valuable result" },
+            { num: "09", zh: "知識很多卻沒收入", en: "Knowledge Rich But Income Poor", pattern_zh: "知識停在腦中", pattern_en: "Knowledge stays in my head", mechanism_zh: "沒有產品化", mechanism_en: "Not productized", bottleneck_zh: "Packaging不足", bottleneck_en: "Insufficient packaging", intervention_zh: "解決一個明確問題", intervention_en: "Solve one specific problem" },
+            { num: "10", zh: "產品很多卻賣不好", en: "Many Products But Poor Sales", pattern_zh: "從產品出發", pattern_en: "Start from product", mechanism_zh: "沒對準痛點", mechanism_en: "Miss the pain point", bottleneck_zh: "Problem-Market Fit不足", bottleneck_en: "Insufficient problem-market fit", intervention_zh: "先問客戶卡在哪", intervention_en: "First ask where customers are stuck" },
+            { num: "11", zh: "很努力經營卻沒成長", en: "Work Hard But No Growth", pattern_zh: "一直輸出但沒分析", pattern_en: "Keep outputting but don't analyze", mechanism_zh: "Feedback Loop斷掉", mechanism_en: "Feedback loop broken", bottleneck_zh: "不知道什麼有效", bottleneck_en: "Don't know what works", intervention_zh: "每週看一次轉換資料", intervention_en: "Review conversion data weekly" },
+            { num: "12", zh: "粉絲很多收入不高", en: "Many Followers But Low Income", pattern_zh: "注意力沒有轉成價值交換", pattern_en: "Attention not converted to value exchange", mechanism_zh: "商業路徑斷裂", mechanism_en: "Business path broken", bottleneck_zh: "缺少Offer", bottleneck_en: "Lack of offer", intervention_zh: "建立一個清楚入口", intervention_en: "Create one clear entry point" },
+            { num: "13", zh: "客戶只買一次", en: "Customers Buy Only Once", pattern_zh: "單次交易", pattern_en: "One-time transaction", mechanism_zh: "沒有持續價值", mechanism_en: "No ongoing value", bottleneck_zh: "Retention不足", bottleneck_en: "Insufficient retention", intervention_zh: "增加售後追蹤", intervention_en: "Add post-sale follow-up" },
+            { num: "14", zh: "一直找新客戶很累", en: "Always Finding New Customers is Tiring", pattern_zh: "每次重新建立信任", pattern_en: "Rebuild trust each time", mechanism_zh: "信任無法累積", mechanism_en: "Trust can't accumulate", bottleneck_zh: "關係資產不足", bottleneck_en: "Insufficient relationship assets", intervention_zh: "經營既有客戶", intervention_en: "Nurture existing customers" },
+            { num: "15", zh: "商品容易被比價", en: "Products Easily Price-Compared", pattern_zh: "賣的是同質產品", pattern_en: "Selling commodities", mechanism_zh: "價格成唯一變數", mechanism_en: "Price becomes only variable", bottleneck_zh: "差異化不足", bottleneck_en: "Insufficient differentiation", intervention_zh: "加入知識與服務", intervention_en: "Add knowledge and service" },
+            { num: "16", zh: "降價才有人買", en: "People Buy Only When Discounted", pattern_zh: "客戶看不到其他價值", pattern_en: "Customers see no other value", mechanism_zh: "價值訊號不足", mechanism_en: "Insufficient value signals", bottleneck_zh: "Positioning不足", bottleneck_en: "Insufficient positioning", intervention_zh: "說清楚解決什麼問題", intervention_en: "Clearly state what problem you solve" },
+            { num: "17", zh: "很會服務卻賺很少", en: "Good at Service But Low Income", pattern_zh: "不敢收合理價格", pattern_en: "Afraid to charge fair price", mechanism_zh: "價值與價格脫鉤", mechanism_en: "Value and price decoupled", bottleneck_zh: "定價模型", bottleneck_en: "Pricing model", intervention_zh: "計算完整服務成本", intervention_en: "Calculate full service costs" },
+            { num: "18", zh: "不敢談錢", en: "Afraid to Talk About Money", pattern_zh: "錢與貪心綁定", pattern_en: "Money tied to greed", mechanism_zh: "金錢信念限制", mechanism_en: "Limiting money beliefs", bottleneck_zh: "價值交換模型錯誤", bottleneck_en: "Wrong value exchange model", intervention_zh: "把收入重新定義成價值交換", intervention_en: "Redefine income as value exchange" },
+            { num: "19", zh: "覺得賺錢很辛苦", en: "Feel Making Money is Hard", pattern_zh: "只熟悉勞動收入", pattern_en: "Only familiar with labor income", mechanism_zh: "舊收入模型", mechanism_en: "Old income model", bottleneck_zh: "槓桿不足", bottleneck_en: "Insufficient leverage", intervention_zh: "找一個非工時收入節點", intervention_en: "Find one non-labor income node" },
+            { num: "20", zh: "什麼機會都想做", en: "Want to Do Every Opportunity", pattern_zh: "害怕錯過", pattern_en: "Fear of missing out", mechanism_zh: "FOMO增加認知熵", mechanism_en: "FOMO increases cognitive entropy", bottleneck_zh: "Priority失焦", bottleneck_en: "Unfocused priority", intervention_zh: "一季只做一個主軸", intervention_en: "One main axis per quarter" },
+            { num: "21", zh: "專案很多都沒做大", en: "Many Projects, None Got Big", pattern_zh: "資源被平均分散", pattern_en: "Resources spread thin", mechanism_zh: "無法形成臨界質量", mechanism_en: "Can't reach critical mass", bottleneck_zh: "Focus不足", bottleneck_en: "Insufficient focus", intervention_zh: "找最高潛力20%", intervention_en: "Find highest potential 20%" },
+            { num: "22", zh: "APP做很多卻沒有整合", en: "Many Apps But No Integration", pattern_zh: "每次重新開發", pattern_en: "Rebuild each time", mechanism_zh: "知識資產碎片化", mechanism_en: "Fragmented knowledge assets", bottleneck_zh: "母體不足", bottleneck_en: "Insufficient core structure", intervention_zh: "共用一套核心架構", intervention_en: "Share one core framework" },
+            { num: "23", zh: "內容一直重做", en: "Content Always Redone", pattern_zh: "找不到以前資料", pattern_en: "Can't find old data", mechanism_zh: "知識沒有結構化", mechanism_en: "Knowledge not structured", bottleneck_zh: "Retrieval不足", bottleneck_en: "Insufficient retrieval", intervention_zh: "建母體資料庫", intervention_en: "Build core database" },
+            { num: "24", zh: "AI用了反而更忙", en: "Using AI Made Me Busier", pattern_zh: "產出速度提高", pattern_en: "Output speed increased", mechanism_zh: "Input與Output一起爆增", mechanism_en: "Input and output both exploded", bottleneck_zh: "缺少篩選", bottleneck_en: "Lack of filtering", intervention_zh: "AI只處理Priority Node", intervention_en: "AI only handles priority node" },
+            { num: "25", zh: "AI生成很多卻沒變現", en: "AI Generated Content But No Revenue", pattern_zh: "Output≠Value", pattern_en: "Output ≠ Value", mechanism_zh: "沒進入使用情境", mechanism_en: "Didn't enter usage context", bottleneck_zh: "最後一哩不足", bottleneck_en: "Insufficient last mile", intervention_zh: "每份內容連到一個用途", intervention_en: "Link each content to one use case" },
+            { num: "26", zh: "每天都很忙", en: "Busy Every Day", pattern_zh: "低價值任務占滿時間", pattern_en: "Low-value tasks fill time", mechanism_zh: "Opportunity Cost過高", mechanism_en: "Too high opportunity cost", bottleneck_zh: "高槓桿時間不足", bottleneck_en: "Insufficient high-leverage time", intervention_zh: "每天刪一項低價值工作", intervention_en: "Delete one low-value task daily" },
+            { num: "27", zh: "沒時間創造新收入", en: "No Time to Create New Income", pattern_zh: "全部時間維持現在", pattern_en: "All time spent maintaining", mechanism_zh: "Exploitation壓過Exploration", mechanism_en: "Exploitation dominates exploration", bottleneck_zh: "未來投資不足", bottleneck_en: "Insufficient future investment", intervention_zh: "每週保留2小時創造資產", intervention_en: "Reserve 2 hours/week to create assets" },
+            { num: "28", zh: "賺得多卻很累", en: "High Income But Exhausted", pattern_zh: "收入靠本人持續輸出", pattern_en: "Income depends on personal output", mechanism_zh: "系統依賴單一節點", mechanism_en: "System depends on one node", bottleneck_zh: "自動化不足", bottleneck_en: "Insufficient automation", intervention_zh: "找一項工作SOP化", intervention_en: "SOP-ify one work item" },
+            { num: "29", zh: "自己休息收入就停", en: "Stop Working Means Stop Income", pattern_zh: "沒有資產工作", pattern_en: "No asset work", mechanism_zh: "Time-Leverage低", mechanism_en: "Low time-leverage", bottleneck_zh: "被動槓桿不足", bottleneck_en: "Insufficient passive leverage", intervention_zh: "建立可重複交付產品", intervention_en: "Build repeatable deliverables" },
+            { num: "30", zh: "不敢授權", en: "Afraid to Delegate", pattern_zh: "覺得自己做最快", pattern_en: "Think I'm fastest", mechanism_zh: "個人成為瓶頸", mechanism_en: "Self becomes bottleneck", bottleneck_zh: "Delegation不足", bottleneck_en: "Insufficient delegation", intervention_zh: "先交出一項低風險工作", intervention_en: "Delegate one low-risk task first" },
+            { num: "31", zh: "現金很多卻一直焦慮", en: "Lots of Cash But Still Anxious", pattern_zh: "不知道多少才夠", pattern_en: "Don't know what's enough", mechanism_zh: "安全目標模糊", mechanism_en: "Vague safety target", bottleneck_zh: "財務底線不清", bottleneck_en: "Unclear financial floor", intervention_zh: "算出最低生活成本", intervention_en: "Calculate minimum living cost" },
+            { num: "32", zh: "沒有緊急預備", en: "No Emergency Reserve", pattern_zh: "所有錢都被使用", pattern_en: "All money is in use", mechanism_zh: "系統沒有Buffer", mechanism_en: "System has no buffer", bottleneck_zh: "抗衝擊能力不足", bottleneck_en: "Low shock resistance", intervention_zh: "先建立小型預備金", intervention_en: "Build small emergency fund first" },
+            { num: "33", zh: "一有突發支出就崩", en: "Collapse With Unexpected Expenses", pattern_zh: "現金流沒有冗餘", pattern_en: "Cash flow has no slack", mechanism_zh: "系統韌性低", mechanism_en: "Low system resilience", bottleneck_zh: "Buffer不足", bottleneck_en: "Insufficient buffer", intervention_zh: "建立專用備用資金", intervention_en: "Create dedicated backup funds" },
+            { num: "34", zh: "信用卡帳單壓力", en: "Credit Card Bill Stress", pattern_zh: "消費與付款時間分離", pattern_en: "Consumption separated from payment", mechanism_zh: "未來收入提前使用", mechanism_en: "Future income used in advance", bottleneck_zh: "現金流失真", bottleneck_en: "Cash flow is dishonest", intervention_zh: "每週看一次未結帳金額", intervention_en: "Check unpaid balance weekly" },
+            { num: "35", zh: "高利負債一直存在", en: "High-Interest Debt Always There", pattern_zh: "利息持續吞噬現金流", pattern_en: "Interest keeps eating cash flow", mechanism_zh: "負向複利", mechanism_en: "Negative compound", bottleneck_zh: "債務成本高", bottleneck_en: "High debt cost", intervention_zh: "盤點利率與餘額", intervention_en: "Inventory interest rates and balances" },
+            { num: "36", zh: "想靠投資翻身", en: "Want to Reverse Situation Through Investing", pattern_zh: "本業現金流弱", pattern_en: "Weak primary income cash flow", mechanism_zh: "希望用報酬補結構問題", mechanism_en: "Hope returns fix structural issues", bottleneck_zh: "風險錯配", bottleneck_en: "Risk mismatch", intervention_zh: "先穩定現金流", intervention_en: "Stabilize cash flow first" },
+            { num: "37", zh: "追熱門股票", en: "Chasing Hot Stocks", pattern_zh: "漲了才想買", pattern_en: "Buy only after it rises", mechanism_zh: "群體訊號驅動", mechanism_en: "Herd signal driven", bottleneck_zh: "沒有投資規則", bottleneck_en: "No investing rules", intervention_zh: "投資前寫下理由", intervention_en: "Write reasons before investing" },
+            { num: "38", zh: "跌了就恐慌", en: "Panic When Prices Drop", pattern_zh: "價格變動被解讀成危險", pattern_en: "Price changes read as danger", mechanism_zh: "風險承受度與配置不符", mechanism_en: "Risk tolerance doesn't match allocation", bottleneck_zh: "配置失準", bottleneck_en: "Misallocated", intervention_zh: "降到能承受波動的程度", intervention_en: "Lower to tolerable volatility" },
+            { num: "39", zh: "一直換投資標的", en: "Always Switching Investments", pattern_zh: "短期結果控制決策", pattern_en: "Short-term results control decisions", mechanism_zh: "Noise被當Signal", mechanism_en: "Noise treated as signal", bottleneck_zh: "時間尺度太短", bottleneck_en: "Time horizon too short", intervention_zh: "設固定檢視週期", intervention_en: "Set fixed review cycles" },
+            { num: "40", zh: "只看報酬率", en: "Only Look at Returns", pattern_zh: "忽略風險、流動性與成本", pattern_en: "Ignore risk, liquidity, and costs", mechanism_zh: "單一目標函數", mechanism_en: "Single objective function", bottleneck_zh: "Risk Model不足", bottleneck_en: "Insufficient risk model", intervention_zh: "每次同時看四項", intervention_en: "Always look at four factors" },
+            { num: "41", zh: "害怕投資", en: "Afraid of Investing", pattern_zh: "把所有波動等同損失", pattern_en: "All volatility equals loss", mechanism_zh: "風險模型過度保守", mechanism_en: "Overly conservative risk model", bottleneck_zh: "金融知識不足", bottleneck_en: "Insufficient financial knowledge", intervention_zh: "先學懂再投入", intervention_en: "Learn before investing" },
+            { num: "42", zh: "太敢投資", en: "Too Eager to Invest", pattern_zh: "只看成功案例", pattern_en: "Only look at success stories", mechanism_zh: "Survivorship Bias", mechanism_en: "Survivorship Bias", bottleneck_zh: "下行風險被忽略", bottleneck_en: "Downside risk ignored", intervention_zh: "先問最壞能損失多少", intervention_en: "Ask how much you can lose worst case" },
+            { num: "43", zh: "聽朋友推薦就買", en: "Buy Based on Friend Recommendations", pattern_zh: "外包判斷", pattern_en: "Outsource judgment", mechanism_zh: "自己沒有模型", mechanism_en: "No personal model", bottleneck_zh: "Decision Ownership不足", bottleneck_en: "Insufficient decision ownership", intervention_zh: "說不清楚就不買", intervention_en: "Don't buy if you can't explain it" },
+            { num: "44", zh: "退休讓人焦慮", en: "Retirement Makes Me Anxious", pattern_zh: "不知道未來需要多少", pattern_en: "Don't know future needs", mechanism_zh: "問題沒有量化", mechanism_en: "Problem not quantified", bottleneck_zh: "Retirement Gap未知", bottleneck_en: "Retirement gap unknown", intervention_zh: "先估基本退休支出", intervention_en: "Estimate basic retirement spending first" },
+            { num: "45", zh: "為孩子花很多", en: "Spending a Lot on Kids", pattern_zh: "愛與金錢沒有邊界", pattern_en: "Love and money have no boundary", mechanism_zh: "當期支出壓縮未來安全", mechanism_en: "Current spending squeezes future safety", bottleneck_zh: "目標衝突", bottleneck_en: "Goal conflict", intervention_zh: "分開教育與退休資金", intervention_en: "Separate education and retirement funds" },
+            { num: "46", zh: "賺錢犧牲健康", en: "Trading Health for Income", pattern_zh: "收入是唯一KPI", pattern_en: "Income is only KPI", mechanism_zh: "財富目標函數過窄", mechanism_en: "Too narrow wealth objective", bottleneck_zh: "健康成本未計價", bottleneck_en: "Health costs not priced", intervention_zh: "把健康耗損列入成本", intervention_en: "Include health costs in calculations" },
+            { num: "47", zh: "賺錢犧牲家庭", en: "Trading Family for Income", pattern_zh: "所有高品質時間被工作吃掉", pattern_en: "Work consumes all quality time", mechanism_zh: "金錢擠出關係資產", mechanism_en: "Money crowds out relationship assets", bottleneck_zh: "配置失衡", bottleneck_en: "Allocation imbalance", intervention_zh: "保護固定關係時間", intervention_en: "Protect fixed relationship time" },
+            { num: "48", zh: "有錢仍不安心", en: "Rich But Still Insecure", pattern_zh: "財富被定義成數字", pattern_en: "Wealth defined as number", mechanism_zh: "安全感沒有上限", mechanism_en: "Security has no limit", bottleneck_zh: "Enough Point不存在", bottleneck_en: "No 'enough' point exists", intervention_zh: "定義『多少已經足夠』", intervention_en: "Define what 'enough' means" },
+            { num: "49", zh: "一直想賺更多", en: "Always Want to Earn More", pattern_zh: "目標不斷上移", pattern_en: "Goals keep shifting up", mechanism_zh: "Hedonic Adaptation", mechanism_en: "Hedonic Adaptation", bottleneck_zh: "沒有終點函數", bottleneck_en: "No endpoint function", intervention_zh: "定義錢要換來什麼", intervention_en: "Define what money exchanges for" },
+            { num: "50", zh: "不知道財富真正為何", en: "Don't Know What Wealth Is For", pattern_zh: "把錢當終點", pattern_en: "Money as end point", mechanism_zh: "工具變成目標", mechanism_en: "Tool becomes goal", bottleneck_zh: "目標函數錯誤", bottleneck_en: "Wrong objective function", intervention_zh: "重新定義財富", intervention_en: "Redefine wealth" }
+        ];
+        
+        function initProblems() {
+            const container = document.getElementById('problems-container');
+            problemsData.forEach(problem => {
+                const card = document.createElement('div');
+                card.className = 'problem-card';
+                card.innerHTML = `
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <span class="card-num">${problem.num}</span>
+                        <div class="card-title">
+                            <div>${problem.zh}</div>
+                            <div style="font-size: 0.8rem; color: #666; font-weight: 400; margin-top: 0.2rem;">${problem.en}</div>
+                        </div>
+                        <span class="card-toggle">▼</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="bilingual-row">
+                            <div><div class="zh-label">Pattern (規律)</div><div class="zh-text">${problem.pattern_zh}</div></div>
+                            <div><div class="en-text">${problem.pattern_en}</div></div>
+                        </div>
+                        <div class="bilingual-row">
+                            <div><div class="zh-label">Mechanism (機制)</div><div class="zh-text">${problem.mechanism_zh}</div></div>
+                            <div><div class="en-text">${problem.mechanism_en}</div></div>
+                        </div>
+                        <div class="bilingual-row">
+                            <div><div class="zh-label">Bottleneck (瓶頸)</div><div class="zh-text">${problem.bottleneck_zh}</div></div>
+                            <div><div class="en-text">${problem.bottleneck_en}</div></div>
+                        </div>
+                        <div class="bilingual-row bilingual-full">
+                            <div style="background: linear-gradient(135deg, #E6F5F0 0%, #F0F4F8 100%); padding: 1.2rem; border-radius: 6px;">
+                                <div class="zh-label" style="color: var(--teal);">Minimum Intervention</div>
+                                <div class="zh-text">${problem.intervention_zh}</div>
+                                <div class="en-text" style="margin-top: 0.8rem;">${problem.intervention_en}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function initTable() {
+            const tbody = document.getElementById('table-body');
+            problemsData.forEach(problem => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${problem.num}</td>
+                    <td><strong>${problem.zh}</strong><br><small>${problem.en}</small></td>
+                    <td>${problem.pattern_zh}</td>
+                    <td>${problem.mechanism_zh}</td>
+                    <td>${problem.bottleneck_zh}</td>
+                    <td>${problem.intervention_zh}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        function toggleCard(header) {
+            header.classList.toggle('active');
+        }
+        
+        function switchSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            event.target.closest('.nav-btn').classList.add('active');
+        }
+        
+        function playTTS(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initProblems();
+            initTable();
+            
+            // Add TTS buttons to all English text sections
+            document.querySelectorAll('.en-text').forEach((el, idx) => {
+                const text = el.textContent.trim();
+                if (text.length > 10) {
+                    const btn = document.createElement('button');
+                    btn.className = 'tts-btn';
+                    btn.textContent = '🔊';
+                    btn.title = 'Play English pronunciation';
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        playTTS(text);
+                    };
+                    el.appendChild(btn);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
