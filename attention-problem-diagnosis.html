@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注意力 × Problem Diagnosis | Attention × Problem Diagnosis</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1A2B5F;
+            --gold: #C9960C;
+            --teal: #0A7A72;
+            --light-bg: #F8F7F4;
+            --text-dark: #2C2C2C;
+            --border: #E8E6E1;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: white;
+            color: var(--text-dark);
+            line-height: 1.8;
+            display: flex;
+        }
+
+        /* SIDEBAR MENU */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--navy) 0%, rgba(26, 43, 95, 0.95) 100%);
+            color: white;
+            overflow-y: auto;
+            padding-top: 2rem;
+            z-index: 1000;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 2rem;
+            border-bottom: 2px solid var(--gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.4;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+
+        .menu-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-section-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gold);
+            padding: 0.8rem 1.5rem 0.5rem;
+            letter-spacing: 1px;
+        }
+
+        .menu-item {
+            padding: 0.7rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--gold);
+            padding-left: 1.8rem;
+        }
+
+        .menu-item.active {
+            background: rgba(201, 150, 12, 0.2);
+            border-left-color: var(--gold);
+            font-weight: 600;
+        }
+
+        .menu-item-cn {
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .menu-item-en {
+            display: block;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background: var(--navy);
+            color: white;
+            border: none;
+            padding: 0.8rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-close {
+            display: none;
+            text-align: right;
+            padding: 1rem 1.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            width: calc(100% - 280px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-bottom: 4px solid var(--gold);
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .intro-section {
+            background: var(--light-bg);
+            border-left: 4px solid var(--gold);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 4px;
+        }
+
+        .intro-section .title-cn {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        .intro-section .content-cn {
+            font-size: 1.05rem;
+            margin-bottom: 1.5rem;
+            line-height: 2;
+            letter-spacing: 0.3px;
+        }
+
+        .intro-section .content-en {
+            font-size: 0.95rem;
+            color: #555;
+            line-height: 1.9;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 100px;
+        }
+
+        .section[id] {
+            scroll-behavior: smooth;
+        }
+
+        .section-header {
+            background: var(--navy);
+            color: white;
+            padding: 1.2rem 1.5rem;
+            border-radius: 4px 4px 0 0;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.15rem;
+            font-weight: 600;
+            border-left: 4px solid var(--gold);
+            transition: background 0.3s ease;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(90deg, var(--navy), var(--teal));
+        }
+
+        .section-header .toggle-icon {
+            font-size: 1.3rem;
+            transition: transform 0.3s ease;
+        }
+
+        .section.active .section-header .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .section-content {
+            display: none;
+            padding: 2rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 0 0 4px 4px;
+            border-top: none;
+        }
+
+        .section.active .section-content {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bilingual-block {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+            align-items: start;
+        }
+
+        .bilingual-block.full {
+            grid-template-columns: 1fr;
+        }
+
+        .text-cn {
+            font-size: 1.05rem;
+            line-height: 2;
+            letter-spacing: 0.3px;
+            color: var(--text-dark);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .text-en {
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #555;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            white-space: pre-wrap;
+            word-break: break-word;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .text-en-content {
+            flex: 1;
+        }
+
+        .tts-btn {
+            flex-shrink: 0;
+            background: var(--teal);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tts-btn:hover {
+            background: var(--navy);
+            transform: translateY(-2px);
+        }
+
+        .tts-btn.playing {
+            background: var(--gold);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: var(--navy);
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        tr:nth-child(even) {
+            background: var(--light-bg);
+        }
+
+        tr:hover {
+            background: rgba(10, 122, 114, 0.05);
+        }
+
+        .card {
+            background: var(--light-bg);
+            border-left: 4px solid var(--gold);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 4px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--navy);
+            font-size: 1.05rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-content {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .formula-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .formula-box {
+            background: white;
+            border: 2px solid var(--teal);
+            border-radius: 4px;
+            padding: 1.5rem;
+        }
+
+        .formula-label {
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+        }
+
+        .formula-content {
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: #555;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .hierarchy-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .hierarchy-list li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .hierarchy-list li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .box-centered {
+            background: linear-gradient(135deg, rgba(26, 43, 95, 0.05), rgba(10, 122, 114, 0.05));
+            border: 2px solid var(--gold);
+            border-radius: 4px;
+            padding: 1.5rem;
+            text-align: center;
+            margin: 1.5rem 0;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .level-box {
+            background: white;
+            border-left: 4px solid var(--teal);
+            padding: 1rem;
+            margin: 0.8rem 0;
+            border-radius: 2px;
+        }
+
+        .level-num {
+            color: var(--gold);
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+
+        .footer {
+            background: var(--navy);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+            font-size: 0.9rem;
+            border-top: 4px solid var(--gold);
+        }
+
+        .footer-credit {
+            margin-top: 1rem;
+            opacity: 0.8;
+            font-size: 0.85rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--teal);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .back-to-top:hover {
+            background: var(--navy);
+            transform: translateY(-3px);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 250px;
+            }
+
+            .main-content {
+                margin-left: 250px;
+                width: calc(100% - 250px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                width: 80vw;
+                max-width: 280px;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .sidebar-close {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .bilingual-block {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .section-header {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .intro-section {
+                padding: 1.5rem;
+            }
+
+            .section-content {
+                padding: 1.5rem;
+            }
+
+            .table-wrapper {
+                font-size: 0.85rem;
+            }
+
+            td, th {
+                padding: 0.7rem;
+            }
+
+            .back-to-top {
+                width: 45px;
+                height: 45px;
+                bottom: 1.5rem;
+                right: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR MENU -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-close" id="sidebarClose">✕</div>
+        
+        <div class="sidebar-header">
+            <div class="sidebar-title">注意力 × Problem Diagnosis</div>
+            <div class="sidebar-subtitle">Attention Resource Allocation</div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Core Frameworks</div>
+            <div class="menu-item" data-section="intro">
+                <span class="menu-item-cn">介紹</span>
+                <span class="menu-item-en">Introduction</span>
+            </div>
+            <div class="menu-item" data-section="shared-matrix">
+                <span class="menu-item-cn">共同母體</span>
+                <span class="menu-item-en">Shared Matrix</span>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Key Tables & Data</div>
+            <div class="menu-item" data-section="50-phenomena">
+                <span class="menu-item-cn">50大現象表</span>
+                <span class="menu-item-en">50 Phenomena</span>
+            </div>
+            <div class="menu-item" data-section="essence">
+                <span class="menu-item-cn">本體層</span>
+                <span class="menu-item-en">Essence Layer</span>
+            </div>
+            <div class="menu-item" data-section="structure">
+                <span class="menu-item-cn">結構層</span>
+                <span class="menu-item-en">Structure Layer</span>
+            </div>
+            <div class="menu-item" data-section="mechanism">
+                <span class="menu-item-cn">機制層</span>
+                <span class="menu-item-en">Mechanism Layer</span>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">5 Major Rules</div>
+            <div class="menu-item" data-section="5-rules">
+                <span class="menu-item-cn">五大規律</span>
+                <span class="menu-item-en">5 Major Rules</span>
+            </div>
+            <div class="menu-item" data-section="bottleneck">
+                <span class="menu-item-cn">瓶頸與優先節點</span>
+                <span class="menu-item-en">Bottleneck & Priority</span>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Intervention & Loops</div>
+            <div class="menu-item" data-section="minimum">
+                <span class="menu-item-cn">最小介入</span>
+                <span class="menu-item-en">Min Intervention</span>
+            </div>
+            <div class="menu-item" data-section="prediction">
+                <span class="menu-item-cn">預測錯誤</span>
+                <span class="menu-item-en">Prediction Error</span>
+            </div>
+            <div class="menu-item" data-section="entropy">
+                <span class="menu-item-cn">高熵與低熵</span>
+                <span class="menu-item-en">Entropy Loops</span>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Cross-Domain</div>
+            <div class="menu-item" data-section="crossdomain">
+                <span class="menu-item-cn">跨領域應用</span>
+                <span class="menu-item-en">Cross-Domain</span>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Evolution & Frameworks</div>
+            <div class="menu-item" data-section="evolution">
+                <span class="menu-item-cn">五階進化</span>
+                <span class="menu-item-en">5-Level Evolution</span>
+            </div>
+            <div class="menu-item" data-section="algorithm">
+                <span class="menu-item-cn">High Agency算法</span>
+                <span class="menu-item-en">High Agency Algorithm</span>
+            </div>
+            <div class="menu-item" data-section="daily-5">
+                <span class="menu-item-cn">每日5問</span>
+                <span class="menu-item-en">Daily 5 Questions</span>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <div class="menu-section-title">Reference</div>
+            <div class="menu-item" data-section="formulas">
+                <span class="menu-item-cn">注意力公式</span>
+                <span class="menu-item-en">Formulas</span>
+            </div>
+            <div class="menu-item" data-section="knowledge-20">
+                <span class="menu-item-cn">20大知識庫</span>
+                <span class="menu-item-en">20 Knowledge Bases</span>
+            </div>
+            <div class="menu-item" data-section="top-10">
+                <span class="menu-item-cn">最重要10問</span>
+                <span class="menu-item-en">Top 10 Questions</span>
+            </div>
+            <div class="menu-item" data-section="final">
+                <span class="menu-item-cn">最終升維</span>
+                <span class="menu-item-en">Final Upgrade</span>
+            </div>
+        </div>
+    </div>
+
+    <button class="sidebar-toggle" id="sidebarToggle">☰ Menu</button>
+    <button class="back-to-top" id="backToTop">↑</button>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="header">
+            <h1>注意力 × Problem Diagnosis</h1>
+            <div class="subtitle">從「逼自己專心」升級成「輸入管理→瓶頸辨識→注意力配置→回饋→模型更新」</div>
+            <div class="subtitle" style="margin-top: 0.8rem; font-size: 0.95rem;">From "Force Yourself to Focus" to "Input Management → Bottleneck Diagnosis → Attention Allocation → Feedback → Model Update"</div>
+        </div>
+
+        <div class="container">
+            <!-- INTRO -->
+            <div id="intro" class="intro-section">
+                <div class="text-cn">注意力不是意志力。
+
+注意力是：
+【大腦把有限的認知資源，配置給某些訊號、任務與目標的選擇系統。】
+
+你看什麼。
+你就處理什麼。
+你反覆處理什麼。
+大腦就強化什麼。
+大腦反覆強化什麼。
+最後就容易生成你的：
+認知。
+情緒。
+習慣。
+能力。
+人格。
+人生結果。
+
+所以注意力管理不是小技巧。
+它其實是：
+【生命資源配置。】</div>
+                <div class="text-en">
+                    <div class="text-en-content">
+Attention is not willpower.
+
+Attention is:
+[The brain's selection system that allocates limited cognitive resources to certain signals, tasks, and goals.]
+
+What you look at.
+Is what you process.
+What you repeatedly process.
+Your brain reinforces.
+What your brain repeatedly reinforces.
+Eventually easily generates your:
+Cognition.
+Emotion.
+Habit.
+Ability.
+Personality.
+Life results.
+
+So attention management is not a small technique.
+It is actually:
+[Life resource allocation.]
+                    </div>
+                    <button class="tts-btn" data-text-id="intro-en">🔊 Speak</button>
+                </div>
+            </div>
+
+            <!-- SHARED MATRIX -->
+            <div id="shared-matrix" class="section active">
+                <div class="section-header">
+                    <span>共同母體 | Shared Matrix</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block full">
+                        <div class="text-cn">Input
+→Diagnosis
+→Pattern
+→Mechanism
+→Bottleneck
+→Priority Node
+→Skill
+→Minimum Intervention
+→Action
+→Feedback
+→Prediction Error
+→Model Update
+→Retest</div>
+                        <div class="text-en">
+                            <div class="text-en-content">
+Input
+→Diagnosis
+→Pattern
+→Mechanism
+→Bottleneck
+→Priority Node
+→Skill
+→Minimum Intervention
+→Action
+→Feedback
+→Prediction Error
+→Model Update
+→Retest
+                            </div>
+                            <button class="tts-btn" data-text-id="matrix">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 50 PHENOMENA TABLE -->
+            <div id="50-phenomena" class="section">
+                <div class="section-header">
+                    <span>注意力現象 × 50大場景 | 50 Attention Phenomena</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <p style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #666;">以下表格展示50個常見的注意力困境、舊模型與高解析度模型的區別、優先節點與最小介入 | The table below shows 50 common attention challenges, the difference between old and high-resolution models, priority nodes and minimum interventions</p>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>注意力現象 | Phenomenon</th>
+                                    <th>舊模型 | Old Model</th>
+                                    <th>高解析度模型 | High-Resolution Model</th>
+                                    <th>Priority Node</th>
+                                    <th>最小介入 | Min Intervention</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>01</td><td>一直滑手機</td><td>我沒自律</td><td>高刺激入口太容易</td><td>環境</td><td>手機離開視線</td></tr>
+                                <tr><td>02</td><td>一直看LINE</td><td>怕漏訊息</td><td>不確定性拉走注意力</td><td>通知</td><td>關閉非必要通知</td></tr>
+                                <tr><td>03</td><td>讀書容易分心</td><td>我不適合讀書</td><td>任務／環境可能設計不良</td><td>環境</td><td>桌面只留教材</td></tr>
+                                <tr><td>04</td><td>看書看不下去</td><td>專注力差</td><td>即時刺激閾值可能過高</td><td>刺激</td><td>先讀10分鐘</td></tr>
+                                <tr><td>05</td><td>一直換工作</td><td>我很有效率</td><td>Task Switching增加成本</td><td>單工</td><td>一次只開一個任務</td></tr>
+                                <tr><td>06</td><td>同時做很多事</td><td>我會多工</td><td>注意力其實反覆切換</td><td>Single Task</td><td>關閉其他視窗</td></tr>
+                                <tr><td>07</td><td>一直想別的事</td><td>我控制不了大腦</td><td>未完成事項持續占用資源</td><td>Capture</td><td>先寫進待辦</td></tr>
+                                <tr><td>08</td><td>工作做到一半看手機</td><td>只是休息</td><td>Reward Loop插入任務</td><td>手機</td><td>放到另一處</td></tr>
+                                <tr><td>09</td><td>上課一直看手機</td><td>課太無聊</td><td>手機刺激密度高於課堂</td><td>刺激差</td><td>集中保管</td></tr>
+                                <tr><td>10</td><td>寫作寫不出來</td><td>沒靈感</td><td>Input過多或任務太大</td><td>下一步</td><td>先寫一句</td></tr>
+                                <tr><td>11</td><td>很忙沒成果</td><td>時間不夠</td><td>注意力配置錯誤</td><td>Priority</td><td>今天只抓Top 1</td></tr>
+                                <tr><td>12</td><td>資訊收藏很多</td><td>我愛學習</td><td>收藏不等於深度處理</td><td>Output</td><td>學完輸出一句</td></tr>
+                                <tr><td>13</td><td>看很多短影音</td><td>我在吸收知識</td><td>高切換造成碎片化輸入</td><td>Input</td><td>限制短影音時段</td></tr>
+                                <tr><td>14</td><td>一直追新聞</td><td>我要掌握世界</td><td>新奇性持續搶奪注意力</td><td>Filter</td><td>固定一次查看</td></tr>
+                                <tr><td>15</td><td>很在意別人看法</td><td>我比較敏感</td><td>注意力被外部評價控制</td><td>評價</td><td>回到自己的判準</td></tr>
+                                <tr><td>16</td><td>一直想過去</td><td>我放不下</td><td>注意力反覆餵養舊模型</td><td>Trigger</td><td>標記「又出現了」</td></tr>
+                                <tr><td>17</td><td>一直擔心未來</td><td>我要先準備</td><td>Prediction占用現在資源</td><td>Reality</td><td>寫出可控制事項</td></tr>
+                                <tr><td>18</td><td>考試腦袋空白</td><td>我不會</td><td>壓力占用工作記憶</td><td>降負荷</td><td>先做最熟題</td></tr>
+                                <tr><td>19</td><td>上課聽不懂</td><td>老師講太快</td><td>前置知識可能不足</td><td>Gap</td><td>補一個關鍵概念</td></tr>
+                                <tr><td>20</td><td>單字背不住</td><td>記憶力不好</td><td>沒有提取與間隔</td><td>Retrieval</td><td>今天自測一次</td></tr>
+                                <tr><td>21</td><td>閱讀容易跳行</td><td>我粗心</td><td>注意力控制不足</td><td>節奏</td><td>一段一段讀</td></tr>
+                                <tr><td>22</td><td>作文一直卡</td><td>英文不好</td><td>同時處理內容與語言負荷過高</td><td>結構</td><td>先列中文骨架</td></tr>
+                                <tr><td>23</td><td>一直拖延</td><td>我懶</td><td>注意力避開高摩擦任務</td><td>啟動</td><td>只做5分鐘</td></tr>
+                                <tr><td>24</td><td>房間亂就不能讀</td><td>我很挑</td><td>視覺噪音占用資源</td><td>空間</td><td>清出一個桌面</td></tr>
+                                <tr><td>25</td><td>一直被打斷</td><td>我沒效率</td><td>注意力邊界不足</td><td>Boundary</td><td>設30分鐘勿擾</td></tr>
+                                <tr><td>26</td><td>工作很多</td><td>我要全部記住</td><td>工作記憶超載</td><td>External Brain</td><td>全部寫下來</td></tr>
+                                <tr><td>27</td><td>選項很多</td><td>我要找到最好</td><td>決策熵過高</td><td>Criteria</td><td>設3個判準</td></tr>
+                                <tr><td>28</td><td>每件事都重要</td><td>都不能放</td><td>Priority失效</td><td>Goal</td><td>選唯一第一名</td></tr>
+                                <tr><td>29</td><td>一直救火</td><td>工作就是這樣</td><td>緊急事項控制注意力</td><td>Prevention</td><td>找最常發生的火</td></tr>
+                                <tr><td>30</td><td>一有訊息就回</td><td>不回很失禮</td><td>外界取得你的注意力控制權</td><td>Batch</td><td>集中回覆</td></tr>
+                                <tr><td>31</td><td>社群讓我焦慮</td><td>大家都很好</td><td>注意力被比較樣本綁架</td><td>Input</td><td>取消低價值追蹤</td></tr>
+                                <tr><td>32</td><td>一直看按讚數</td><td>我要知道成效</td><td>Reward Feedback太密集</td><td>Metric</td><td>固定時間看數據</td></tr>
+                                <tr><td>33</td><td>AI一直問一直做</td><td>AI很好用</td><td>無限生成增加認知熵</td><td>Goal</td><td>先定義輸出</td></tr>
+                                <tr><td>34</td><td>APP很多</td><td>資源豐富</td><td>選擇過多增加摩擦</td><td>Navigation</td><td>只推薦下一個APP</td></tr>
+                                <tr><td>35</td><td>課程很多</td><td>越多越好</td><td>內容過量稀釋行動</td><td>Priority</td><td>一次只上一課</td></tr>
+                                <tr><td>36</td><td>點子很多</td><td>我很有創意</td><td>Idea Switching阻止完成</td><td>Execution</td><td>點子先停車</td></tr>
+                                <tr><td>37</td><td>一直修改</td><td>我要更完美</td><td>注意力停留在低邊際收益</td><td>Done</td><td>設完成標準</td></tr>
+                                <tr><td>38</td><td>休息還看手機</td><td>我在放鬆</td><td>注意力仍在高刺激輸入</td><td>Recovery</td><td>走路10分鐘</td></tr>
+                                <tr><td>39</td><td>睡前一直滑</td><td>我睡不著</td><td>刺激延長清醒循環</td><td>睡眠</td><td>手機不進床</td></tr>
+                                <tr><td>40</td><td>睡眠不足後分心</td><td>我要更努力</td><td>生理容量下降</td><td>睡眠</td><td>優先補恢復</td></tr>
+                                <tr><td>41</td><td>壓力大無法專心</td><td>我要逼自己</td><td>Threat Monitoring搶資源</td><td>Stress</td><td>先降低壓力源</td></tr>
+                                <tr><td>42</td><td>情緒不好一直想</td><td>我要想通</td><td>反芻占用注意力</td><td>Rumination</td><td>寫下事實／解讀</td></tr>
+                                <tr><td>43</td><td>關係衝突後不能工作</td><td>我太情緒化</td><td>社會威脅占用認知資源</td><td>Closure</td><td>定義下一步</td></tr>
+                                <tr><td>44</td><td>一直擔心健康</td><td>我要查清楚</td><td>搜尋可能強化威脅注意</td><td>Boundary</td><td>限制查詢時段</td></tr>
+                                <tr><td>45</td><td>做簡單事逃避重要事</td><td>至少我有做事</td><td>假生產力</td><td>Priority</td><td>先做高價值10分鐘</td></tr>
+                                <tr><td>46</td><td>上午精神最好卻回訊息</td><td>先清雜事</td><td>高品質注意力被低價值任務消耗</td><td>Peak Time</td><td>最佳時段做核心事</td></tr>
+                                <tr><td>47</td><td>下午效率差</td><td>我變懶</td><td>能量與注意力具有波動</td><td>Energy</td><td>低能量做低負荷工作</td></tr>
+                                <tr><td>48</td><td>每天都重新決定</td><td>我要有彈性</td><td>決策成本持續消耗注意力</td><td>Routine</td><td>固定一個流程</td></tr>
+                                <tr><td>49</td><td>做很多卻沒累積</td><td>我還不夠努力</td><td>注意力沒有投入複利資產</td><td>Compound</td><td>每天投一個長期節點</td></tr>
+                                <tr><td>50</td><td>想提升注意力</td><td>我要更專心</td><td>真正問題可能是系統設計</td><td>System</td><td>先改環境再練意志</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESSENCE LAYER -->
+            <div id="essence" class="section">
+                <div class="section-header">
+                    <span>本體層 | Essence Layer：注意力到底是什麼？</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block">
+                        <div class="text-cn">注意力不是：
+「我有沒有認真。」
+
+注意力更像：
+【有限認知頻寬的配置權。】
+
+一天有24小時。
+但不是24小時都具有相同品質。
+
+真正稀缺的是：
+高品質注意力。
+
+所以：
+時間管理再往上一層。
+其實是：
+【注意力管理。】</div>
+                        <div class="text-en">
+                            <div class="text-en-content">
+Attention is not:
+"Whether I'm being serious."
+
+Attention is more like:
+[The allocation authority of limited cognitive bandwidth.]
+
+There are 24 hours in a day.
+But not all 24 hours have the same quality.
+
+What is truly scarce:
+High-quality attention.
+
+Therefore:
+Time management, going up one level,
+Is actually:
+[Attention management.]
+                            </div>
+                            <button class="tts-btn" data-text-id="essence">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STRUCTURE LAYER -->
+            <div id="structure" class="section">
+                <div class="section-header">
+                    <span>結構層 | Structure Layer：注意力的10大控制器</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div style="margin-bottom: 2rem;">
+                        <div class="card">
+                            <div class="card-title">01 | 目標 | Goal</div>
+                            <div class="card-content">我現在到底要完成什麼？
+What do I need to accomplish right now?</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">02 | 重要性 | Importance</div>
+                            <div class="card-content">這件事值得多少注意力？
+How much attention does this deserve?</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">03 | 新奇性 | Novelty</div>
+                            <div class="card-content">新的東西容易搶走注意力。
+New things easily hijack attention.</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">04 | 獎賞 | Reward</div>
+                            <div class="card-content">快速回饋容易吸引注意力。
+Quick feedback easily attracts attention.</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">05 | 威脅 | Threat</div>
+                            <div class="card-content">危險訊號會優先取得注意力。
+Danger signals take priority for attention.</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">06 | 情緒 | Emotion</div>
+                            <div class="card-content">高情緒事件容易占據認知資源。
+High-emotion events easily occupy cognitive resources.</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">07 | 環境 | Environment</div>
+                            <div class="card-content">手機、通知、聲音、人物都能成為Trigger。
+Phones, notifications, sounds, people can all be triggers.</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">08 | 能量 | Energy</div>
+                            <div class="card-content">睡眠不足時注意力控制能力通常下降。
+Attention control ability usually decreases when sleep-deprived.</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">09 | Skill | Skill</div>
+                            <div class="card-content">任務太難容易逃避，太簡單容易無聊。
+Tasks too hard lead to avoidance, too easy lead to boredom.</div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">10 | 習慣 | Habit</div>
+                            <div class="card-content">反覆配置注意力後，行為逐漸自動化。
+After repeated attention allocation, behavior gradually automates.</div>
+                        </div>
+                    </div>
+
+                    <div class="box-centered">
+所以注意力不是單一變數。
+而是一個：
+【Goal × Reward × Threat × Environment × Energy × Habit】的動態系統。
+
+So attention is not a single variable.
+But a dynamic system of:
+【Goal × Reward × Threat × Environment × Energy × Habit】
+                    </div>
+                </div>
+            </div>
+
+            <!-- MECHANISM LAYER -->
+            <div id="mechanism" class="section">
+                <div class="section-header">
+                    <span>機制層 | Mechanism Layer：注意力如何被生成？</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block">
+                        <div class="text-cn">外界有大量Input。
+↓
+大腦不可能全部處理。
+↓
+開始Filter。
+↓
+什麼最重要？
+什麼最新奇？
+什麼最危險？
+什麼最有獎賞？
+↓
+部分訊號進入注意。
+↓
+工作記憶開始處理。
+↓
+反覆處理。
+↓
+形成學習與記憶。
+↓
+形成Pattern。
+↓
+形成Prediction。
+↓
+影響下一次注意。
+
+因此：
+【你注意什麼，會改變你未來更容易注意什麼。】
+
+這是一個Feedback Loop。</div>
+                        <div class="text-en">
+                            <div class="text-en-content">
+There is massive input from the world.
+↓
+The brain cannot process all of it.
+↓
+It begins to filter.
+↓
+What's most important?
+What's most novel?
+What's most dangerous?
+What's most rewarding?
+↓
+Some signals enter attention.
+↓
+Working memory begins processing.
+↓
+Repeated processing.
+↓
+Forms learning and memory.
+↓
+Forms pattern.
+↓
+Forms prediction.
+↓
+Influences next attention.
+
+Therefore:
+【What you attend to changes what you'll more easily attend to in the future.】
+
+This is a feedback loop.
+                            </div>
+                            <button class="tts-btn" data-text-id="mechanism">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 MAJOR RULES -->
+            <div id="5-rules" class="section">
+                <div class="section-header">
+                    <span>注意力5大規律 | 5 Major Attention Rules</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="card" style="border-left-color: var(--teal);">
+                        <div class="card-title">第一大規律 | First Rule：注意力是有限資源</div>
+                        <div class="card-content" style="font-size: 0.95rem;">你不可能：同時深度閱讀、同時認真回LINE、同時看影片、同時寫作文、還保持完全相同的處理品質。
+
+很多所謂Multitasking。其實是：Task A → 切換 → Task B → 切換 → Task C。
+
+注意力一直重新載入Context。
+
+所以：【多工最大的隱形成本不是時間，而是切換。】
+
+---
+
+You cannot simultaneously: do deep reading, seriously reply to messages, watch videos, write essays, while maintaining identical processing quality. Much so-called multitasking is actually: Task A → Switch → Task B → Switch → Task C. Attention constantly reloads context. Therefore: 【The biggest hidden cost of multitasking is not time, but switching.】</div>
+                    </div>
+
+                    <div class="card" style="border-left-color: var(--teal);">
+                        <div class="card-title">第二大規律 | Second Rule：高刺激會改變比較基準</div>
+                        <div class="card-content" style="font-size: 0.95rem;">短影音：幾秒一個刺激。遊戲：快速Feedback。社群：不斷新內容。課本：一頁可能要讀10分鐘。
+
+當大腦習慣高密度刺激。低刺激但高價值活動就容易感覺：「好無聊。」
+
+這不代表：讀書真的沒有價值。
+
+而是：【Reward Baseline不同。】
+
+所以恢復注意力的一部分不是：逼自己更努力。而是：降低不必要的高刺激輸入。
+
+---
+
+Short videos: stimulus every few seconds. Games: fast feedback. Social: constant new content. Textbooks: a page might take 10 minutes. When the brain gets used to high-density stimulation, low-stimulus but high-value activities feel "so boring." This does not mean reading has no value. But: 【Reward baselines differ.】 So recovering attention involves not just forcing yourself harder. But lowering unnecessary high-stimulus input.</div>
+                    </div>
+
+                    <div class="card" style="border-left-color: var(--teal);">
+                        <div class="card-title">第三大規律 | Third Rule：威脅會綁架注意力</div>
+                        <div class="card-content" style="font-size: 0.95rem;">主管的一句話、伴侶的一個表情、考試的一次低分、身體的一個症狀。都可能讓注意力反覆回去。
+
+因為大腦優先問：「這會不會有危險？」
+
+所以：注意力問題有時不是：不專心。
+
+而是：【注意力正在非常努力地監控另一個威脅。】
+
+這時真正Priority Node可能是：壓力、情緒、關係、健康。
+
+而不是再買一本時間管理書。
+
+---
+
+A boss's comment, a partner's expression, a low test score, a body symptom. All can make attention repeatedly loop back. Because the brain's first question: "Is there danger here?" So: attention problems sometimes aren't lack of focus. But: 【Attention is working very hard monitoring a threat.】 The real priority node might be: stress, emotion, relationships, health. Not buying another time management book.</div>
+                    </div>
+
+                    <div class="card" style="border-left-color: var(--teal);">
+                        <div class="card-title">第四大規律 | Fourth Rule：環境通常比意志力便宜</div>
+                        <div class="card-content" style="font-size: 0.95rem;">手機放桌上 → 看到手機 → 產生Cue → 想到訊息 → 注意力被拉走。
+
+更高階不是：「我要忍住。」
+
+而是：手機放遠 → Cue消失 → 需要抵抗的次數下降。
+
+這就是：【Environment Design。】
+
+最好的自律系統不是：每天贏過誘惑100次。
+
+而是：【讓誘惑少出現90次。】
+
+---
+
+Phone on desk → see phone → cue appears → think of messages → attention pulled away. Higher level isn't: "I must resist." But: phone placed far away → cue disappears → resistance moments decrease. This is: 【Environment design.】 The best discipline system isn't resisting temptation 100 times daily. But: 【Making temptation appear 90 fewer times.】</div>
+                    </div>
+
+                    <div class="card" style="border-left-color: var(--teal);">
+                        <div class="card-title">第五大規律 | Fifth Rule：清楚會降低注意力熵</div>
+                        <div class="card-content" style="font-size: 0.95rem;">「我要讀英文。」太模糊。大腦還要決定：讀哪裡？讀多久？先做什麼？做到什麼算完成？每一個都是Decision Cost。
+
+改成：「19:30開始，做學測閱讀第1篇，限時12分鐘，完成後訂正。」
+
+注意力成本立刻下降。
+
+所以：【模糊目標製造熵，具體下一步降低熵。】
+
+---
+
+"I need to read English" is too vague. The brain must decide: read where? How long? What first? When done? Each is decision cost. Changed to: "Start at 7:30pm, do college entrance exam reading passage 1, 12-minute limit, review after completion." Attention cost drops immediately. Therefore: 【Vague goals create entropy; concrete next steps lower entropy.】</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BOTTLENECK & PRIORITY -->
+            <div id="bottleneck" class="section">
+                <div class="section-header">
+                    <span>最大Bottleneck與Priority Node | Bottleneck & Priority Node</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block">
+                        <div class="text-cn">注意力最大的Bottleneck
+
+很多人以為：注意力不夠。
+
+其實可能是：
+目標太多。
+手機太近。
+通知太多。
+睡眠不足。
+任務太大。
+能力不足。
+情緒未處理。
+環境太亂。
+工作記憶超載。
+沒有Priority。
+沒有停止規則。
+沒有恢復。
+
+所以真正問題不是：
+「怎麼讓自己更專心？」
+
+而是：
+【到底是什麼正在搶走注意力？】</div>
+                        <div class="text-en">
+                            <div class="text-en-content">
+Attention's Biggest Bottleneck
+
+Many think:
+Not enough attention.
+
+But it might actually be:
+Too many goals.
+Phone too close.
+Too many notifications.
+Insufficient sleep.
+Tasks too large.
+Ability insufficient.
+Emotions unprocessed.
+Environment messy.
+Working memory overloaded.
+No priority.
+No stopping rules.
+No recovery.
+
+So the real problem isn't:
+"How can I focus more?"
+
+But:
+【What is actually hijacking my attention?】
+                            </div>
+                            <button class="tts-btn" data-text-id="bottleneck">🔊 Speak</button>
+                        </div>
+                    </div>
+
+                    <div class="bilingual-block">
+                        <div class="text-cn">注意力 × Priority Node
+
+例如學生：
+英文讀不下去。
+↓
+每天滑手機5小時。
+↓
+晚上1點睡。
+↓
+白天疲累。
+↓
+上課分心。
+↓
+聽不懂。
+↓
+回家更不想讀。
+↓
+繼續滑手機。
+
+看起來有很多問題。
+手機。睡眠。英文。專注。拖延。成績。
+
+但Priority Node可能只有一個：
+【晚上手機停止時間。】
+
+一個節點改變。
+可能同時改善：
+睡眠。能量。上課注意。學習效率。情緒。
+
+這才叫：
+High Leverage。</div>
+                        <div class="text-en">
+                            <div class="text-en-content">
+Attention × Priority Node
+
+Example: a student.
+Can't read English.
+↓
+Scrolls phone 5 hours daily.
+↓
+Sleeps at 1am.
+↓
+Tired during day.
+↓
+Distracted in class.
+↓
+Doesn't understand.
+↓
+Doesn't want to study at home.
+↓
+Continues scrolling.
+
+Seems like many problems.
+Phone. Sleep. English. Focus. Procrastination. Grades.
+
+But priority node might be just one:
+【Phone shutdown time at night.】
+
+One node changes.
+Might simultaneously improve:
+Sleep. Energy. Class focus. Learning efficiency. Mood.
+
+That's:
+High leverage.
+                            </div>
+                            <button class="tts-btn" data-text-id="priority">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MINIMUM INTERVENTION -->
+            <div id="minimum" class="section">
+                <div class="section-header">
+                    <span>最小介入法則 | Minimum Intervention Principle</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block full">
+                        <div style="font-size: 0.95rem;">
+                            <div class="text-cn" style="margin-bottom: 2rem;">不要：我要戒手機。
+改成：讀書時手機離開房間20分鐘。
+
+不要：我要每天專心3小時。
+改成：先完成15分鐘單工。
+
+不要：我要停止分心。
+改成：每次分心只記一個「正」字。
+
+不要：我要整理所有事情。
+改成：把腦中的待辦全部倒到一張紙。
+
+不要：我要提升工作效率。
+改成：明天第一個小時不開LINE。
+
+真正的改變通常不是：巨大決心。
+
+而是：
+【降低下一個正確行動的摩擦。】</div>
+                            <div class="text-en" style="font-size: 0.85rem; color: #666;">Don't say: "I need to quit my phone."
+Do this: "Keep phone out of room while studying, 20 minutes."
+
+Don't say: "I'll focus 3 hours daily."
+Do this: "First complete 15 minutes of single-tasking."
+
+Don't say: "I'll stop distractions."
+Do this: "Mark a '✓' each time I get distracted."
+
+Don't say: "I'll organize everything."
+Do this: "Pour all to-dos from my head onto one sheet."
+
+Don't say: "I'll boost work efficiency."
+Do this: "Don't open messaging apps in the first hour tomorrow."
+
+Real change usually isn't:
+Massive willpower.
+
+But:
+【Reducing friction for the next right action.】</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PREDICTION ERROR -->
+            <div id="prediction" class="section">
+                <div class="section-header">
+                    <span>預測錯誤與模型更新 | Prediction Error & Model Update</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div class="card">
+                            <div class="card-title">Prediction Error 1</div>
+                            <div class="card-content">Prediction：「手機放旁邊，我不看就好。」
+Reality：30分鐘看了8次。
+↓ Prediction Error
+Update：環境比意志力重要。
+
+---
+
+Prediction: "Phone beside me, I just won't look."
+Reality: Checked it 8 times in 30 minutes.
+Update: Environment matters more than willpower.</div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">Prediction Error 2</div>
+                            <div class="card-content">Prediction：「我今天要讀4小時。」
+Reality：拖到晚上都沒開始。
+↓ Prediction Error
+Update：目標太大造成啟動摩擦。
+
+---
+
+Prediction: "I'll study 4 hours today."
+Reality: Kept procrastinating, didn't start.
+Update: Goal too large creates startup friction.</div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">Prediction Error 3</div>
+                            <div class="card-content">Prediction：「同時回訊息不會影響工作。」
+Reality：一上午核心工作沒完成。
+↓ Prediction Error
+Update：切換成本被低估。
+
+---
+
+Prediction: "Replying to messages won't affect my work."
+Reality: Didn't complete core work all morning.
+Update: Switching costs underestimated.</div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">Prediction Error 4</div>
+                            <div class="card-content">Prediction：「看短影音是在休息。」
+Reality：看完更停不下來。
+↓ Prediction Error
+Update：刺激不等於恢復。
+
+---
+
+Prediction: "Watching short videos is resting."
+Reality: Can't stop after watching.
+Update: Stimulation ≠ recovery.</div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">Prediction Error 5</div>
+                            <div class="card-content">Prediction：「我就是沒有專注力。」
+Reality：睡飽後工作效率明顯改善。
+↓ Prediction Error
+Update：人格問題可能其實是狀態問題。
+
+---
+
+Prediction: "I just lack focus ability."
+Reality: Efficiency obviously improves after good sleep.
+Update: Personality problem might actually be state problem.</div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-title">Prediction Error 6</div>
+                            <div class="card-content">Prediction：「我要知道更多才會進步。」
+Reality：收藏越多越不知道做什麼。
+↓ Prediction Error
+Update：需要的不是More Input。
+而是：【Better Selection ＋ More Output。】
+
+---
+
+Prediction: "I need to know more to improve."
+Reality: The more I collect, the less I know what to do.
+Update: Doesn't need more input.
+But: 【Better selection + more output.】</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ENTROPY LOOPS -->
+            <div id="entropy" class="section">
+                <div class="section-header">
+                    <span>高熵與低熵迴圈 | High-Entropy vs Low-Entropy Loops</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block">
+                        <div class="text-cn">注意力 × 高熵Loop
+
+通知 → 查看 → 新資訊 → 再點一個連結 → 另一個訊息 → 想到另一件事 → 切換APP → 忘記原本任務 → 重新找回Context → 疲累 → 核心工作拖延 → 壓力增加 → 更想找快速刺激 → 繼續滑手機。
+
+形成：
+【Attention Entropy Loop。】</div>
+                        <div class="text-en">
+                            <div class="text-en-content">
+Attention × High-Entropy Loop
+
+Notification → Check it → New information → Click another link → Another message → Remember another thing → Switch apps → Forget original task → Reload context → Exhausted → Core work delayed → Stress increases → Crave quick stimulus → Keep scrolling.
+
+Creates:
+【Attention entropy loop.】
+                            </div>
+                            <button class="tts-btn" data-text-id="entropy-high">🔊 Speak</button>
+                        </div>
+                    </div>
+
+                    <div class="bilingual-block">
+                        <div class="text-cn">注意力 × 低熵Loop
+
+Goal → Priority → Environment → Single Task → Focus Block → 完成 → Recovery → Feedback → Prediction Error → Update → 下一次更精準配置。
+
+這叫：
+【Attention Control Loop。】</div>
+                        <div class="text-en">
+                            <div class="text-en-content">
+Attention × Low-Entropy Loop
+
+Goal → Priority → Environment → Single task → Focus block → Complete → Recovery → Feedback → Prediction error → Update → Next allocation more precise.
+
+This is:
+【Attention control loop.】
+                            </div>
+                            <button class="tts-btn" data-text-id="entropy-low">🔊 Speak</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CROSSCUTTING THEMES (shortened for demo) -->
+            <div id="crossdomain" class="section">
+                <div class="section-header">
+                    <span>注意力 × 跨領域應用 | Attention × Cross-Domain Applications</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="card">
+                        <div class="card-title">注意力 × 時間 | Attention × Time</div>
+                        <div class="card-content">低階時間管理：把行程塞滿。高階時間管理：把高品質注意力放到高價值工作。不要只管理時間，要匹配任務與注意力品質。</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">注意力 × 學習 | Attention × Learning</div>
+                        <div class="card-content">學習效能：不是Study Time。而是：【有效注意 × 正確策略 × Retrieval × Feedback。】</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">注意力 × 手機 | Attention × Phone</div>
+                        <div class="card-content">真正手機自律不是不用手機。而是：【從被Cue控制，變成由Goal控制。】</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">注意力 × 情緒 | Attention × Emotion</div>
+                        <div class="card-content">注意力不是單純看見世界，而是在參與生成你所經驗的世界。</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">注意力 × 關係 | Attention × Relationships</div>
+                        <div class="card-content">高品質關係的核心資源：Undivided Attention。10分鐘真正專心 > 2小時滑手機陪伴。</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">注意力 × 工作 | Attention × Work</div>
+                        <div class="card-content">真正高效不是反應速度最快。而是：【最重要的工作能不能取得最好的注意力。】</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">注意力 × AI | Attention × AI</div>
+                        <div class="card-content">AI時代核心能力：【Attention Allocation。】不是我能生成多少。而是【什麼值得進入我的認知系統？】</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">注意力 × 財富 | Attention × Wealth</div>
+                        <div class="card-content">更高階財富管理：也要問【我的注意力每天被誰拿走？】</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">注意力 × 使命 | Attention × Mission</div>
+                        <div class="card-content">使命最大功能：【幫你決定什麼不值得注意。】使命越清楚，注意力熵通常越低。</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5-LEVEL EVOLUTION -->
+            <div id="evolution" class="section">
+                <div class="section-header">
+                    <span>注意力五階進化 | 5-Level Attention Evolution</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block full">
+                        <div>
+                            <div class="level-box"><span class="level-num">Level 1：被動型 | Passive</span><span>什麼出現，我就看什麼。 | Whatever appears, I look at it.</span></div>
+                            <div class="level-box" style="text-align: center; border: none; background: none;">↓</div>
+                            <div class="level-box"><span class="level-num">Level 2：抑制型 | Inhibitory</span><span>誘惑出現，我努力忍住。 | Temptation appears, I try to resist.</span></div>
+                            <div class="level-box" style="text-align: center; border: none; background: none;">↓</div>
+                            <div class="level-box"><span class="level-num">Level 3：環境型 | Environmental</span><span>提前移除干擾。 | Proactively remove distractions.</span></div>
+                            <div class="level-box" style="text-align: center; border: none; background: none;">↓</div>
+                            <div class="level-box"><span class="level-num">Level 4：配置型 | Allocative</span><span>最好的注意力給最重要的事情。 | Best attention for most important things.</span></div>
+                            <div class="level-box" style="text-align: center; border: none; background: none;">↓</div>
+                            <div class="level-box"><span class="level-num">Level 5：生成型 | Generative</span><span>注意力持續投入：學習、能力、健康、關係、使命、複利資產。 | Attention continuously invested in learning, ability, health, relationships, mission, compounding assets. 【注意力開始生成你想成為的人。】</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HIGH AGENCY ALGORITHM -->
+            <div id="algorithm" class="section">
+                <div class="section-header">
+                    <span>注意力High Agency Algorithm | High Agency Algorithm</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block full">
+                        <ul class="hierarchy-list" style="list-style: none; padding: 0;">
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>Input：</strong>現在什麼正在取得我的注意力？| What is currently capturing my attention?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Diagnosis：</strong>它是目標導向，還是刺激導向？| Is it goal-oriented or stimulus-driven?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Pattern：</strong>我通常什麼時候分心？| When do I usually get distracted?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Trigger：</strong>什麼訊號啟動它？| What signal triggers it?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Mechanism：</strong>Reward？Threat？Boredom？Fatigue？Uncertainty？Habit？</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Bottleneck：</strong>真正限制專注的是什麼？| What truly limits focus?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Priority Node：</strong>現在改哪一點最有效？| Which point to change for most effect?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Skill：</strong>需要什麼能力？| What skill is needed?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Minimum Intervention：</strong>最小改變是什麼？| What's the minimum change?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Action → Focus → Output → Feedback →</strong></li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Prediction Error：</strong>我原本以為什麼？實際發生什麼？| What did I assume? What actually happened?</li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Model Update → Environment Update → Retest →</strong></li>
+                            <li style="padding-left: 0; margin-bottom: 1rem;"><strong>↓ Attention Control & Agency提升 | Increased Attention Control & Agency</strong></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DAILY 5 QUESTIONS -->
+            <div id="daily-5" class="section">
+                <div class="section-header">
+                    <span>注意力每日5問 | Daily Attention 5 Questions</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div>
+                            <div class="card" style="border-left-color: var(--gold);">
+                                <div class="card-title">01</div>
+                                <div class="card-content">今天我的注意力主要流向哪裡？ | Where did my attention mainly flow today?</div>
+                            </div>
+                            <div class="card" style="border-left-color: var(--gold);">
+                                <div class="card-title">02</div>
+                                <div class="card-content">哪件事拿走最多注意力，卻沒有創造相應價值？ | What took most attention but created no value?</div>
+                            </div>
+                            <div class="card" style="border-left-color: var(--gold);">
+                                <div class="card-title">03</div>
+                                <div class="card-content">今天最高品質的一小時給了什麼？ | What got my best hour today?</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="card" style="border-left-color: var(--teal);">
+                                <div class="card-title">04</div>
+                                <div class="card-content">現在最大的Attention Bottleneck是什麼？ | What's my biggest attention bottleneck right now?</div>
+                            </div>
+                            <div class="card" style="border-left-color: var(--teal);">
+                                <div class="card-title">05</div>
+                                <div class="card-content">明天只改哪一個節點？ | Which one node to change tomorrow?</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMULAS -->
+            <div id="formulas" class="section">
+                <div class="section-header">
+                    <span>注意力公式 | Attention Formulas</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="formula-grid">
+                        <div class="formula-box">
+                            <div class="formula-label">注意力效能 | Efficiency</div>
+                            <div class="formula-content">≈有效輸出 ÷ 注意力耗損
+≈ Effective Output ÷ Attention Loss</div>
+                        </div>
+                        <div class="formula-box">
+                            <div class="formula-label">深度工作品質 | Deep Work</div>
+                            <div class="formula-content">≈注意力品質 × 連續時間 × 任務匹配度
+≈ Quality × Duration × Match</div>
+                        </div>
+                        <div class="formula-box">
+                            <div class="formula-label">注意力熵 | Entropy</div>
+                            <div class="formula-content">≈通知 ＋切換 ＋未完成 ＋噪音 ＋資訊過載
+≈ Notifications + Switching + Incomplete + Noise + Overload</div>
+                        </div>
+                        <div class="formula-box">
+                            <div class="formula-label">注意力控制力 | Control</div>
+                            <div class="formula-content">≈目標清晰 × 環境設計 × 抑制能力 × 能量狀態
+≈ Clarity × Design × Inhibition × Energy</div>
+                        </div>
+                        <div class="formula-box">
+                            <div class="formula-label">學習效能 | Learning</div>
+                            <div class="formula-content">≈注意力 × 理解 × 提取 × Feedback × 更新
+≈ Attention × Understanding × Retrieval × Feedback × Update</div>
+                        </div>
+                        <div class="formula-box">
+                            <div class="formula-label">注意力複利 | Compounding</div>
+                            <div class="formula-content">≈高價值注意力 × 持續時間 × 正確方向
+≈ High-Value Attention × Duration × Direction</div>
+                        </div>
+                    </div>
+
+                    <div class="box-centered" style="margin-top: 2rem;">
+                        人生輸出不只取決於：你有多少時間。
+更取決於：【你的高品質注意力長期流向哪裡。】
+
+Life output depends not just on: time available.
+But more on: 【Where high-quality attention flows long-term.】
+                    </div>
+                </div>
+            </div>
+
+            <!-- KNOWLEDGE BASE 20 -->
+            <div id="knowledge-20" class="section">
+                <div class="section-header">
+                    <span>注意力APP 20大知識庫 | 20 Knowledge Bases</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+                        <div class="card" style="margin: 0;">01｜注意力類型庫</div>
+                        <div class="card" style="margin: 0;">02｜分心Trigger庫</div>
+                        <div class="card" style="margin: 0;">03｜手機刺激庫</div>
+                        <div class="card" style="margin: 0;">04｜短影音Loop庫</div>
+                        <div class="card" style="margin: 0;">05｜學習注意庫</div>
+                        <div class="card" style="margin: 0;">06｜工作注意庫</div>
+                        <div class="card" style="margin: 0;">07｜情緒注意庫</div>
+                        <div class="card" style="margin: 0;">08｜壓力注意庫</div>
+                        <div class="card" style="margin: 0;">09｜睡眠注意庫</div>
+                        <div class="card" style="margin: 0;">10｜環境設計庫</div>
+                        <div class="card" style="margin: 0;">11｜Deep Work庫</div>
+                        <div class="card" style="margin: 0;">12｜Task Switching庫</div>
+                        <div class="card" style="margin: 0;">13｜Decision Fatigue庫</div>
+                        <div class="card" style="margin: 0;">14｜Priority庫</div>
+                        <div class="card" style="margin: 0;">15｜Focus Skill庫</div>
+                        <div class="card" style="margin: 0;">16｜Minimum Intervention庫</div>
+                        <div class="card" style="margin: 0;">17｜Bottleneck庫</div>
+                        <div class="card" style="margin: 0;">18｜Prediction Error庫</div>
+                        <div class="card" style="margin: 0;">19｜Model Update庫</div>
+                        <div class="card" style="margin: 0;">20｜Attention Compounding庫</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOP 10 QUESTIONS -->
+            <div id="top-10" class="section">
+                <div class="section-header">
+                    <span>注意力最重要的10問 | Top 10 Attention Questions</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div style="display: grid; gap: 1rem;">
+                        <div class="card" style="margin: 0;">01 | 現在真正值得我注意的是什麼？| What truly deserves my attention now?</div>
+                        <div class="card" style="margin: 0;">02 | 現在什麼正在搶走我的注意力？| What is stealing my attention right now?</div>
+                        <div class="card" style="margin: 0;">03 | 這是Goal還是Trigger在控制我？| Is goal or trigger controlling me?</div>
+                        <div class="card" style="margin: 0;">04 | 我分心的Pattern是什麼？| What's my distraction pattern?</div>
+                        <div class="card" style="margin: 0;">05 | 真正Mechanism是刺激、壓力、疲勞還是逃避？| Stimulus, stress, fatigue, or avoidance?</div>
+                        <div class="card" style="margin: 0;">06 | 最大的Bottleneck在哪？| Where's the biggest bottleneck?</div>
+                        <div class="card" style="margin: 0;">07 | 哪個環境改變可以降低最多摩擦？| Which environment change reduces most friction?</div>
+                        <div class="card" style="margin: 0;">08 | 今天最小介入是什麼？| What's today's minimum intervention?</div>
+                        <div class="card" style="margin: 0;">09 | 實際結果和原本Prediction差在哪？| Where does reality differ from prediction?</div>
+                        <div class="card" style="margin: 0;">10 | 下一輪如何重新配置注意力？| How to reallocate attention next round?</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINAL SYNTHESIS -->
+            <div id="final" class="section">
+                <div class="section-header">
+                    <span>注意力的最終升維 | Final Attention Upgrade</span>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                    <div class="bilingual-block full">
+                        <div style="font-size: 0.95rem;">
+                            <div class="text-cn" style="margin-bottom: 2rem;">真正的注意力管理：
+不是把自己逼到永遠不分心。
+而是：【分心後能快速回來。】
+
+真正的專注：
+不是把世界全部關掉。
+而是：【知道現在什麼最值得進入你的有限頻寬。】
+
+真正的自律：
+不是一直跟誘惑戰鬥。
+而是：【把環境設計到不需要一直戰鬥。】
+
+真正的自由：
+不是想看什麼就看什麼。
+而是：【你可以決定什麼值得得到你的生命。】
+
+最後一句：
+【你的人生不只由你擁有多少時間決定，更由你把最好的注意力，長期交給了什麼決定。】</div>
+                            <div class="text-en" style="font-size: 0.85rem; color: #666;">True attention management: Not forcing yourself never to distract. But: 【Returning quickly after distraction.】
+
+True focus: Not shutting out the whole world. But: 【Knowing what now deserves your limited bandwidth.】
+
+True discipline: Not fighting temptation constantly. But: 【Designing environment so fighting isn't needed.】
+
+True freedom: Not watching whatever you want. But: 【Deciding what deserves your life.】
+
+Last thought: 【Your life is determined not just by how much time you have, but by what you consistently give your best attention to.】</div>
+                        </div>
+                    </div>
+
+                    <div class="box-centered" style="margin-top: 2rem;">
+                        最終母體 | Final Matrix：
+Input → Filter → Attention → Diagnosis → Pattern → Trigger → Mechanism → Bottleneck → Priority Node → Skill → Minimum Intervention → Action → Focus → Output → Feedback → Prediction Error → Model Update → Retest → Agency → Compounding
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <strong>注意力 × Problem Diagnosis | Attention × Problem Diagnosis</strong>
+            <div style="margin-top: 1rem; font-size: 0.9rem;">從「逼自己專心」升級成「輸入管理→瓶頸辨識→注意力配置→回饋→模型更新」</div>
+            <div class="footer-credit">© 2026 | Compiled by 王欣蓉 Anne Wang | bilingual.app.attention.with.menu</div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        sidebarClose.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+
+        // Menu item click
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const sectionId = item.dataset.section;
+                const section = document.getElementById(sectionId);
+                
+                if (section) {
+                    // Close sidebar on mobile
+                    sidebar.classList.remove('active');
+                    
+                    // Open section if closed
+                    if (!section.classList.contains('active')) {
+                        section.classList.add('active');
+                    }
+                    
+                    // Scroll to section
+                    setTimeout(() => {
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                    
+                    // Update active menu item
+                    document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Expand/collapse sections
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const section = header.closest('.section');
+                section.classList.toggle('active');
+            });
+        });
+
+        // Back to top button
+        const backToTop = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // TTS functionality
+        const ttsButtons = document.querySelectorAll('.tts-btn');
+        let currentUtterance = null;
+
+        ttsButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                if (currentUtterance) {
+                    speechSynthesis.cancel();
+                    ttsButtons.forEach(btn => btn.classList.remove('playing'));
+                }
+
+                const textId = button.dataset.textId;
+                let textContent = '';
+
+                if (textId === 'intro-en') {
+                    textContent = `Attention is not willpower. Attention is: The brain's selection system that allocates limited cognitive resources to certain signals, tasks, and goals. What you look at is what you process. What your brain reinforces becomes what it easily generates: cognition, emotion, habit, ability, personality, and life results. So attention management is not a small technique. It is: Life resource allocation.`;
+                } else if (textId === 'matrix') {
+                    textContent = 'Input, Diagnosis, Pattern, Mechanism, Bottleneck, Priority Node, Skill, Minimum Intervention, Action, Feedback, Prediction Error, Model Update, Retest';
+                } else if (textId === 'essence') {
+                    textContent = `Attention is not willpower. Attention is the allocation authority of limited cognitive bandwidth. There are 24 hours in a day, but not all have the same quality. What is truly scarce is high-quality attention. Time management, going up one level, is actually: Attention management.`;
+                } else if (textId === 'mechanism') {
+                    textContent = `There is massive input from the world. The brain filters it by asking: what's most important? Most novel? Most dangerous? Most rewarding? Some signals enter attention. Working memory processes them repeatedly, forming learning, memory, pattern, and prediction. Therefore: what you attend to changes what you'll easily attend to in the future. This is a feedback loop.`;
+                } else if (textId === 'bottleneck') {
+                    textContent = `Attention's biggest bottleneck. Many think: not enough attention. But it might be: too many goals, phone too close, too many notifications, insufficient sleep, tasks too large, emotions unprocessed, environment messy, working memory overloaded, no priority, no stopping rules, no recovery. So the real problem isn't: how can I focus more? But: what is hijacking my attention?`;
+                } else if (textId === 'priority') {
+                    textContent = `Example: a student can't read English, scrolls phone 5 hours daily, sleeps at 1am, is tired during day, distracted in class, doesn't understand, doesn't want to study at home, continues scrolling. Seems like many problems: phone, sleep, English, focus, procrastination, grades. But priority node might be just one: phone shutdown time at night. One node changes might improve: sleep, energy, class focus, learning efficiency, mood. That's high leverage.`;
+                } else if (textId === 'entropy-high') {
+                    textContent = `Attention entropy loop. Notification appears, you check it, new information appears, you click another link, another message comes, you remember something else, switch apps, forget original task, reload context, get exhausted, core work gets delayed, stress increases, you crave quick stimulus, keep scrolling. This creates: attention entropy loop.`;
+                } else if (textId === 'entropy-low') {
+                    textContent = `Attention control loop. Goal, priority, environment, single task, focus block, complete, recovery, feedback, prediction error, update, next allocation more precise. This is: attention control loop.`;
+                }
+
+                if (textContent) {
+                    button.classList.add('playing');
+                    currentUtterance = new SpeechSynthesisUtterance(textContent);
+                    currentUtterance.lang = 'en-US';
+                    currentUtterance.rate = 0.85;
+                    currentUtterance.pitch = 1;
+                    
+                    currentUtterance.onend = () => {
+                        button.classList.remove('playing');
+                    };
+                    
+                    speechSynthesis.speak(currentUtterance);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
