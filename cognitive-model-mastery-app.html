@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>認知 × Problem Diagnosis | Cognitive Model Mastery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --navy: #1A2B5F;
+            --gold: #C9960C;
+            --teal: #0A7A72;
+            --light-bg: #f8f7f5;
+            --border: #e0dcd6;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+            background: white;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--teal) 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--gold);
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        header p {
+            font-size: 18px;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+        
+        .author {
+            font-size: 14px;
+            margin-top: 12px;
+            opacity: 0.8;
+        }
+        
+        nav {
+            background: var(--light-bg);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        nav li {
+            flex: 1;
+            min-width: 140px;
+        }
+        
+        nav button {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--navy);
+            transition: 0.3s;
+        }
+        
+        nav button:hover, nav button.active {
+            background: var(--gold);
+            color: white;
+            border-color: var(--gold);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .section h2 {
+            color: var(--navy);
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--gold);
+            padding-bottom: 10px;
+        }
+        
+        .bilingual-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--teal);
+        }
+        
+        .zh, .en {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .zh-label, .en-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .zh-text, .en-text {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+        
+        .en-text {
+            position: relative;
+        }
+        
+        .tts-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background: var(--teal);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: 0.2s;
+            width: fit-content;
+        }
+        
+        .tts-btn:hover {
+            background: var(--navy);
+        }
+        
+        .tts-btn.playing {
+            background: var(--gold);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        th {
+            background: var(--navy);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tr:hover {
+            background: var(--light-bg);
+        }
+        
+        .problem-id {
+            color: var(--gold);
+            font-weight: 600;
+            width: 30px;
+        }
+        
+        .zh-cell {
+            color: var(--navy);
+            font-weight: 500;
+        }
+        
+        .en-cell {
+            color: #555;
+            font-size: 13px;
+        }
+        
+        .expandable {
+            cursor: pointer;
+            background: white;
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+        
+        .expandable:hover {
+            border-color: var(--gold);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .expandable h4 {
+            color: var(--navy);
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+        }
+        
+        .expandable.expanded h4::after {
+            content: "−";
+        }
+        
+        .expandable h4::after {
+            content: "+";
+            font-size: 20px;
+            color: var(--gold);
+        }
+        
+        .expandable-content {
+            display: none;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .expandable.expanded .expandable-content {
+            display: block;
+        }
+        
+        .bilingual-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .pair-item {
+            padding: 10px;
+            background: var(--light-bg);
+            border-radius: 4px;
+        }
+        
+        .pair-label {
+            font-size: 11px;
+            color: var(--gold);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .pair-text {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .search-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px 15px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--teal);
+            box-shadow: 0 0 8px rgba(10, 122, 114, 0.2);
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: 0.3s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--gold);
+        }
+        
+        .card h3 {
+            color: var(--navy);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .card p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .card-label {
+            font-size: 11px;
+            color: var(--teal);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .flow-diagram {
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--teal);
+            margin-bottom: 20px;
+        }
+        
+        .flow-step {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid var(--gold);
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .flow-arrow {
+            text-align: center;
+            color: var(--teal);
+            font-weight: 300;
+            padding: 5px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .bilingual-row, .bilingual-pair {
+                grid-template-columns: 1fr;
+            }
+            
+            nav button {
+                font-size: 11px;
+                padding: 10px;
+            }
+            
+            header h1 {
+                font-size: 20px;
+            }
+        }
+        
+        .footer {
+            background: var(--light-bg);
+            border-top: 1px solid var(--border);
+            padding: 30px 20px;
+            text-align: center;
+            color: #666;
+            font-size: 13px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>認知 × Problem Diagnosis</h1>
+        <p>From "That's How I Think" to "I Can See, Test, and Correct My Model"</p>
+        <p class="author">By 王欣蓉 Anne Wang</p>
+    </header>
+    
+    <nav>
+        <ul id="navTabs">
+            <li><button class="nav-btn active" data-tab="problems">50 Problems</button></li>
+            <li><button class="nav-btn" data-tab="systems">8 Systems</button></li>
+            <li><button class="nav-btn" data-tab="errors">Prediction Errors</button></li>
+            <li><button class="nav-btn" data-tab="levers">10 Levers</button></li>
+            <li><button class="nav-btn" data-tab="stages">5 Stages</button></li>
+            <li><button class="nav-btn" data-tab="mechanism">Mechanism</button></li>
+            <li><button class="nav-btn" data-tab="applications">Applications</button></li>
+        </ul>
+    </nav>
+    
+    <div class="container">
+        <!-- 50 Problems Section -->
+        <section id="problems" class="section active">
+            <h2>50 Cognitive Problems & Solutions</h2>
+            <input type="text" id="searchBox" class="search-box" placeholder="Search problems (Chinese or English)..." />
+            <div id="problemsTable"></div>
+        </section>
+        
+        <!-- 8 Systems Section -->
+        <section id="systems" class="section">
+            <h2>Cognitive Structure: 8 Systems</h2>
+            <div id="systemsContainer"></div>
+        </section>
+        
+        <!-- Prediction Errors -->
+        <section id="errors" class="section">
+            <h2>10 Greatest Prediction Errors</h2>
+            <div id="errorsContainer"></div>
+        </section>
+        
+        <!-- 10 Levers -->
+        <section id="levers" class="section">
+            <h2>10 Cognitive Levers</h2>
+            <div id="leversContainer"></div>
+        </section>
+        
+        <!-- 5 Stages -->
+        <section id="stages" class="section">
+            <h2>5 Stages of Cognitive Evolution</h2>
+            <div id="stagesContainer"></div>
+        </section>
+        
+        <!-- Mechanism -->
+        <section id="mechanism" class="section">
+            <h2>How Cognition Works</h2>
+            <div id="mechanismContainer"></div>
+        </section>
+        
+        <!-- Applications -->
+        <section id="applications" class="section">
+            <h2>Real-World Applications</h2>
+            <div id="applicationsContainer"></div>
+        </section>
+    </div>
+    
+    <div class="footer">
+        <p>Cognitive Model Mastery System © 2026 | Designed for personal cognitive upgrade</p>
+        <p>This app helps you move from reactive thinking to self-updating cognition.</p>
+    </div>
+    
+    <script type="application/json" id="appData">
+{"problems": [{"id": 1, "zh": "一失敗就覺得自己很差", "en": "One failure makes me think I'm bad", "pattern": "事件→人格", "pattern_en": "Event→Personality", "mechanism": "過度概括", "mechanism_en": "Overgeneralization", "bottleneck": "事件人格化", "bottleneck_en": "Personalizing events", "intervention": "改問「哪一步出錯？」", "intervention_en": "Ask 'Which step went wrong?'"}, {"id": 2, "zh": "別人沒回訊息就亂想", "en": "When others don't reply, I make up stories", "pattern": "資料不足就補故事", "pattern_en": "Insufficient data→Fill with stories", "mechanism": "大腦預測未知", "mechanism_en": "Brain predicts the unknown", "bottleneck": "假設當事實", "bottleneck_en": "Treating assumptions as facts", "intervention": "先列3種可能", "intervention_en": "List 3 possible explanations first"}, {"id": 3, "zh": "被批評就很難受", "en": "Criticism hurts deeply", "pattern": "批評＝否定自己", "pattern_en": "Criticism=Rejecting myself", "mechanism": "Identity綁結果", "mechanism_en": "Identity bound to outcomes", "bottleneck": "自我模型僵化", "bottleneck_en": "Rigid self-model", "intervention": "分開「我」與「這件事」", "intervention_en": "Separate 'me' from 'this situation'"}, {"id": 4, "zh": "一次考差就覺得完了", "en": "One poor exam means I'm done", "pattern": "局部→全局", "pattern_en": "Local→Global", "mechanism": "災難化", "mechanism_en": "Catastrophizing", "bottleneck": "尺度錯誤", "bottleneck_en": "Scale mismatch", "intervention": "只分析這一次", "intervention_en": "Analyze only this one instance"}, {"id": 5, "zh": "覺得大家都在看自己", "en": "Everyone is watching me", "pattern": "高估他人注意", "pattern_en": "Overestimate others' attention", "mechanism": "Spotlight Effect", "mechanism_en": "Spotlight Effect", "bottleneck": "自我中心取樣", "bottleneck_en": "Self-centered sampling", "intervention": "問「有證據嗎？」", "intervention_en": "Ask 'Is there evidence?'"}, {"id": 6, "zh": "總覺得別人針對自己", "en": "People are targeting me", "pattern": "中性事件人格化", "pattern_en": "Personalize neutral events", "mechanism": "意圖推測", "mechanism_en": "Intention inference", "bottleneck": "資料不足", "bottleneck_en": "Insufficient data", "intervention": "描述事件，不猜動機", "intervention_en": "Describe events, don't guess motives"}, {"id": 7, "zh": "覺得自己一定做不到", "en": "I definitely can't do it", "pattern": "過去推演未來", "pattern_en": "Past predicts future", "mechanism": "舊模型控制預測", "mechanism_en": "Old model controls prediction", "bottleneck": "模型過時", "bottleneck_en": "Outdated model", "intervention": "找一個反例", "intervention_en": "Find one counterexample"}, {"id": 8, "zh": "還沒開始就怕失敗", "en": "Fear of failure before starting", "pattern": "模擬最壞結果", "pattern_en": "Simulate worst outcome", "mechanism": "威脅預測過強", "mechanism_en": "Threat prediction too strong", "bottleneck": "行動資料不足", "bottleneck_en": "Insufficient action data", "intervention": "做5分鐘測試", "intervention_en": "Do a 5-minute test"}, {"id": 9, "zh": "一直想最壞情況", "en": "Always thinking worst-case scenario", "pattern": "威脅訊號權重過高", "pattern_en": "Threat signal weighted too high", "mechanism": "生存模型偏差", "mechanism_en": "Survival model bias", "bottleneck": "風險校準不足", "bottleneck_en": "Insufficient risk calibration", "intervention": "同時寫最佳／普通／最差", "intervention_en": "Write best/normal/worst simultaneously"}, {"id": 10, "zh": "只看到缺點", "en": "I only see flaws", "pattern": "負面資訊優先", "pattern_en": "Negative information prioritized", "mechanism": "Negativity Bias", "mechanism_en": "Negativity Bias", "bottleneck": "取樣偏差", "bottleneck_en": "Sampling bias", "intervention": "補3筆中性資料", "intervention_en": "Add 3 neutral data points"}, {"id": 11, "zh": "只找支持自己的證據", "en": "I only find evidence supporting me", "pattern": "先有結論再找資料", "pattern_en": "Conclusion first, then data", "mechanism": "Confirmation Bias", "mechanism_en": "Confirmation Bias", "bottleneck": "反證不足", "bottleneck_en": "Insufficient counterevidence", "intervention": "問「什麼證據會推翻我？」", "intervention_en": "Ask 'What evidence would disprove me?'"}, {"id": 12, "zh": "不願承認自己錯", "en": "Unwilling to admit I'm wrong", "pattern": "錯＝輸", "pattern_en": "Wrong=Losing", "mechanism": "Identity Defense", "mechanism_en": "Identity Defense", "bottleneck": "更新成本過高", "bottleneck_en": "Update cost too high", "intervention": "把錯誤改叫新資料", "intervention_en": "Reframe error as new data"}, {"id": 13, "zh": "一直跟別人比較", "en": "Constantly comparing myself to others", "pattern": "他人＝評分尺", "pattern_en": "Others=Score metric", "mechanism": "外部基準控制", "mechanism_en": "External standard control", "bottleneck": "自我基準不足", "bottleneck_en": "Insufficient self-reference", "intervention": "比較自己的前後資料", "intervention_en": "Compare my own before/after"}, {"id": 14, "zh": "別人成功就焦慮", "en": "Others' success makes me anxious", "pattern": "成功＝有限資源", "pattern_en": "Success=Limited resources", "mechanism": "零和模型", "mechanism_en": "Zero-sum model", "bottleneck": "資源模型錯誤", "bottleneck_en": "Wrong resource model", "intervention": "問「我能學什麼？」", "intervention_en": "Ask 'What can I learn?'"}, {"id": 15, "zh": "一直後悔以前", "en": "Always regretting the past", "pattern": "用現在資訊審判過去", "pattern_en": "Judge past with current info", "mechanism": "Hindsight Bias", "mechanism_en": "Hindsight Bias", "bottleneck": "時間資訊錯置", "bottleneck_en": "Temporal information mismatch", "intervention": "問「當時知道什麼？」", "intervention_en": "Ask 'What did I know then?'"}, {"id": 16, "zh": "覺得早知道就好了", "en": "Wish I had known earlier", "pattern": "結果已知後重建因果", "pattern_en": "Rebuild causation after outcome known", "mechanism": "後見偏誤", "mechanism_en": "Hindsight bias", "bottleneck": "因果模型失真", "bottleneck_en": "Distorted causal model", "intervention": "記錄當時Prediction", "intervention_en": "Record prediction at the time"}, {"id": 17, "zh": "覺得努力一定有回報", "en": "Effort guarantees reward", "pattern": "線性因果", "pattern_en": "Linear causation", "mechanism": "忽略複雜系統", "mechanism_en": "Ignore complex systems", "bottleneck": "變數不足", "bottleneck_en": "Insufficient variables", "intervention": "找出其他關鍵變數", "intervention_en": "Identify other key variables"}, {"id": 18, "zh": "覺得一個原因造成全部", "en": "One cause created everything", "pattern": "單因果敘事", "pattern_en": "Single-cause narrative", "mechanism": "大腦偏好簡化", "mechanism_en": "Brain prefers simplification", "bottleneck": "多變量不足", "bottleneck_en": "Insufficient multivariate thinking", "intervention": "至少列5個變數", "intervention_en": "List at least 5 variables"}, {"id": 19, "zh": "遇到問題就找誰的錯", "en": "Find blame instead of diagnosis", "pattern": "問責取代診斷", "pattern_en": "Blame replaces diagnosis", "mechanism": "善惡模型", "mechanism_en": "Good/evil model", "bottleneck": "機制分析不足", "bottleneck_en": "Insufficient mechanism analysis", "intervention": "改問「什麼結構生成它？」", "intervention_en": "Ask 'What structure generated this?'"}, {"id": 20, "zh": "覺得人永遠不會變", "en": "People never change", "pattern": "人格固定化", "pattern_en": "Fixed personality", "mechanism": "Trait Model", "mechanism_en": "Trait Model", "bottleneck": "更新模型不足", "bottleneck_en": "Insufficient update model", "intervention": "看情境與時間變化", "intervention_en": "Observe context and time changes"}, {"id": 21, "zh": "覺得自己就是懶", "en": "I'm just lazy", "pattern": "行為→人格", "pattern_en": "Behavior→Personality", "mechanism": "Labeling", "mechanism_en": "Labeling", "bottleneck": "機制被遮蔽", "bottleneck_en": "Mechanism hidden", "intervention": "問「什麼讓啟動變難？」", "intervention_en": "Ask 'What makes activation hard?'"}, {"id": 22, "zh": "覺得自己沒自制力", "en": "I have no self-control", "pattern": "結果歸因人格", "pattern_en": "Attribute outcome to personality", "mechanism": "忽略環境Cue", "mechanism_en": "Ignore environmental cues", "bottleneck": "結構診斷不足", "bottleneck_en": "Insufficient structural diagnosis", "intervention": "先移除一個誘惑", "intervention_en": "Remove one temptation first"}, {"id": 23, "zh": "覺得焦慮就是不好", "en": "Anxiety is bad", "pattern": "情緒二元化", "pattern_en": "Binary emotion", "mechanism": "訊號＝問題", "mechanism_en": "Signal=Problem", "bottleneck": "情緒模型失真", "bottleneck_en": "Distorted emotion model", "intervention": "問「焦慮提醒什麼？」", "intervention_en": "Ask 'What does anxiety signal?'"}, {"id": 24, "zh": "想把負面情緒消滅", "en": "Try to eliminate negative emotions", "pattern": "情緒＝敵人", "pattern_en": "Emotion=Enemy", "mechanism": "壓抑模型", "mechanism_en": "Suppression model", "bottleneck": "訊號讀取不足", "bottleneck_en": "Insufficient signal reading", "intervention": "先命名再處理", "intervention_en": "Name it first, then process"}, {"id": 25, "zh": "生氣就認定對方錯", "en": "Anger means they're wrong", "pattern": "情緒＝證據", "pattern_en": "Emotion=Evidence", "mechanism": "Affect Heuristic", "mechanism_en": "Affect Heuristic", "bottleneck": "情緒與事實混合", "bottleneck_en": "Emotion and fact conflated", "intervention": "先列事實", "intervention_en": "List facts first"}, {"id": 26, "zh": "喜歡一個人就覺得他很好", "en": "I like someone so they're great", "pattern": "好感擴散", "pattern_en": "Good feeling spreads", "mechanism": "Halo Effect", "mechanism_en": "Halo Effect", "bottleneck": "維度混合", "bottleneck_en": "Dimensions conflated", "intervention": "分項評估", "intervention_en": "Evaluate by dimension"}, {"id": 27, "zh": "討厭一個人就否定全部", "en": "I dislike someone so everything about them is bad", "pattern": "負面擴散", "pattern_en": "Negative spreads", "mechanism": "Horn Effect", "mechanism_en": "Horn Effect", "bottleneck": "全局化", "bottleneck_en": "Globalization", "intervention": "找一項中性資料", "intervention_en": "Find one neutral data point"}, {"id": 28, "zh": "權威說的就相信", "en": "I believe authority figures", "pattern": "身分取代證據", "pattern_en": "Identity replaces evidence", "mechanism": "Authority Bias", "mechanism_en": "Authority Bias", "bottleneck": "驗證不足", "bottleneck_en": "Insufficient verification", "intervention": "問「證據是什麼？」", "intervention_en": "Ask 'Where's the evidence?'"}, {"id": 29, "zh": "大家都這樣就跟著做", "en": "Everyone does it, so I do", "pattern": "多數＝正確", "pattern_en": "Majority=Correct", "mechanism": "Social Proof", "mechanism_en": "Social Proof", "bottleneck": "自主判斷不足", "bottleneck_en": "Insufficient independent judgment", "intervention": "問「適合我嗎？」", "intervention_en": "Ask 'Does it fit me?'"}, {"id": 30, "zh": "很多人分享就當真", "en": "Many shares mean it's true", "pattern": "熱度＝真實", "pattern_en": "Popularity=Truth", "mechanism": "Popularity Bias", "mechanism_en": "Popularity Bias", "bottleneck": "來源判讀不足", "bottleneck_en": "Insufficient source evaluation", "intervention": "查原始來源", "intervention_en": "Check original source"}, {"id": 31, "zh": "AI說的就相信", "en": "I believe what AI says", "pattern": "流暢＝正確", "pattern_en": "Fluency=Correctness", "mechanism": "Automation Bias", "mechanism_en": "Automation Bias", "bottleneck": "驗證能力不足", "bottleneck_en": "Insufficient verification ability", "intervention": "要求來源並交叉驗證", "intervention_en": "Demand sources and cross-verify"}, {"id": 32, "zh": "AI說錯就不用AI", "en": "AI made one mistake so I reject it", "pattern": "一次錯誤→全面否定", "pattern_en": "One error→Reject everything", "mechanism": "二元思考", "mechanism_en": "Binary thinking", "bottleneck": "工具模型錯誤", "bottleneck_en": "Wrong tool model", "intervention": "分辨適用與不適用任務", "intervention_en": "Distinguish applicable vs non-applicable tasks"}, {"id": 33, "zh": "覺得懂了就是會了", "en": "Understanding means mastery", "pattern": "熟悉＝掌握", "pattern_en": "Familiarity=Mastery", "mechanism": "Fluency Illusion", "mechanism_en": "Fluency Illusion", "bottleneck": "Retrieval不足", "bottleneck_en": "Insufficient retrieval", "intervention": "關掉資料自己講", "intervention_en": "Close sources and teach it"}, {"id": 34, "zh": "看很多書卻沒改變", "en": "Read much but nothing changes", "pattern": "Input＝成長", "pattern_en": "Input=Growth", "mechanism": "知識沒有進入行動", "mechanism_en": "Knowledge doesn't enter action", "bottleneck": "Transfer不足", "bottleneck_en": "Insufficient transfer", "intervention": "今天用一個觀念", "intervention_en": "Apply one concept today"}, {"id": 35, "zh": "收藏很多資料", "en": "I collect lots of resources", "pattern": "收藏＝擁有", "pattern_en": "Collection=Ownership", "mechanism": "外部儲存產生成就感", "mechanism_en": "External storage creates satisfaction", "bottleneck": "Processing不足", "bottleneck_en": "Insufficient processing", "intervention": "每收藏10份處理1份", "intervention_en": "Process 1 for every 10 collected"}, {"id": 36, "zh": "一直學新方法", "en": "Always learning new methods", "pattern": "Novelty Reward", "pattern_en": "Novelty Reward", "mechanism": "更新工具而非能力", "mechanism_en": "Update tools not abilities", "bottleneck": "Retest不足", "bottleneck_en": "Insufficient retesting", "intervention": "舊方法先測兩週", "intervention_en": "Test old method for 2 weeks first"}, {"id": 37, "zh": "覺得越複雜越高級", "en": "Complex means sophisticated", "pattern": "複雜＝深度", "pattern_en": "Complexity=Depth", "mechanism": "Complexity Bias", "mechanism_en": "Complexity Bias", "bottleneck": "壓縮能力不足", "bottleneck_en": "Insufficient compression ability", "intervention": "用一句白話說明", "intervention_en": "Explain in one simple sentence"}, {"id": 38, "zh": "覺得簡單方法沒用", "en": "Simple methods don't work", "pattern": "簡單＝低級", "pattern_en": "Simple=Low-level", "mechanism": "Sophistication Bias", "mechanism_en": "Sophistication Bias", "bottleneck": "最小介入被忽略", "bottleneck_en": "Minimum intervention ignored", "intervention": "先測最小版本", "intervention_en": "Test minimum version first"}, {"id": 39, "zh": "一直尋找完美答案", "en": "Always seeking the perfect answer", "pattern": "不確定＝危險", "pattern_en": "Uncertainty=Danger", "mechanism": "Certainty Seeking", "mechanism_en": "Certainty Seeking", "bottleneck": "容錯不足", "bottleneck_en": "Insufficient error tolerance", "intervention": "找「目前最好答案」", "intervention_en": "Find 'best answer so far'"}, {"id": 40, "zh": "做決定很痛苦", "en": "Decision-making is painful", "pattern": "想消除所有風險", "pattern_en": "Eliminate all risk", "mechanism": "不確定性不可接受", "mechanism_en": "Uncertainty unacceptable", "bottleneck": "Decision Rule不足", "bottleneck_en": "Insufficient decision rules", "intervention": "設停止搜尋條件", "intervention_en": "Set search stopping conditions"}, {"id": 41, "zh": "選擇很多反而不快樂", "en": "More choices make me unhappy", "pattern": "選項越多越好", "pattern_en": "More options better", "mechanism": "Choice Overload", "mechanism_en": "Choice Overload", "bottleneck": "篩選規則不足", "bottleneck_en": "Insufficient filtering rules", "intervention": "只保留3個選項", "intervention_en": "Keep only 3 options"}, {"id": 42, "zh": "一直想卻不行動", "en": "Think but don't act", "pattern": "思考取代測試", "pattern_en": "Thinking replaces testing", "mechanism": "模擬沒有現實Feedback", "mechanism_en": "Simulation lacks real feedback", "bottleneck": "行動不足", "bottleneck_en": "Insufficient action", "intervention": "做低成本實驗", "intervention_en": "Do low-cost experiment"}, {"id": 43, "zh": "想到完全確定才開始", "en": "Wait for certainty before starting", "pattern": "Prediction要求100%", "pattern_en": "Demand 100% certainty", "mechanism": "現實本來不確定", "mechanism_en": "Reality is inherently uncertain", "bottleneck": "探索不足", "bottleneck_en": "Insufficient exploration", "intervention": "70%資訊就小測試", "intervention_en": "Test with 70% information"}, {"id": 44, "zh": "結果不好就換方法", "en": "Poor result means change method", "pattern": "短期Feedback權重過高", "pattern_en": "Short-term feedback weighted too high", "mechanism": "時間尺度太短", "mechanism_en": "Time scale too short", "bottleneck": "測試週期不足", "bottleneck_en": "Insufficient test cycles", "intervention": "先設定Retest時間", "intervention_en": "Set retest time first"}, {"id": 45, "zh": "成功一次就覺得找到真理", "en": "One success means truth found", "pattern": "小樣本過度推論", "pattern_en": "Overinference from small sample", "mechanism": "Sample Size不足", "mechanism_en": "Insufficient sample size", "bottleneck": "驗證不足", "bottleneck_en": "Insufficient verification", "intervention": "再測3次", "intervention_en": "Test 3 more times"}, {"id": 46, "zh": "失敗一次就放棄", "en": "One failure means give up", "pattern": "單次資料權重過高", "pattern_en": "Single data point weighted too high", "mechanism": "Noise被當Signal", "mechanism_en": "Noise treated as signal", "bottleneck": "樣本不足", "bottleneck_en": "Insufficient sample", "intervention": "看趨勢不看單點", "intervention_en": "Look at trend not single point"}, {"id": 47, "zh": "過去有效就一直用", "en": "If it worked before, use it forever", "pattern": "舊成功強化舊模型", "pattern_en": "Past success reinforces old model", "mechanism": "Environment已改變", "mechanism_en": "Environment has changed", "bottleneck": "模型更新不足", "bottleneck_en": "Insufficient model update", "intervention": "問「條件變了嗎？」", "intervention_en": "Ask 'Did conditions change?'"}, {"id": 48, "zh": "經驗很多反而固執", "en": "Experience makes me rigid", "pattern": "經驗＝真理", "pattern_en": "Experience=Truth", "mechanism": "模型過度穩定", "mechanism_en": "Model overstabilized", "bottleneck": "Prediction Error被忽略", "bottleneck_en": "Prediction error ignored", "intervention": "主動找異常資料", "intervention_en": "Actively seek anomalous data"}, {"id": 49, "zh": "只想證明自己對", "en": "I only want to prove I'm right", "pattern": "認知服務Identity", "pattern_en": "Cognition serves identity", "mechanism": "防衛高於學習", "mechanism_en": "Defense over learning", "bottleneck": "更新迴路斷裂", "bottleneck_en": "Update loop broken", "intervention": "改問「我錯在哪？」", "intervention_en": "Ask 'Where did I go wrong?'"}, {"id": 50, "zh": "不知道怎麼變聰明", "en": "Don't know how to get smarter", "pattern": "智慧＝知道很多", "pattern_en": "Wisdom=Know a lot", "mechanism": "忽略模型更新", "mechanism_en": "Ignore model updates", "bottleneck": "更新能力不足", "bottleneck_en": "Insufficient update ability", "intervention": "每天修正一個預測", "intervention_en": "Correct one prediction daily"}], "systems": [{"id": 1, "zh": "Input System", "en": "Input System", "q": "我接收到什麼資料？", "q_en": "What data do I receive?"}, {"id": 2, "zh": "Attention System", "en": "Attention System", "q": "我從大量資料裡看見什麼？", "q_en": "What do I see from all the data?"}, {"id": 3, "zh": "Language System", "en": "Language System", "q": "我怎麼描述它？", "q_en": "How do I describe it?"}, {"id": 4, "zh": "Interpretation System", "en": "Interpretation System", "q": "我認為它代表什麼？", "q_en": "What do I think it means?"}, {"id": 5, "zh": "Memory System", "en": "Memory System", "q": "過去哪些經驗被叫出來？", "q_en": "Which past experiences emerge?"}, {"id": 6, "zh": "Prediction System", "en": "Prediction System", "q": "我認為接下來會發生什麼？", "q_en": "What do I predict will happen?"}, {"id": 7, "zh": "Decision System", "en": "Decision System", "q": "因此我準備做什麼？", "q_en": "What will I do as a result?"}, {"id": 8, "zh": "Update System", "en": "Update System", "q": "結果與預測不同時，我有沒有修改模型？", "q_en": "When results differ from predictions, do I update my model?"}], "errors": [{"id": 1, "old": "我想到的就是真的", "old_en": "What I think is real", "new": "想法只是大腦生成的假設", "new_en": "Thoughts are hypotheses generated by the brain"}, {"id": 2, "old": "我的感覺就是證據", "old_en": "My feelings are evidence", "new": "感覺是真實訊號，但對原因的解讀仍可能錯", "new_en": "Feelings are real signals, but interpretation of causes may be wrong"}, {"id": 3, "old": "我記得很清楚，所以一定是真的", "old_en": "I remember clearly, so it must be true", "new": "記憶會受到重建與情境影響", "new_en": "Memory is reconstructed and context-influenced"}, {"id": 4, "old": "我經驗過，所以我知道", "old_en": "I experienced it, so I know", "new": "經驗是資料，不自動等於正確因果模型", "new_en": "Experience is data, not automatic causal truth"}, {"id": 5, "old": "大家都這樣說", "old_en": "Everyone says so", "new": "共識提高參考價值，但不能取代證據", "new_en": "Consensus is informative but doesn't replace evidence"}, {"id": 6, "old": "專家說的一定對", "old_en": "Experts are always right", "new": "專業提高可信度，但仍需看領域、證據與不確定性", "new_en": "Expertise increases credibility, but check domain, evidence, and uncertainty"}, {"id": 7, "old": "AI整理得這麼完整一定正確", "old_en": "AI's complete answer must be correct", "new": "語言流暢度不等於真實度", "new_en": "Fluency doesn't equal truth"}, {"id": 8, "old": "錯了代表我不夠聰明", "old_en": "Being wrong means I'm not smart", "new": "沒有Prediction Error，就缺少更新訊號", "new_en": "Without prediction error, there's no update signal"}, {"id": 9, "old": "改變想法代表以前的我很笨", "old_en": "Changing my mind means I was dumb", "new": "能根據新資料更新，本身就是認知能力", "new_en": "Updating from new data is cognitive ability"}, {"id": 10, "old": "成熟就是有一套固定價值觀永遠不變", "old_en": "Maturity means unchanging values", "new": "核心價值可以穩定，但對世界的模型仍需接受現實校準", "new_en": "Core values can be stable, but world models need reality calibration"}], "levers": [{"id": 1, "zh": "Separate", "en": "Separate", "desc": "事實與解讀分開", "desc_en": "Separate facts from interpretation"}, {"id": 2, "zh": "Name", "en": "Name", "desc": "把模糊感受說清楚", "desc_en": "Clarify vague feelings"}, {"id": 3, "zh": "Variables", "en": "Variables", "desc": "把故事拆成變數", "desc_en": "Decompose stories into variables"}, {"id": 4, "zh": "Alternatives", "en": "Alternatives", "desc": "永遠保留其他可能解釋", "desc_en": "Always keep alternative explanations"}, {"id": 5, "zh": "Evidence", "en": "Evidence", "desc": "問證據在哪", "desc_en": "Ask where evidence is"}, {"id": 6, "zh": "Falsification", "en": "Falsification", "desc": "問什麼證據能證明我錯", "desc_en": "Ask what would prove me wrong"}, {"id": 7, "zh": "Prediction", "en": "Prediction", "desc": "先留下自己的預測", "desc_en": "Record predictions first"}, {"id": 8, "zh": "Action", "en": "Action", "desc": "讓現實參與回答", "desc_en": "Let reality participate in answering"}, {"id": 9, "zh": "Feedback", "en": "Feedback", "desc": "讀取結果而不是只評價自己", "desc_en": "Read results, not just self-evaluate"}, {"id": 10, "zh": "Update", "en": "Update", "desc": "有新資料就更新", "desc_en": "Update when you have new data"}], "stages": [{"id": 1, "name": "反應型", "name_en": "Reactive", "desc": "我想到什麼，就相信什麼", "desc_en": "Believe whatever I think"}, {"id": 2, "name": "解釋型", "name_en": "Explanatory", "desc": "開始替事情找原因。但常只有一個故事", "desc_en": "Start finding reasons. But usually only one story"}, {"id": 3, "name": "分析型", "name_en": "Analytical", "desc": "開始：拆事實。找變數。辨Pattern。看機制", "desc_en": "Start: Break down facts. Find variables. Identify patterns. See mechanisms"}, {"id": 4, "name": "High Agency型", "name_en": "High Agency", "desc": "開始：提出假設。做Prediction。主動測試。取得Feedback", "desc_en": "Start: Propose hypotheses. Make predictions. Test actively. Get feedback"}, {"id": 5, "name": "Self-Updating型", "name_en": "Self-Updating", "desc": "不執著：「我要永遠是對的」。而追求：我的模型要愈來愈接近現實", "desc_en": "Not attached to 'always being right.' Pursuing: My model gets closer to reality"}]}
+    </script>
+    
+    <script>
+        const appData = JSON.parse(document.getElementById('appData').textContent);
+        let allProblems = appData.problems;
+        
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+            });
+        });
+        
+        // Render problems table
+        function renderProblems(problems) {
+            const html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30px;">#</th>
+                            <th style="width: 35%;">Problem</th>
+                            <th style="width: 65%;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${problems.map(p => `
+                            <tr>
+                                <td class="problem-id">${p.id}</td>
+                                <td>
+                                    <div class="zh-cell">${p.zh}</div>
+                                    <div class="en-cell">${p.en}</div>
+                                </td>
+                                <td>
+                                    <div style="font-size: 13px; margin-bottom: 5px;"><strong style="color: var(--gold);">Pattern:</strong> ${p.pattern} / ${p.pattern_en}</div>
+                                    <div style="font-size: 13px; margin-bottom: 5px;"><strong style="color: var(--gold);">Mechanism:</strong> ${p.mechanism} / ${p.mechanism_en}</div>
+                                    <div style="font-size: 13px; margin-bottom: 5px;"><strong style="color: var(--gold);">Bottleneck:</strong> ${p.bottleneck} / ${p.bottleneck_en}</div>
+                                    <div style="font-size: 13px; color: var(--teal);"><strong>Solution:</strong> ${p.intervention} / ${p.intervention_en}</div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('problemsTable').innerHTML = html;
+        }
+        
+        // Search functionality
+        document.getElementById('searchBox').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const filtered = allProblems.filter(p => 
+                p.zh.includes(query) || 
+                p.en.toLowerCase().includes(query) ||
+                p.pattern.includes(query) ||
+                p.mechanism.includes(query) ||
+                p.intervention.includes(query)
+            );
+            renderProblems(filtered);
+        });
+        
+        // Render systems
+        function renderSystems() {
+            const html = appData.systems.map(sys => `
+                <div class="bilingual-row">
+                    <div class="zh">
+                        <div class="zh-label">系統 ${sys.id}</div>
+                        <div class="zh-text"><strong>${sys.zh}</strong></div>
+                        <div class="zh-text" style="margin-top: 10px; font-size: 15px;">${sys.q}</div>
+                    </div>
+                    <div class="en">
+                        <div class="en-label">System ${sys.id}</div>
+                        <div class="en-text"><strong>${sys.en}</strong></div>
+                        <div class="en-text" style="margin-top: 10px; font-size: 15px;">${sys.q_en}</div>
+                        <button class="tts-btn" data-text="${sys.q_en}">🔊 Speak</button>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('systemsContainer').innerHTML = html;
+            attachTTSListeners();
+        }
+        
+        // Render errors
+        function renderErrors() {
+            const html = appData.errors.map((err, i) => `
+                <div class="card">
+                    <h3>❌ ${err.id}. ${err.old}</h3>
+                    <p style="font-size: 12px; color: #999; margin-bottom: 12px;">${err.old_en}</p>
+                    <div style="background: var(--light-bg); padding: 12px; border-radius: 4px; margin-bottom: 12px;">
+                        <div style="font-size: 11px; color: var(--teal); text-transform: uppercase; font-weight: 600; margin-bottom: 5px;">✅ Updated:</div>
+                        <div style="font-size: 14px; color: #333; margin-bottom: 8px;">${err.new}</div>
+                        <div style="font-size: 13px; color: #666;">${err.new_en}</div>
+                        <button class="tts-btn" data-text="${err.new_en}" style="margin-top: 8px;">🔊 Speak</button>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('errorsContainer').innerHTML = `<div class="card-grid">${html}</div>`;
+            attachTTSListeners();
+        }
+        
+        // Render levers
+        function renderLevers() {
+            const html = appData.levers.map(lever => `
+                <div class="card">
+                    <h3>#${lever.id} ${lever.en}</h3>
+                    <div class="pair-label">Chinese</div>
+                    <div class="pair-text" style="margin-bottom: 12px;">${lever.desc}</div>
+                    <div class="pair-label">English</div>
+                    <div class="pair-text" style="margin-bottom: 8px;">${lever.desc_en}</div>
+                    <button class="tts-btn" data-text="${lever.desc_en}">🔊 Speak</button>
+                </div>
+            `).join('');
+            document.getElementById('leversContainer').innerHTML = `<div class="card-grid">${html}</div>`;
+            attachTTSListeners();
+        }
+        
+        // Render stages
+        function renderStages() {
+            const html = appData.stages.map(stage => `
+                <div class="expandable" onclick="this.classList.toggle('expanded')">
+                    <h4>Stage ${stage.id}: ${stage.name_en} (${stage.name})</h4>
+                    <div class="expandable-content">
+                        <div class="bilingual-pair">
+                            <div class="pair-item">
+                                <div class="pair-label">Chinese</div>
+                                <div class="pair-text">${stage.desc}</div>
+                            </div>
+                            <div class="pair-item">
+                                <div class="pair-label">English</div>
+                                <div class="pair-text">${stage.desc_en}</div>
+                                <button class="tts-btn" data-text="${stage.desc_en}" style="margin-top: 8px;">🔊 Speak</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('stagesContainer').innerHTML = html;
+            attachTTSListeners();
+        }
+        
+        // Render mechanism
+        function renderMechanism() {
+            const html = `
+                <h3 style="color: var(--navy); margin-bottom: 15px;">How Cognition Creates Your Experience</h3>
+                <div class="flow-diagram">
+                    <div class="flow-step">Reality Event</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Brain Sampling</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Attention Selection</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Language Naming</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Old Memory Activation</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Form Interpretation</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Create Prediction</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Body & Emotion Prepare</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Take Action</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Environment Responds</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Form Result</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Feedback Generated</div>
+                    <div class="flow-arrow">↓</div>
+                    <div class="flow-step">Prediction Error</div>
+                </div>
+                
+                <h3 style="color: var(--navy); margin-top: 30px; margin-bottom: 15px;">The Critical Fork: Two Paths</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                    <div style="border-left: 4px solid #d9534f; padding-left: 15px;">
+                        <h4 style="color: #d9534f; margin-bottom: 10px;">Path 1: Closed Loop (High Entropy)</h4>
+                        <div class="flow-diagram" style="border-left: 4px solid #d9534f;">
+                            <div class="flow-step">Prediction Error</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Defend</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Blame Others</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Rationalize</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Selective Ignore</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Model Stays Same</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Rigidity Increases</div>
+                        </div>
+                    </div>
+                    
+                    <div style="border-left: 4px solid #5cb85c; padding-left: 15px;">
+                        <h4 style="color: #5cb85c; margin-bottom: 10px;">Path 2: Open Loop (Low Entropy)</h4>
+                        <div class="flow-diagram" style="border-left: 4px solid #5cb85c;">
+                            <div class="flow-step">Prediction Error</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Curious</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Re-examine</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Find Missing Variables</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Correct Hypothesis</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Model Updates</div>
+                            <div class="flow-arrow">↓</div>
+                            <div class="flow-step">Prediction Accuracy Increases</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="tts-btn" data-text="This is how cognition works. Your thoughts are not reality. They are models your brain creates. The same event processed through different cognitive models generates completely different emotions, actions, and results. The bottleneck is not knowledge. It is knowing that you might know wrong. The gateway to cognitive freedom is this: distinguish facts from interpretations, identify biases, maintain alternatives, ask for evidence, and most importantly, update your model when reality shows you were wrong." style="width: 100%; padding: 12px; margin-top: 20px;">🔊 Play Full Mechanism Summary</button>
+            `;
+            document.getElementById('mechanismContainer').innerHTML = html;
+            attachTTSListeners();
+        }
+        
+        // Render applications
+        function renderApplications() {
+            const html = `
+                <div class="expandable" onclick="this.classList.toggle('expanded')">
+                    <h4>Cognition × Emotion</h4>
+                    <div class="expandable-content">
+                        <div class="bilingual-row">
+                            <div class="zh">
+                                <div class="zh-label">事件</div>
+                                <div class="zh-text">朋友沒有回LINE。</div>
+                            </div>
+                            <div class="en">
+                                <div class="en-label">Event</div>
+                                <div class="en-text">Friend didn't reply to message.</div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: #d9534f; color: white; padding: 15px; border-radius: 6px; margin: 15px 0;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">❌ Old Cognition</div>
+                            <div style="font-size: 14px;">「他是不是討厭我？」 → Threat Prediction → Anxiety → Check phone repeatedly</div>
+                            <div style="font-size: 13px; margin-top: 5px;">「Is he rejecting me?」 → Overgeneration → Emotional spiral</div>
+                        </div>
+                        
+                        <div style="background: #5cb85c; color: white; padding: 15px; border-radius: 6px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">✅ New Cognition</div>
+                            <div style="font-size: 14px;">「目前只有『尚未回覆』這筆資料。」 → List possible causes → Wait for more data</div>
+                            <div style="font-size: 13px; margin-top: 5px;">「Currently only: no reply yet.」 → Could be: busy, didn't see, thinking of response → Less reactivity</div>
+                            <button class="tts-btn" data-text="This is not positive thinking. This is reducing model overgeneralization. You separate the fact from your prediction.">🔊 Explain</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="expandable" onclick="this.classList.toggle('expanded')">
+                    <h4>Cognition × Relationships</h4>
+                    <div class="expandable-content">
+                        <div style="background: #f0ad4e; color: #333; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">Partner says something harsh</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div style="background: var(--light-bg); padding: 12px; border-radius: 6px;">
+                                <div style="color: var(--gold); font-size: 11px; font-weight: 600; margin-bottom: 5px;">Low Level</div>
+                                <div style="font-size: 14px;">「你每次都這樣。」</div>
+                                <div style="font-size: 12px; margin-top: 5px; color: #999;">Personality judgment. No space for dialogue.</div>
+                            </div>
+                            
+                            <div style="background: var(--light-bg); padding: 12px; border-radius: 6px;">
+                                <div style="color: var(--teal); font-size: 11px; font-weight: 600; margin-bottom: 5px;">High Level</div>
+                                <div style="font-size: 14px;">「剛才這句話讓我不舒服，我想確認你真正想表達的是什麼。」</div>
+                                <div style="font-size: 12px; margin-top: 5px; color: #999;">Data-based. Opening for clarification.</div>
+                            </div>
+                        </div>
+                        
+                        <button class="tts-btn" data-text="When you convert personality judgments into specific data points, relationships gain room to update. Instead of conclusion-based conflict, you get information-based dialogue.">🔊 Explain</button>
+                    </div>
+                </div>
+                
+                <div class="expandable" onclick="this.classList.toggle('expanded')">
+                    <h4>Cognition × Learning</h4>
+                    <div class="expandable-content">
+                        <div style="background: #f0ad4e; color: #333; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">Exam question you got wrong</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div style="background: var(--light-bg); padding: 12px; border-radius: 6px;">
+                                <div style="color: var(--gold); font-size: 11px; font-weight: 600; margin-bottom: 5px;">Low Level</div>
+                                <div style="font-size: 14px;">「粗心。」</div>
+                                <div style="font-size: 12px; margin-top: 5px; color: #999;">Nearly zero diagnostic value. Personality label.</div>
+                            </div>
+                            
+                            <div style="background: var(--light-bg); padding: 12px; border-radius: 6px;">
+                                <div style="color: var(--teal); font-size: 11px; font-weight: 600; margin-bottom: 5px;">High Level</div>
+                                <div style="font-size: 14px;">「Vocabulary gap? Syntax confusion? Misread stem? Concept missing? Time pressure? Wrong distractor recognition?」</div>
+                                <div style="font-size: 12px; margin-top: 5px; color: #999;">Each points to specific model update.</div>
+                            </div>
+                        </div>
+                        
+                        <button class="tts-btn" data-text="Real learning is not correcting the answer. Real learning is modifying the model that generated the error.">🔊 Core Principle</button>
+                    </div>
+                </div>
+                
+                <div class="expandable" onclick="this.classList.toggle('expanded')">
+                    <h4>Cognition × Health</h4>
+                    <div class="expandable-content">
+                        <div style="background: #f0ad4e; color: #333; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">You feel body discomfort</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div style="background: #d9534f; padding: 12px; border-radius: 6px; color: white;">
+                                <div style="font-size: 11px; font-weight: 600; margin-bottom: 8px;">❌ Two Extremes</div>
+                                <div style="margin-bottom: 8px;">「一定沒事」- Dismissal</div>
+                                <div>「我是不是得了很嚴重的病？」- Catastrophizing</div>
+                            </div>
+                            
+                            <div style="background: #5cb85c; padding: 12px; border-radius: 6px; color: white;">
+                                <div style="font-size: 11px; font-weight: 600; margin-bottom: 8px;">✅ Better Process</div>
+                                <div style="margin-bottom: 4px;">Timeline? Severity? Related factors? Red flags? Medical eval needed?</div>
+                                <div>Objective data. Reality-calibrated judgment.</div>
+                            </div>
+                        </div>
+                        
+                        <button class="tts-btn" data-text="Health cognition doesn't use stories to replace data, and doesn't use internet guesses to replace necessary medical evaluation.">🔊 Key Principle</button>
+                    </div>
+                </div>
+                
+                <div class="expandable" onclick="this.classList.toggle('expanded')">
+                    <h4>Cognition × AI</h4>
+                    <div class="expandable-content">
+                        <div style="background: #f0ad4e; color: #333; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <div style="font-weight: 600; margin-bottom: 8px;">The biggest AI risk in this era</div>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px; padding: 12px; background: var(--light-bg); border-radius: 6px;">
+                            <div style="color: var(--gold); font-size: 11px; font-weight: 600; margin-bottom: 5px;">RISK</div>
+                            <div style="font-size: 14px;">Not that AI is smarter than you.</div>
+                            <div style="font-size: 14px; margin-top: 5px; font-style: italic; color: #d9534f; font-weight: 600;">But that AI makes it too easy to get a complete-looking answer.</div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div style="background: var(--light-bg); padding: 12px; border-radius: 6px;">
+                                <div style="color: var(--gold); font-size: 11px; font-weight: 600; margin-bottom: 8px;">❌ Low Level</div>
+                                <div style="font-size: 13px;">Question → AI answer → Believe</div>
+                            </div>
+                            
+                            <div style="background: var(--light-bg); padding: 12px; border-radius: 6px;">
+                                <div style="color: var(--teal); font-size: 11px; font-weight: 600; margin-bottom: 8px;">✅ High Level</div>
+                                <div style="font-size: 13px;">Build your model → Compare models → Find conflicts → Verify sources → Update yours</div>
+                            </div>
+                        </div>
+                        
+                        <button class="tts-btn" data-text="AI's real value is not answer volume. AI's real value is accelerating your cognitive update speed.">🔊 Core Value</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('applicationsContainer').innerHTML = html;
+            attachTTSListeners();
+        }
+        
+        // TTS Function
+        function attachTTSListeners() {
+            document.querySelectorAll('.tts-btn').forEach(btn => {
+                btn.removeEventListener('click', handleTTS);
+                btn.addEventListener('click', handleTTS);
+            });
+        }
+        
+        function handleTTS(e) {
+            const text = this.dataset.text;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                utterance.onstart = () => this.classList.add('playing');
+                utterance.onend = () => this.classList.remove('playing');
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
+        // Initial render
+        renderProblems(allProblems);
+        renderSystems();
+        renderErrors();
+        renderLevers();
+        renderStages();
+        renderMechanism();
+        renderApplications();
+    </script>
+</body>
+</html>
